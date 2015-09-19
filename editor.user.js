@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.8
+// @version        1.5.2.10
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -97,8 +97,8 @@
             "inline": "_xCodexInlinexPlacexHolderx_"
         };
         App.globals.checks = {
-            "block": /((    )+.*)|(\<\!\-\- .* \-\-\>)/gm,
-            "inline": /(`.*`)|(http[s]*:[\S/]*(\s|$))/gmi
+            "block": /((    )+.*)|(\<\!\-\- .* \-\-\>)/gm,  // block code or HTML comments
+            "inline": /(`.*`)|(http[s]*:[\S/]*(\s|$))/gmi   // inline code or URLs
         };
 
         // Assign modules here
