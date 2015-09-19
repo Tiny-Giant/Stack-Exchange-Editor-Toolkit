@@ -9,7 +9,8 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.9
+// @version        1.5.2.8
+// @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -54,11 +55,8 @@
 // @exclude        *://stackapps.com/questions/tagged/*
 // ==/UserScript==
 
-var sheet = document.createElement('style');
-sheet.textContent = 'td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }';
-document.body.appendChild(sheet);
-
-var main = function() {
+(function(){
+    "use strict";
     function EditorToolkit(targetID) {
         if (!(this instanceof EditorToolkit)) return false;
 
@@ -99,8 +97,8 @@ var main = function() {
             "inline": "_xCodexInlinexPlacexHolderx_"
         };
         App.globals.checks = {
-            "block": /(    )+.*/gm,
-            "inline": /`.*`/gm
+            "block": /((    )+.*)|(\<\!\-\- .* \-\-\>)/gm,
+            "inline": /(`.*`)|(http[s]*:[\S/]*(\s|$))/gmi
         };
 
         // Assign modules here
@@ -198,7 +196,7 @@ var main = function() {
                 reason: "'AngularJS is the proper capitalization"
             },
             thanks: {
-                expr: /(this\s*(is)?\s*)?(thanks|pl(?:ease|z|s)\s+h[ea]lp|cheers|(kind(est)?\ +?)?regards|thx|thank\s+you|my\s+first\s+question|kindly\shelp)/gmi,
+                expr: /(this\s*(is)?\s*)?(thanx(.?(\s|$))?|thanks|pl(?:ease|z|s)\s+(h[ea]lp|cheers|(kind(est)?\ +?)?regards|thx|thank\s+you|my\s+first\s+question|kindly\shelp)?)/gmi,
                 replacement: "",
                 reason: "'$3' is unnecessary noise"
             },
@@ -370,18 +368,18 @@ var main = function() {
                 reason: "in English, the personal pronoun is 'I'"
             },
             im: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)(im|iam)\b(\S|)(?!\S)/gmi,
+                expr: /(^|[.,'"*\-(]|\s)(i[']*m)\b(\S|)(?!\S)/gmi,
                 replacement: "$1I'm$3",
                 reason: "in English, the personal pronoun is 'I'"
             },
             ive: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)ive\b(\S|)(?!\S)/gmi,
+                expr: /(^|[.,'"*\-(]|\s)i'*ve\b(\S|)(?!\S)/gmi,
                 replacement: "$1I've$2",
                 reason: "in English, the personal pronoun is 'I'"
             },
             ur: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)ur\b(\S|)(?!\S)/gmi,
-                replacement: "$1you are$2",
+                expr: /(^|[.,'"*\-(]|\s)ur\b(\S|)(?!\S)/gmi,
+                replacement: "$1your$2", // May also be "you are", but less common on SO
                 reason: "de-text"
             },
             u: {
@@ -420,7 +418,7 @@ var main = function() {
             multiplespaces: {
                 expr: /(\S)  +(\S)/gm,
                 replacement: "$1 $2",
-                reason: "One space at a time"
+                reason: "punctuation & spacing"
             },
             spacesbeforepunctuation: {
                 //expr: / +([.,:;?!])/g,
@@ -456,11 +454,10 @@ var main = function() {
                 var tmpinput = input;
                 input = input.replace(expression, replacement);
                 if(input !== tmpinput) {
-                    console.log(matches);
                     while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]]);
                     return {
                         reason: reasoning,
-                        fixed: input
+                        fixed: String(input).trim()
                     };
                 } else return false;
             };
@@ -506,7 +503,7 @@ var main = function() {
 
             // Wait for relevant dynamic content to finish loading
             App.funcs.dynamicDelay = function(callback) {
-                setTimeout(callback, 500);
+                setTimeout(callback, 1000);
             };
 
             // Populate or refresh DOM selections
@@ -515,6 +512,7 @@ var main = function() {
                 var scope = $('div[data-questionid="' + targetID + '"]');
                 if (!scope.length) scope = $('div[data-answerid="' + targetID + '"]');
                 if (!scope.length) scope = '';
+                if ($('.ToolkitButtonWrapper', scope).length) return false;
                 App.selections.buttonBar = $('[id^="wmd-button-bar"]', scope);
                 App.selections.buttonBar.unbind();
                 App.selections.redoButton = $('[id^="wmd-redo-button"]', scope);
@@ -590,11 +588,11 @@ var main = function() {
                     'line-height': '19px'
                 });
             };
-            
+
             App.funcs.makeDiffTable = function() {
                 App.selections.diffTable = $('<table class="diffTable"/>');
                 App.selections.editor.append(App.selections.diffTable);
-            }
+            };
 
             App.funcs.fixEvent = function(e) {
                 if(e) e.preventDefault();
@@ -602,22 +600,22 @@ var main = function() {
                 App.funcs.popItems();
                 // Pipe data through editing modules
                 App.pipe(App.items, App.globals.pipeMods, App.globals.order);
-            }
+            };
 
             App.funcs.diff = function() { 
                 App.selections.diffTable.empty();
-                
+
                 function maakRij(x, y, type, rij){
-                    
+
                     var tr = $('<tr/>');
-                    
+
                     if(type==='+') tr.addClass('add');
                     if(type==='-') tr.addClass('del');
 
                     tr.append($('<td class="codekolom">' + y + '</td>'));
                     tr.append($('<td class="codekolom">' + x + '</td>'));
                     tr.append($('<td class="bredecode">' + type + ' ' + rij.replace(/\</g,'&lt;') + '</td>'));
-                    
+
                     App.selections.diffTable.append(tr);
                 }
 
@@ -643,17 +641,17 @@ var main = function() {
                 a2 = App.items.body.split('\n');
 
                 var matrix = new Array(a1.length+1);
-
-                for(var y=0; y<matrix.length; y++){
+                var x, y;
+                for(y=0; y<matrix.length; y++){
                     matrix[y] = new Array(a2.length+1);
 
-                    for(var x=0; x<matrix[y].length; x++){
+                    for(x=0; x<matrix[y].length; x++){
                         matrix[y][x] = 0;
                     }
                 }
 
-                for(var y=1; y<matrix.length; y++){
-                    for(var x=1; x<matrix[y].length; x++){
+                for(y=1; y<matrix.length; y++){
+                    for(x=1; x<matrix[y].length; x++){
                         if(a1[y-1]===a2[x-1]){
                             matrix[y][x] = 1 + matrix[y-1][x-1];
                         } else {
@@ -704,6 +702,10 @@ var main = function() {
                 App.funcs.popOriginals();
                 App.funcs.applyListeners();
                 App.funcs.makeDiffTable();
+                var s = App.selections;
+                console.log('Post ID: ' + App.globals.targetID);
+                for(var i in s) console.log(i + ' : ' + s[i].length);
+                console.log('');
             });
         };
 
@@ -788,27 +790,29 @@ var main = function() {
 
         App.init();
     }
-    $(window).load(function(){
+    try {
         var Apps = [];
-
-        // It will be this if you are in the queue
-        var targetID = $('.post-id').text();
-
+        var addApp = function(targetID) {
+            if (!targetID) console.log('[!!] No targetID');
+            else Apps[targetID] = new EditorToolkit(targetID);
+        }
         var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
-        var clickables = $(selector);
-        if (clickables.length) {
-            // ^^^ Inline editing.
-            clickables.click(function(e) {
-                if (e.target.href) targetID = e.target.href.match(/\d/g).join("");
-                Apps[targetID] = new EditorToolkit(targetID);
-            });
-            // vvv On the edit page.
-        } else Apps[$('#post-id').val()] = new EditorToolkit($('#post-id').val());
-    });
-}
-
-// Inject the main script
-var script = document.createElement('script');
-script.type = "text/javascript";
-script.textContent = '(' + main.toString() + ')();';
-document.body.appendChild(script);
+        var targetID;
+        var jqcheck = setInterval(function(){
+            if(typeof($) !== "undefined") {
+                clearInterval(jqcheck);
+                $(document).on('click', selector, function(e) {
+                    addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
+                });
+                $(window).load(function(){
+                    $('body').append($('<style>td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>'));
+                    targetID = $('#post-id').val();
+                    if (targetID && !Apps.length) addApp(targetID);
+                    else targetID = $('.post-id').text();
+                });
+            }
+        },100);
+    } catch (e) {
+        console.log()
+    }
+})();
