@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.8
+// @version        1.5.2.9
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -200,7 +200,7 @@ var main = function() {
             thanks: {
                 expr: /(this\s*(is)?\s*)?(thanks|pl(?:ease|z|s)\s+h[ea]lp|cheers|(kind(est)?\ +?)?regards|thx|thank\s+you|my\s+first\s+question|kindly\shelp)/gmi,
                 replacement: "",
-                reason: "'$1' is unnecessary noise"
+                reason: "'$3' is unnecessary noise"
             },
             commas: {
                 expr: /,([^\s])/g,
@@ -452,11 +452,12 @@ var main = function() {
                 // If there is nothing to search, exit
                 if (!input) return false;
                 // Scan the post text using the expression to see if there are any matches
-                var matches = input.match(expression);
+                var matches = expression.exec(input), match;
                 var tmpinput = input;
                 input = input.replace(expression, replacement);
                 if(input !== tmpinput) {
-                    while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]-1]);
+                    console.log(matches);
+                    while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]]);
                     return {
                         reason: reasoning,
                         fixed: input
@@ -787,21 +788,23 @@ var main = function() {
 
         App.init();
     }
-    var Apps = [];
+    $(window).load(function(){
+        var Apps = [];
 
-    // It will be this if you are in the queue
-    var targetID = $('.post-id').text();
+        // It will be this if you are in the queue
+        var targetID = $('.post-id').text();
 
-    var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
-    var clickables = $(selector);
-    if (clickables.length) {
-        // ^^^ Inline editing.
-        clickables.click(function(e) {
-            if (e.target.href) targetID = e.target.href.match(/\d/g).join("");
-            Apps[targetID] = new EditorToolkit(targetID);
-        });
-        // vvv On the edit page.
-    } else Apps[$('#post-id').val()] = new EditorToolkit($('#post-id').val());
+        var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
+        var clickables = $(selector);
+        if (clickables.length) {
+            // ^^^ Inline editing.
+            clickables.click(function(e) {
+                if (e.target.href) targetID = e.target.href.match(/\d/g).join("");
+                Apps[targetID] = new EditorToolkit(targetID);
+            });
+            // vvv On the edit page.
+        } else Apps[$('#post-id').val()] = new EditorToolkit($('#post-id').val());
+    });
 }
 
 // Inject the main script
