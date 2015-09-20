@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.10
+// @version        1.5.2.11
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -97,350 +97,290 @@
             "inline": "_xCodexInlinexPlacexHolderx_"
         };
         App.globals.checks = {
-            "block": /((    )+.*)|(\<\!\-\- .* \-\-\>)/gm,  // block code or HTML comments
-            "inline": /(`.*`)|(http[s]*:[\S/]*(\s|$))/gmi   // inline code or URLs
+            "block": /(    |\s+\t|\t)+.*/g,  // block code or HTML comments
+            "inline": /(`.*`)|(".*")|('.*')|(http[s]*:[\S/]*(\s|$))/gi   // inline code, quoted text or URLs
         };
 
         // Assign modules here
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "edit", "replace"];
+        App.globals.order = ["omit", "casing", "edit", "replace"];
 
 
         // Define edit rules
         App.edits = {
-            yell: {
-                expr: /^((?=.*[A-Z])[^a-z]*)$/g,
-                replacement: "$1",
-                reason: "no need to yell"
-            },
-            tags: {
-                expr: /\</gm,
-                replacement: "&lt;",
-                reason: "formatting"
-            },
-            folks: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)folks?\b(\S|)(?!\S)/gmi,
-                replacement: "$1$2",
-                reason: "formatting"
-            },
             so: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Ss]tack\s*overflow|StackOverflow(.|$)/gm,
-                replacement: "$1Stack Overflow$2",
+                expr: /\bstack\s*overflow\b/igm,
+                replacement: "Stack Overflow",
                 reason: "'Stack Overflow' is the legal name"
             },
             se: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Ss]tack\s*exchange|StackExchange(.|$)/gm,
-                replacement: "$1Stack Exchange$2",
+                expr: /\bstack\s*exchange\b/igm,
+                replacement: "Stack Exchange",
                 reason: "'Stack Exchange' is the legal name"
             },
             expansionSO: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)SO(\s|,|\.|!|\?|;|\/|\)|$)/gm,
-                replacement: "$1Stack Overflow$2",
-                reason: "'SO' expansion"
+                expr: /\bSO\b/gm,
+                replacement: "Stack Overflow",
+                reason: "'Stack Overflow' is the legal name"
             },
             expansionSE: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)SE(\s|,|\.|!|\?|;|\/|\)|$)/gm,
-                replacement: "$1Stack Exchange$2",
-                reason: "'SE' expansion"
+                expr: /\bSE\b/gm,
+                replacement: "Stack Exchange",
+                reason: "'Stack Exchange' is the legal name"
             },
             javascript: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Jj]ava\s+?script(.|$)/gm,
-                replacement: "$1JavaScript$2",
+                expr: /\b(javascript|js)\b/igm,
+                replacement: "JavaScript",
                 reason: "'JavaScript' is the proper capitalization"
             },
-            periods: {
-                expr: /\.\.+/gm,
-                replacement: ".",
-                reason: "punctuation & spacing"
-            },
             jsfiddle: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Jj][Ss]\s*[Ff]iddle(.|$)/gm,
-                replacement: "$1JSFiddle$2",
-                reason: "'JSFiddle' is the currently accepted capitalization"
-            },
-            caps: {
-                expr: /^(?!https?)([a-z])/gm,
-                replacement: "$1",
-                reason: "copy edited"
+                expr: /\bjsfiddle\b/igm,
+                replacement: "JSFiddle",
+                reason: "'JSFiddle' is the proper capitalization"
             },
             jquery: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Jj][Qq]uery(.|$)/gm,
-                replacement: "$1jQuery$2",
+                expr: /\bjquery\b/igm,
+                replacement: "jQuery",
                 reason: "'jQuery' is the proper capitalization"
             },
-            html: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Hh]tml([5]?)\b(\S|)(?!\S)/gm,
-                replacement: "$1HTML$2$3",
-                reason: "HTML stands for HyperText Markup Language"
-            },
-            css: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Cc]ss\b(\S|)(?!\S)/gm,
-                replacement: "$1CSS$2",
-                reason: "CSS stands for Cascading Style Sheets"
-            },
-            json: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Jj]son\b(\S|)(?!\S)/gm,
-                replacement: "$1JSON$2",
-                reason: "JSON stands for JavaScript Object Notation"
-            },
-            ajax: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Aa]jax\b(\S|)(?!\S)/gm,
-                replacement: "$1AJAX$2",
-                reason: "AJAX stands for Asynchronous JavaScript and XML"
-            },
             angular: {
-                expr: /[Aa]ngular[Jj][Ss]/g,
+                expr: /\bangular(js)?\b/gim,
                 replacement: "AngularJS",
                 reason: "'AngularJS is the proper capitalization"
             },
-            thanks: {
-                expr: /(this\s*(is)?\s*)?(thanx(.?(\s|$))?|thanks|pl(?:ease|z|s)\s+(h[ea]lp|cheers|(kind(est)?\ +?)?regards|thx|thank\s+you|my\s+first\s+question|kindly\shelp)?)/gmi,
-                replacement: "",
-                reason: "'$3' is unnecessary noise"
+            html: {
+                expr: /\bhtml(\d)?\b/gm,
+                replacement: "HTML$1",
+                reason: "HTML stands for HyperText Markup Language"
             },
-            commas: {
-                expr: /,([^\s])/g,
-                replacement: ", $1",
-                reason: "punctuation & spacing"
+            css: {
+                expr: /\bcss\b/gm,
+                replacement: "CSS",
+                reason: "CSS stands for Cascading Style Sheets"
+            },
+            json: {
+                expr: /\bjson\b/igm,
+                replacement: "JSON",
+                reason: "JSON stands for JavaScript Object Notation"
+            },
+            ajax: {
+                expr: /\bajax\b/igm,
+                replacement: "AJAX",
+                reason: "AJAX stands for Asynchronous JavaScript and XML"
             },
             php: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Pp]hp\b(\S|)(?!\S)/gm,
-                replacement: "$1PHP$2",
+                expr: /\bphp\b/gm,
+                replacement: "PHP",
                 reason: "PHP stands for PHP: Hypertext Preprocessor"
             },
-            hello: {
-                expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
-                replacement: "",
-                reason: "greetings like '$1' are unnecessary noise"
-            },
-            edit: {
-                expr: /(?:^\**)(edit|update):?(?:\**):?/gmi,
-                replacement: "",
-                reason: "Stack Exchange has an advanced revision history system: 'Edit' or 'Update' is unnecessary"
-            },
             voting: {
-                expr: /([Dd]own|[Uu]p)[\s*\-]vot/g,
+                expr: /\b(down|up)\Wvot/gmi,
                 replacement: "$1vote",
                 reason: "the proper spelling (despite the tag name) is '$1vote' (one word)"
             },
-            mysite: {
-                expr: /mysite\./g,
-                replacement: "example.",
-                reason: "links to mysite.domain are not allowed: use example.domain instead"
-            },
             c: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)c(#|\++|\s|$)/gm,
-                replacement: "$1C$2",
-                reason: "C$2 is the proper capitalization"
+                expr: /\bc([^\w].*?)/igm,
+                replacement: "C$1",
+                reason: "C$1 is the proper reference"
             },
             java: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)java\b(\S|)(?!\S)/gmi,
-                replacement: "$1Java$2",
-                reason: "Java should be capitalized"
+                expr: /\bjava\b/gmi,
+                replacement: "Java",
+                reason: "Java is the proper reference"
             },
             sql: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Ss]ql\b(\S|)(?!\S)/gm,
-                replacement: "$1SQL$2",
-                reason: "SQL is the proper capitalization"
+                expr: /\bsql\b/gm,
+                replacement: "SQL",
+                reason: "SQL is the proper reference"
             },
             sqlite: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Ss]qlite([0-9]*)\b(\S|)(?!\S)/gm,
-                replacement: "$1SQLite$2$3",
-                reason: "SQLite is the proper capitalization"
+                expr: /\bsqlite\s*([0-9]*)\b/gm,
+                replacement: "SQLite $2",
+                reason: "SQLite is the proper reference"
             },
             android: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)android\b(\S|)(?!\S)/gmi,
-                replacement: "$1Android$2",
-                reason: "Android should be capitalized"
+                expr: /\bandroid\b/gmi,
+                replacement: "Android",
+                reason: "Android is the proper reference"
             },
             oracle: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)oracle\b(\S|)(?!\S)/gmi,
-                replacement: "$1Oracle$2",
-                reason: "Oracle should be capitalized"
+                expr: /\boracle\b/gmi,
+                replacement: "Oracle",
+                reason: "Oracle is the proper reference"
             },
             windows: {
-                expr: /(win|windows(?:\ ?)(\s[0-9]+))\b(\S|)(?!\S)/igm,
-                replacement: "Windows$2$3",
-                reason: "Windows should be capitalized"
+                expr: /\b(win|windows)\s*([0-9]+)\b/igm,
+                replacement: "Windows $2",
+                reason: "Windows $2 is the proper reference"
             },
             windowsXP: {
-                expr: /(win|windows(?:\ ?)(\sxp))\b(\S|)(?!\S)/igm,
-                replacement: "Windows XP$3",
-                reason: "Windows XP should be capitalized"
+                expr: /\b(win|windows)\s*(xp)\b/igm,
+                replacement: "Windows XP",
+                reason: "Windows XP is the proper reference"
             },
             windowsVista: {
-                expr: /(win|windows(?:\ ?)(\svista))\b(\S|)(?!\S)/igm,
-                replacement: "Windows Vista$3",
-                reason: "Windows Vista should be capitalized"
-            },
-            ubuntu: {
-                expr: /(ubunto|ubunut|ubunutu|ubunu|ubntu|ubutnu|ubanto[o]+|unbuntu|ubunt|ubutu)\b(\S|)(?!\S)/igm,
-                replacement: "Ubuntu$2",
-                reason: "corrected Ubuntu spelling"
+                expr: /\b(win|windows)\s*(vista)\b/igm,
+                replacement: "Windows Vista",
+                reason: "Windows Vista is the proper reference"
             },
             linux: {
-                expr: /(linux)\b(\S|)(?!\S)/igm,
+                expr: /\blinux\b/igm,
                 replacement: "Linux$2",
-                reason: "Linux should be capitalized"
-            },
-            apostrophes: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)(can|doesn|don|won|hasn|isn|didn)t(\s|\*|\-,|\.|!|\?|;|\/|\'|\)|$)/gmi,
-                replacement: "$1$2't$3",
-                reason: "English contractions use apostrophes"
-            },
-            ios: {
-                expr: /\b(?:ios|iOs|ioS|IOS|Ios|IoS|ioS)\b(\S|)(?!\S)/gm,
-                replacement: "iOS$1",
-                reason: "the proper usage is 'iOS'"
-            },
-            iosnum: {
-                expr: /\b(?:ios|iOs|ioS|IOS|Ios|IoS|ioS)([0-9]?)\b(\S|)(?!\S)/gm,
-                replacement: "iOS $1$2",
-                reason: "the proper usage is 'iOS' followed by a space and the version number"
+                reason: "Linux is the proper reference"
             },
             wordpress: {
-                expr: /[Ww]ordpress/ig,
+                expr: /\bwordpress\b/igm,
                 replacement: "WordPress",
-                reason: "'WordPress' is the proper capitalization"
+                reason: "WordPress is the proper reference"
             },
             google: {
-                expr: /(google)\b(\S|)(?!\S)/igm,
-                replacement: "Google$2",
-                reason: "Google is the proper capitalization"
+                expr: /\bgoogle\b/igm,
+                replacement: "Google",
+                reason: "Google is the proper reference"
             },
             mysql: {
-                expr: /(mysql)\b(\S|)(?!\S)/igm,
-                replacement: "MySQL$2",
-                reason: "MySQL is the proper capitalization"
+                expr: /\bmysql\b/igm,
+                replacement: "MySQL",
+                reason: "MySQL is the proper reference"
             },
             apache: {
-                expr: /(apache)\b(\S|)(?!\S)/igm,
-                replacement: "Apache$2",
-                reason: "Apache is the proper capitalization"
+                expr: /\bapache\b/igm,
+                replacement: "Apache",
+                reason: "Apache is the proper reference"
             },
             git: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)(git|GIT)\b(\S|)(?!\S)/igm,
-                replacement: "$1Git$3",
-                reason: "Git is the proper capitalization"
-            },
-            harddisk: {
-                expr: /(hdd|harddisk)\b(\S|)(?!\S)/igm,
-                replacement: "hard disk$2",
-                reason: "Hard disk is the proper capitalization"
+                expr: /\bgit\b/igm,
+                replacement: "Git",
+                reason: "Git is the proper reference"
             },
             github: {
-                expr: /\b([gG]ithub|GITHUB)\b(\S|)(?!\S)/igm,
-                replacement: "GitHub$2",
-                reason: "GitHub is the proper capitalization"
+                expr: /\bgithub\b/igm,
+                replacement: "GitHub",
+                reason: "GitHub is the proper reference"
             },
             facebook: {
-                expr: /\b([fF]acebook|FACEBOOK)\b(\S|)(?!\S)/igm,
-                replacement: "Facebook$2",
-                reason: "Facebook is the proper capitalization"
+                expr: /\bfacebook\b/igm,
+                replacement: "Facebook",
+                reason: "Facebook is the proper reference"
             },
             python: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)[Pp]ython\b(\S|)(?!\S)/igm,
-                replacement: "$1Python$2",
-                reason: "'Python' is the proper capitalization"
+                expr: /\bpython\b/igm,
+                replacement: "Python",
+                reason: "Python is the proper reference"
             },
-            url_uri: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)(ur[li])\b(\S|)(?!\S)/igm,
-                replacement: function(match, p1, p2, p3) {
-                    return p1 + p2.toUpperCase() + p3;
-                },
-                reason: "URL or URI is the proper capitalization"
+            urli: {
+                expr: /\bur([li])\b/igm,
+                replacement: "UR$1",
+                reason: "UR$1 is the proper reference"
             },
-            js: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)js\b(\S|)(?!\S)/gmi,
-                replacement: "$1JavaScript$2",
-                reason: "JS expansion"
+            ios: {
+                expr: /\bios\b/igm,
+                replacement: "iOS",
+                reason: "iOS is the proper reference"
+            },
+            iosnum: {
+                expr: /\bios([0-9])\b/igm,
+                replacement: "iOS $1",
+                reason: "the proper usage is 'iOS' followed by a space and the version number"
+            },
+            ubunto: {
+                expr: /\b[uoa]*b[uoa]*[tn][oua]*[tnu][oua]*\b/igm,
+                replacement: "Ubuntu",
+                reason: "Ubuntu is the proper reference"
+            },
+            regex: {
+                expr: /\bregex(p)?/gmi,
+                replacement: "RegEx$1",
+                reason: "RegEx$1 is the proper reference"
+            },
+            thanks: {
+                expr: /\b((thanks?|tanks?|tanx|pl(?:ease|z|s))|h[ea]?lp)+(?:.+?(fix(?:\sthis)|h[ae]?lp|folks?|cheers|kind(?:est|ly)|regards|(?!my)\s*first\s*question|advan(?:ce|tage)))\b\W*/gmi,
+                replacement: "",
+                reason: "'$1' is unnecessary noise"
+            },
+            hello: {
+                expr: /\b(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\W*)/gmi,
+                replacement: "",
+                reason: "'$1' is unnecessary noise"
+            },
+            edit: {
+                expr: /(?:[^\.\W]*)(edit|update)(?:\W*)/gmi,
+                replacement: "",
+                reason: "'$1' is unnecessary noise, Stack Exchange has an advanced revision history system"
+            },
+            apostrophes: {
+                expr: /\b(can|doesn|don|won|hasn|isn|didn)t\b/gmi,
+                replacement: "$1't",
+                reason: "grammar and spelling"
             },
             prolly: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)proll?y\b(\S|)(?!\S)/gmi,
-                replacement: "$1probably$2",
-                reason: "probably"
+                expr: /\bproll?y\b/gmi,
+                replacement: "probably",
+                reason: "grammar and spelling"
             },
             i: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)i(\s|$)/gm,
-                replacement: "$1I$2",
-                reason: "in English, the personal pronoun is 'I'"
+                expr: /\bi\b/igm,
+                replacement: "I",
+                reason: "grammar and spelling"
             },
             im: {
-                expr: /(^|[.,'"*\-(]|\s)(i[']*m)\b(\S|)(?!\S)/gmi,
-                replacement: "$1I'm$3",
-                reason: "in English, the personal pronoun is 'I'"
+                expr: /\bi[^\s]\W*m\b/gmi,
+                replacement: "I'm",
+                reason: "grammar and spelling"
             },
             ive: {
-                expr: /(^|[.,'"*\-(]|\s)i'*ve\b(\S|)(?!\S)/gmi,
-                replacement: "$1I've$2",
-                reason: "in English, the personal pronoun is 'I'"
+                expr: /\bi\W*ve\b/gmi,
+                replacement: "I've",
+                reason: "grammar and spelling"
             },
             ur: {
-                expr: /(^|[.,'"*\-(]|\s)ur\b(\S|)(?!\S)/gmi,
-                replacement: "$1your$2", // May also be "you are", but less common on SO
-                reason: "de-text"
+                expr: /\bur\b/gmi,
+                replacement: "your", // May also be "you are", but less common on SO
+                reason: "grammar and spelling"
             },
             u: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)u\b(\S|)(?!\S)/gm,
-                replacement: "$1you$2",
-                reason: "de-text"
+                expr: /\bu\b/igm,
+                replacement: "you",
+                reason: "grammar and spelling"
+            },
+            gr8: {
+                expr: /\bgr8\b/igm,
+                replacement: "great",
+                reason: "grammar and spelling"
             },
             allways: {
-                expr: /(\.|\,|\'|\"|\*|\-|\(|\s|^)(a)llways\b(\S|)(?!\S)/gmi,
-                replacement: "$1$2lways$3",
-                reason: "spelling"
+                expr: /\b(a)llways\b/gmi,
+                replacement: "$1lways",
+                reason: "grammar and spelling"
             },
             appreciated: {
-                expr: /(?:[\s-,']\w*)*(help|suggestion|advice).*(?:appreciated)\b(\S|)(?!\S)/gmi,
-                replacement: "$2",
+                expr: /\b(help|suggestion|advice).*(?:appr\w*)\b/gmi,
+                replacement: "",
                 reason: "$1 requests are unnecessary noise"
             },
             hopeMaybeHelps: {
-                expr: /(?:[\s-,']\w*)*(maybe|hope)+(?:[\s-,']\w*)*\s(help[s]*)(?:[\s-,']\w*)*[\.!?]/gmi,
+                expr: /\b(maybe|hope)+(?:[\s-,']\w*)*\s(help[s]*)(?:[\s-,']\w*)*[\.!?]/gmi,
                 replacement: "",
                 reason: "$1...$2 is unnecessary noise"
             },
-            regex: {
-                expr: /regex(p)?/gmi,
-                replacement: function(match, p) {
-                    return "RegEx" + ((p === undefined) ? "" : p).toLowerCase();
-                },
-                reason: "RegEx or RegExp are the correct capitalizations"
-            },
+            // Punctuation & Spacing come last
             multiplesymbols: {
-                expr: /\?\?+/gm,
-                replacement: "?",
-                reason: "One question mark for one question"
+                expr: /\s*(\W)\1{1,}\B/igm,
+                replacement: "$1",
+                reason: "punctuation & spacing"
             },
-            // Whitespace compression comes last
             multiplespaces: {
-                expr: /(\S)  +(\S)/gm,
+                expr: /(\S)  +(\S)/g,
                 replacement: "$1 $2",
                 reason: "punctuation & spacing"
             },
-            spacesbeforepunctuation: {
-                //expr: / +([.,:;?!])/g,
-                expr: / +([.,:;?!])[^\w]/g,
-                replacement: "$1 ",
-                reason: "punctuation & spacing"
-            },
-            spacesafterpunctuation: {
-                expr: /([.,:;?!])  +/g,
-                replacement: "$1 ",
-                reason: "punctuation & spacing"
-            },
             blanklines: {
-                expr: /(?:\s*[\r\n]){3,}/gm,
+                expr: /(?:\s*[\r\n]){3,}|(\s*[\r\n]){1}/gm,
                 replacement: "\n\n",
                 reason: "punctuation & spacing"
             },
-            endblanklines: {
-                expr: /[\s\r\n]+$/g,
-                replacement: "",
-                reason: "punctuation & spacing"
-            }
         };
 
         // Populate funcs
@@ -450,11 +390,11 @@
                 // If there is nothing to search, exit
                 if (!input) return false;
                 // Scan the post text using the expression to see if there are any matches
-                var matches = expression.exec(input), match;
+                var matches = expression.exec(input);
                 var tmpinput = input;
                 input = input.replace(expression, replacement);
                 if(input !== tmpinput) {
-                    while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]]);
+                    while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]] ? matches[match[1]] : '');
                     return {
                         reason: reasoning,
                         fixed: String(input).trim()
@@ -721,6 +661,31 @@
             return data;
         };
 
+        App.globals.pipeMods.casing = function(data) {
+            for(var i in data) {
+                var input = data[i];
+                // No need to yell
+                if(/^((?=.*[A-Z])[^a-z]*)$/g.exec(input)) {
+                    input = input.trim().substr(0,1).toUpperCase() + input.trim().substr(1).toLowerCase();
+                    App.globals.reasons.push('no need to yell');
+                } else {
+                    // Sentence casing
+                    var lines = input.split(/\./gm), line;
+                    for(var i in lines) {
+                        line = lines[i];
+                        line = line.trim().substr(0,1).toUpperCase() + line.trim().substr(1).toLowerCase();
+                        if (lines[i] !== line) {
+                            lines[i] = line.trim();
+                            App.globals.reasons.push('punctuation & spacing');
+                        }
+                    }
+                    input = lines.join('. ');
+                }
+                data[i] = input;
+            }
+            return data;
+        }
+        
         App.globals.pipeMods.edit = function(data) {
             // Visually confirm edit - SE makes it easy because the jQuery color animation plugin seems to be there by default
             App.selections.body.animate({
@@ -805,7 +770,7 @@
                     addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
                 });
                 $(window).load(function(){
-                    $('body').append($('<style>td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>'));
+                    $('body').append($('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>'));
                     targetID = $('#post-id').val();
                     if (targetID && !Apps.length) addApp(targetID);
                     else targetID = $('.post-id').text();
