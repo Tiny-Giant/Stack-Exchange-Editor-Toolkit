@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.12
+// @version        1.5.2.13
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -106,16 +106,20 @@
             "block": "_xCodexBlockxPlacexHolderx_",
             "inline": "_xCodexInlinexPlacexHolderx_"
         };
+        App.globals.placeHolderChecks = {
+            "block": /_xCodexBlockxPlacexHolderx_/g,
+            "inline": /_xCodexInlinexPlacexHolderx_/g
+        };
         App.globals.checks = {
-            "block": /(    |\s+\t|\t)+.*/g,  // block code or HTML comments
-            "inline": /(`.*`)|(".*")|('.*')|(http[s]*:[\S/]*(\s|$))/gi   // inline code, quoted text or URLs
+            "block": /((?:[ ]{4}|[ ]{0,3}\t)+.+(?:\r?\n))+|(  (?:\[\d\]): \w*:+\/\/.*\n)+/g,  // block code or markdown link section
+            "inline": /(`.+`)|(\[.+\]\(.+\))|(\w*:*\/\/[^()\n"'>]*)/g   // inline code, quoted text or URLs
         };
 
         // Assign modules here
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "casing", "edit", "replace"];
+        App.globals.order = ["omit", "edit", "replace"];
 
 
         // Define edit rules
@@ -306,7 +310,7 @@
                 reason: "RegEx$1 is the proper reference"
             },
             thanks: {
-                expr: /\b((thanks?|tanks?|tanx|pl(?:ease|z|s))|h[ea]?lp)+(?:.+?(fix(?:\sthis)|h[ae]?lp|folks?|cheers|kind(?:est|ly)|regards|(?!my)\s*first\s*question|advan(?:ce|tage)))\b\W*/gmi,
+                expr: /[^.!?]*(th?anks?|th(?:an)x|tanx|h[ae]?lp|pl(?:ease|z|s)|folks?|hello|cheers?|kind(‌?:est|ly)|regards|first\s*question).+?[.!?]*/ig,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
@@ -387,10 +391,10 @@
                 reason: "punctuation & spacing"
             },
             blanklines: {
-                expr: /(?:\s*[\r\n]){3,}|(\s*[\r\n]){1}/gm,
+                expr: /(\s*[\r\n])+/gm,
                 replacement: "\n\n",
                 reason: "punctuation & spacing"
-            },
+            }
         };
 
         // Populate funcs
@@ -402,9 +406,20 @@
                 // Scan the post text using the expression to see if there are any matches
                 var matches = expression.exec(input);
                 var tmpinput = input;
-                input = input.replace(expression, replacement);
+                input = input.replace(expression, function() { 
+                    var matches = [].slice.call(arguments,0,-2); 
+                    reasoning = reasoning.replace(/[$](\d)+/g,function(){ 
+                        var phrases = [].slice.call(arguments,0,-2);
+                        var phrase = matches[phrases[1]]; 
+                        return phrase ? phrase : ''; 
+                    });
+                    return replacement.replace(/[$](\d)+/g,function(){ 
+                        var phrases = [].slice.call(arguments,0,-2);
+                        var phrase = matches[phrases[1]]; 
+                        return phrase ? phrase : ''; 
+                    }); 
+                });
                 if(input !== tmpinput) {
-                    while((match = /\$(\d)/g.exec(reasoning))) reasoning = reasoning.replace(match[0], matches[match[1]] ? matches[match[1]] : '');
                     return {
                         reason: reasoning,
                         fixed: String(input).trim()
@@ -414,20 +429,21 @@
 
             // Omit code
             App.funcs.omitCode = function(str, type) {
-                str = str.replace(App.globals.checks[type], function(match) {
-                    App.globals.replacedStrings[type].push(match);
-                    return App.globals.placeHolders[type];
+                return str.replace(App.globals.checks[type], function(match) {
+                    if(match) {
+                        App.globals.replacedStrings[type].push(match);
+                        return App.globals.placeHolders[type]; 
+                    } else return str;
                 });
-                return str;
             };
 
             // Replace code
             App.funcs.replaceCode = function(str, type) {
-                for (var i = 0; i < App.globals.replacedStrings[type].length; i++) {
-                    str = str.replace(App.globals.placeHolders[type],
-                                      App.globals.replacedStrings[type][i]);
-                }
-                return str;
+                var i = 0;
+                str = str.replace(App.globals.placeHolderChecks[type], function(match) {
+                    return App.globals.replacedStrings[type][i++];
+                });
+                return str.replace(/(\s*[\r\n]){3,}/g,'\n\n');
             };
 
             App.funcs.applyListeners = function() { // Removes default Stack Exchange listeners; see https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/43
@@ -473,6 +489,7 @@
                 App.selections.submitButton = $('[id^="submit-button"]', scope);
                 App.selections.helpButton = $('[id^="wmd-help-button"]', scope);
                 App.selections.editor = $('.post-editor', scope);
+                return !!App.selections.redoButton.length;
             };
 
             // Populate edit item sets from DOM selections
@@ -493,6 +510,8 @@
 
             // Insert editing button(s)
             App.funcs.createButton = function() {
+                if(!App.selections.redoButton.length) return false
+                
                 App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
                 App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
                 App.selections.buttonInfo = $('<div class="ToolkitInfo">');
@@ -649,14 +668,10 @@
         App.init = function() {
             App.popFuncs();
             App.funcs.dynamicDelay(function() {
-                App.funcs.popSelections();
+                if(!App.funcs.popSelections()) return false;
                 App.funcs.createButton();
                 App.funcs.applyListeners();
                 App.funcs.makeDiffTable();
-                var s = App.selections;
-                console.log('Post ID: ' + App.globals.targetID);
-                for(var i in s) console.log(i + ' : ' + s[i].length);
-                console.log('');
             });
         };
 
