@@ -111,8 +111,8 @@
             "inline": /_xCodexInlinexPlacexHolderx_/g
         };
         App.globals.checks = {
-            "block": /((?:[ ]{4}|[ ]{0,3}\t)+.+(?:\r?\n))+|(  (?:\[\d\]): \w*:+\/\/.*\n)+/g,  // block code or markdown link section
-            "inline": /(`.+`)|(\[.+\]\(.+\))|(\w*:+(?:\/\/|\\)[^()\n"'>]*)/g   // inline code, quoted text or URLs
+            "block": /((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+|(?:\<[^>]+)[^\n]*\>)+/g,  // block code, markdown link section, tags
+            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*/g   // inline code, quoted text or URLs
         };
 
         // Assign modules here
@@ -135,17 +135,17 @@
                 reason: "'Stack Exchange' is the legal name"
             },
             expansionSO: {
-                expr: /([^\b.])SO\b/g,
+                expr: /([^\b\w.]|^)SO\b/g,
                 replacement: "$1Stack Overflow",
                 reason: "'Stack Overflow' is the legal name"
             },
             expansionSE: {
-                expr: /([^\b.])SE\b/g,
+                expr: /([^\b\w.]|^)SE\b/g,
                 replacement: "$1Stack Exchange",
                 reason: "'Stack Exchange' is the legal name"
             },
             javascript: {
-                expr: /([^\b.])(javascript|js)\b/gi,
+                expr: /([^\b\w.]|^)(javascript|js)\b/gi,
                 replacement: "$1JavaScript",
                 reason: "'JavaScript' is the proper capitalization"
             },
@@ -165,12 +165,12 @@
                 reason: "'AngularJS is the proper capitalization"
             },
             html: {
-                expr: /([^\b.])html(\d)?\b/gi,
+                expr: /([^\b\w.]|^)html(\d)?\b/gi,
                 replacement: "$1HTML$2",
                 reason: "HTML stands for HyperText Markup Language"
             },
             css: {
-                expr: /([^\b.])css\b/gi,
+                expr: /([^\b\w.]|^)css\b/gi,
                 replacement: "$1CSS",
                 reason: "CSS stands for Cascading Style Sheets"
             },
@@ -185,7 +185,7 @@
                 reason: "AJAX stands for Asynchronous JavaScript and XML"
             },
             php: {
-                expr: /([^\b.])php\b/gi,
+                expr: /([^\b\w.]|^)php\b/gi,
                 replacement: "$1PHP",
                 reason: "PHP stands for PHP: Hypertext Preprocessor"
             },
@@ -195,7 +195,7 @@
                 reason: "the proper spelling (despite the tag name) is '$1vote' (one word)"
             },
             c: {
-                expr: /([^\b.])c([#+]+)|([^\b.])\bc\b/gi,
+                expr: /([^\b\w.]|^)c([#+]+)|([^\b.])\bc\b/gi,
                 replacement: "$1C$2",
                 reason: "C$1 is the proper reference"
             },
@@ -205,7 +205,7 @@
                 reason: "Java is the proper reference"
             },
             sql: {
-                expr: /([^\b.])sql\b/gi,
+                expr: /([^\b\w.]|^)sql\b/gi,
                 replacement: "$1SQL",
                 reason: "SQL is the proper reference"
             },
@@ -310,7 +310,7 @@
                 reason: "RegEx$1 is the proper reference"
             },
             thanks: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|edit|update|suggestion|advice|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)[^,.!\n]*[,.!\n]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|edit|update|suggestion|advice|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)\b[^,.!\n]*[,.!]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
@@ -362,6 +362,11 @@
             // Punctuation & Spacing come last
             multiplesymbols: {
                 expr: /([^\w\s*\-_])\1{1,}/g,
+                replacement: "$1",
+                reason: "punctuation & spacing"
+            },
+            spacesbeforesymbols: {
+                expr: /\s+([^\w\s*\-_])(?!\w)/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
