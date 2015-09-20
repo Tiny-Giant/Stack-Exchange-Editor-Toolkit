@@ -1,0 +1,26 @@
+.diff {
+    max-width: 100%;
+    overflow: auto;
+}
+td.bredecode, td.codekolom {
+    padding: 1px 2px;
+}
+td.bredecode {
+    width: 100%;
+    padding-left: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+td.codekolom {
+    text-align: right;
+    min-width: 3em;
+    background-color: #ECECEC;
+    border-right: 1px solid #DDD;
+    color: #AAA;
+}
+tr.add {
+    background: #DFD;
+}
+tr.del {
+    background: #FDD;
+}
