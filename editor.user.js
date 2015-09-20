@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.11
+// @version        1.5.2.12
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -47,12 +47,22 @@
 // @exclude        *://stackoverflow.com/questions/tagged/*
 // @exclude        *://meta.stackoverflow.com/questions/tagged/*
 // @exclude        *://serverfault.com/questions/tagged/*
-// @exclude        *://meta.serverfault.com/questions/*
+// @exclude        *://meta.serverfault.com/questions/tagged/*
 // @exclude        *://superuser.com/questions/tagged/*
 // @exclude        *://meta.superuser.com/questions/tagged/*
 // @exclude        *://askubuntu.com/questions/tagged/*
 // @exclude        *://meta.askubuntu.com/questions/tagged/*
 // @exclude        *://stackapps.com/questions/tagged/*
+// @exclude        *://*.stackexchange.com/questions/new/*
+// @exclude        *://stackoverflow.com/questions/new/*
+// @exclude        *://meta.stackoverflow.com/questions/new/*
+// @exclude        *://serverfault.com/questions/new/*
+// @exclude        *://meta.serverfault.com/questions/new/*
+// @exclude        *://superuser.com/questions/tagged/new/*
+// @exclude        *://meta.superuser.com/questions/tagged/new/*
+// @exclude        *://askubuntu.com/questions/tagged/new/*
+// @exclude        *://meta.askubuntu.com/questions/tagged/new/*
+// @exclude        *://stackapps.com/questions/tagged/new/*
 // ==/UserScript==
 
 (function(){
@@ -537,6 +547,7 @@
             App.funcs.fixEvent = function(e) {
                 if(e) e.preventDefault();
                 // Refresh item population
+                App.funcs.popOriginals();
                 App.funcs.popItems();
                 // Pipe data through editing modules
                 App.pipe(App.items, App.globals.pipeMods, App.globals.order);
@@ -548,7 +559,8 @@
                 function maakRij(x, y, type, rij){
 
                     var tr = $('<tr/>');
-
+                    
+                    if(type===' ') return false;
                     if(type==='+') tr.addClass('add');
                     if(type==='-') tr.addClass('del');
 
@@ -639,7 +651,6 @@
             App.funcs.dynamicDelay(function() {
                 App.funcs.popSelections();
                 App.funcs.createButton();
-                App.funcs.popOriginals();
                 App.funcs.applyListeners();
                 App.funcs.makeDiffTable();
                 var s = App.selections;
