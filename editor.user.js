@@ -119,7 +119,7 @@
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "edit", "replace"];
+        App.globals.order = ["omit", "casing", "edit", "replace"];
 
 
         // Define edit rules
@@ -310,12 +310,7 @@
                 reason: "RegEx$1 is the proper reference"
             },
             thanks: {
-                expr: /[^.!?]*(th?anks?|th(?:an)x|tanx|h[ae]?lp|pl(?:ease|z|s)|folks?|hello|cheers?|kind(‌?:est|ly)|regards|first\s*question).+?[.!?]*/ig,
-                replacement: "",
-                reason: "'$1' is unnecessary noise"
-            },
-            hello: {
-                expr: /\b(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\W*)/gmi,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)[^,.!\n]*[,.!\n]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/ig,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
@@ -381,7 +376,7 @@
             },
             // Punctuation & Spacing come last
             multiplesymbols: {
-                expr: /\s*(\W)\1{1,}\B/igm,
+                expr: /([^\w\s*\-_])\1{2,}/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
@@ -489,6 +484,7 @@
                 App.selections.submitButton = $('[id^="submit-button"]', scope);
                 App.selections.helpButton = $('[id^="wmd-help-button"]', scope);
                 App.selections.editor = $('.post-editor', scope);
+                console.log(App.selections);
                 return !!App.selections.redoButton.length;
             };
 
@@ -696,12 +692,12 @@
                     App.globals.reasons.push('no need to yell');
                 } else {
                     // Sentence casing
-                    var lines = input.split(/\./gm), line;
+                    var lines = input.split(/\./g), line;
                     for(var i in lines) {
-                        line = lines[i];
-                        line = line.trim().substr(0,1).toUpperCase() + line.trim().substr(1).toLowerCase();
+                        line = lines[i].trim();
+                        line = line.substr(0,1).toUpperCase() + line.substr(1).toLowerCase();
                         if (lines[i] !== line) {
-                            lines[i] = line.trim();
+                            lines[i] = line;
                             App.globals.reasons.push('punctuation & spacing');
                         }
                     }
