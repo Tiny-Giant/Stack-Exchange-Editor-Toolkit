@@ -6,10 +6,10 @@
 // @contributor    Unihedron
 // @contributor    Tiny Giant
 // @contributor    Mogsdad
-// @grant          none
+// @grant          GM_addStyle
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.13
+// @version        1.5.2.15
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -112,277 +112,262 @@
         };
         App.globals.checks = {
             "block": /((?:[ ]{4}|[ ]{0,3}\t)+.+(?:\r?\n))+|(  (?:\[\d\]): \w*:+\/\/.*\n)+/g,  // block code or markdown link section
-            "inline": /(`.+`)|(\[.+\]\(.+\))|(\w*:*\/\/[^()\n"'>]*)/g   // inline code, quoted text or URLs
+            "inline": /(`.+`)|(\[.+\]\(.+\))|(\w*:+(?:\/\/|\\)[^()\n"'>]*)/g   // inline code, quoted text or URLs
         };
 
         // Assign modules here
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "casing", "edit", "replace"];
+        App.globals.order = ["omit", "edit", "replace"];
 
 
         // Define edit rules
         App.edits = {
             so: {
-                expr: /\bstack\s*overflow\b/igm,
+                expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
                 reason: "'Stack Overflow' is the legal name"
             },
             se: {
-                expr: /\bstack\s*exchange\b/igm,
+                expr: /\bstack\s*exchange\b/gi,
                 replacement: "Stack Exchange",
                 reason: "'Stack Exchange' is the legal name"
             },
             expansionSO: {
-                expr: /\bSO\b/gm,
-                replacement: "Stack Overflow",
+                expr: /([^\b.])SO\b/g,
+                replacement: "$1Stack Overflow",
                 reason: "'Stack Overflow' is the legal name"
             },
             expansionSE: {
-                expr: /\bSE\b/gm,
-                replacement: "Stack Exchange",
+                expr: /([^\b.])SE\b/g,
+                replacement: "$1Stack Exchange",
                 reason: "'Stack Exchange' is the legal name"
             },
             javascript: {
-                expr: /\b(javascript|js)\b/igm,
-                replacement: "JavaScript",
+                expr: /([^\b.])(javascript|js)\b/gi,
+                replacement: "$1JavaScript",
                 reason: "'JavaScript' is the proper capitalization"
             },
             jsfiddle: {
-                expr: /\bjsfiddle\b/igm,
+                expr: /\bjsfiddle\b/gi,
                 replacement: "JSFiddle",
                 reason: "'JSFiddle' is the proper capitalization"
             },
             jquery: {
-                expr: /\bjquery\b/igm,
+                expr: /\bjquery\b/gi,
                 replacement: "jQuery",
                 reason: "'jQuery' is the proper capitalization"
             },
             angular: {
-                expr: /\bangular(js)?\b/gim,
+                expr: /\bangular(?:js)?\b/gi,
                 replacement: "AngularJS",
                 reason: "'AngularJS is the proper capitalization"
             },
             html: {
-                expr: /\bhtml(\d)?\b/gm,
-                replacement: "HTML$1",
+                expr: /([^\b.])html(\d)?\b/gi,
+                replacement: "$1HTML$2",
                 reason: "HTML stands for HyperText Markup Language"
             },
             css: {
-                expr: /\bcss\b/gm,
-                replacement: "CSS",
+                expr: /([^\b.])css\b/gi,
+                replacement: "$1CSS",
                 reason: "CSS stands for Cascading Style Sheets"
             },
             json: {
-                expr: /\bjson\b/igm,
+                expr: /\bjson\b/gi,
                 replacement: "JSON",
                 reason: "JSON stands for JavaScript Object Notation"
             },
             ajax: {
-                expr: /\bajax\b/igm,
+                expr: /\bajax\b/gi,
                 replacement: "AJAX",
                 reason: "AJAX stands for Asynchronous JavaScript and XML"
             },
             php: {
-                expr: /\bphp\b/gm,
-                replacement: "PHP",
+                expr: /([^\b.])php\b/gi,
+                replacement: "$1PHP",
                 reason: "PHP stands for PHP: Hypertext Preprocessor"
             },
             voting: {
-                expr: /\b(down|up)\Wvot/gmi,
+                expr: /\b(down|up)\Wvot/gi,
                 replacement: "$1vote",
                 reason: "the proper spelling (despite the tag name) is '$1vote' (one word)"
             },
             c: {
-                expr: /\bc([^\w].*?)/igm,
-                replacement: "C$1",
+                expr: /([^\b.])c([#+]+)|([^\b.])\bc\b/gi,
+                replacement: "$1C$2",
                 reason: "C$1 is the proper reference"
             },
             java: {
-                expr: /\bjava\b/gmi,
+                expr: /\bjava\b/gi,
                 replacement: "Java",
                 reason: "Java is the proper reference"
             },
             sql: {
-                expr: /\bsql\b/gm,
-                replacement: "SQL",
+                expr: /([^\b.])sql\b/gi,
+                replacement: "$1SQL",
                 reason: "SQL is the proper reference"
             },
             sqlite: {
-                expr: /\bsqlite\s*([0-9]*)\b/gm,
+                expr: /\bsqlite\s*([0-9]*)\b/gi,
                 replacement: "SQLite $2",
                 reason: "SQLite is the proper reference"
             },
             android: {
-                expr: /\bandroid\b/gmi,
+                expr: /\bandroid\b/gi,
                 replacement: "Android",
                 reason: "Android is the proper reference"
             },
             oracle: {
-                expr: /\boracle\b/gmi,
+                expr: /\boracle\b/gi,
                 replacement: "Oracle",
                 reason: "Oracle is the proper reference"
             },
             windows: {
-                expr: /\b(win|windows)\s*([0-9]+)\b/igm,
-                replacement: "Windows $2",
-                reason: "Windows $2 is the proper reference"
+                expr: /\b(?:win|windows)\s*[0-9]+\b/gi,
+                replacement: "Windows $1",
+                reason: "Windows $1 is the proper reference"
             },
             windowsXP: {
-                expr: /\b(win|windows)\s*(xp)\b/igm,
+                expr: /\b(?:win|windows)\s*xp\b/gi,
                 replacement: "Windows XP",
                 reason: "Windows XP is the proper reference"
             },
             windowsVista: {
-                expr: /\b(win|windows)\s*(vista)\b/igm,
+                expr: /\b(?:win|windows)\s*vista\b/gi,
                 replacement: "Windows Vista",
                 reason: "Windows Vista is the proper reference"
             },
             linux: {
-                expr: /\blinux\b/igm,
-                replacement: "Linux$2",
+                expr: /\blinux\b/gi,
+                replacement: "Linux",
                 reason: "Linux is the proper reference"
             },
             wordpress: {
-                expr: /\bwordpress\b/igm,
+                expr: /\bwordpress\b/gi,
                 replacement: "WordPress",
                 reason: "WordPress is the proper reference"
             },
             google: {
-                expr: /\bgoogle\b/igm,
+                expr: /\bgoogle\b/gi,
                 replacement: "Google",
                 reason: "Google is the proper reference"
             },
             mysql: {
-                expr: /\bmysql\b/igm,
+                expr: /\bmysql\b/gi,
                 replacement: "MySQL",
                 reason: "MySQL is the proper reference"
             },
             apache: {
-                expr: /\bapache\b/igm,
+                expr: /\bapache\b/gi,
                 replacement: "Apache",
                 reason: "Apache is the proper reference"
             },
             git: {
-                expr: /\bgit\b/igm,
+                expr: /\bgit\b/gi,
                 replacement: "Git",
                 reason: "Git is the proper reference"
             },
             github: {
-                expr: /\bgithub\b/igm,
+                expr: /\bgithub\b/gi,
                 replacement: "GitHub",
                 reason: "GitHub is the proper reference"
             },
             facebook: {
-                expr: /\bfacebook\b/igm,
+                expr: /\bfacebook\b/gi,
                 replacement: "Facebook",
                 reason: "Facebook is the proper reference"
             },
             python: {
-                expr: /\bpython\b/igm,
+                expr: /\bpython\b/gi,
                 replacement: "Python",
                 reason: "Python is the proper reference"
             },
             urli: {
-                expr: /\bur([li])\b/igm,
+                expr: /\bur([li])\b/gi,
                 replacement: "UR$1",
                 reason: "UR$1 is the proper reference"
             },
             ios: {
-                expr: /\bios\b/igm,
+                expr: /\bios\b/gi,
                 replacement: "iOS",
                 reason: "iOS is the proper reference"
             },
             iosnum: {
-                expr: /\bios([0-9])\b/igm,
+                expr: /\bios([0-9])\b/gi,
                 replacement: "iOS $1",
                 reason: "the proper usage is 'iOS' followed by a space and the version number"
             },
             ubunto: {
-                expr: /\b[uoa]*b[uoa]*[tn][oua]*[tnu][oua]*\b/igm,
+                expr: /\b[uoa]*b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
                 replacement: "Ubuntu",
                 reason: "Ubuntu is the proper reference"
             },
             regex: {
-                expr: /\bregex(p)?/gmi,
+                expr: /\bregex(p)?/gi,
                 replacement: "RegEx$1",
                 reason: "RegEx$1 is the proper reference"
             },
             thanks: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)[^,.!\n]*[,.!\n]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/ig,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|edit|update|suggestion|advice|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)[^,.!\n]*[,.!\n]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
-            edit: {
-                expr: /(?:[^\.\W]*)(edit|update)(?:\W*)/gmi,
-                replacement: "",
-                reason: "'$1' is unnecessary noise, Stack Exchange has an advanced revision history system"
-            },
             apostrophes: {
-                expr: /\b(can|doesn|don|won|hasn|isn|didn)t\b/gmi,
+                expr: /\b(can|doesn|don|won|hasn|isn|didn)[^\w']*t\b/gi,
                 replacement: "$1't",
                 reason: "grammar and spelling"
             },
             prolly: {
-                expr: /\bproll?y\b/gmi,
+                expr: /\bproll?y\b/gi,
                 replacement: "probably",
                 reason: "grammar and spelling"
             },
             i: {
-                expr: /\bi\b/igm,
+                expr: /\bi\b/gi,
                 replacement: "I",
                 reason: "grammar and spelling"
             },
             im: {
-                expr: /\bi[^\s]\W*m\b/gmi,
+                expr: /\bi\W*m\b/gi,
                 replacement: "I'm",
                 reason: "grammar and spelling"
             },
             ive: {
-                expr: /\bi\W*ve\b/gmi,
+                expr: /\bi\W*ve\b/gi,
                 replacement: "I've",
                 reason: "grammar and spelling"
             },
             ur: {
-                expr: /\bur\b/gmi,
+                expr: /\bur\b/gi,
                 replacement: "your", // May also be "you are", but less common on SO
                 reason: "grammar and spelling"
             },
             u: {
-                expr: /\bu\b/igm,
+                expr: /\bu\b/gi,
                 replacement: "you",
                 reason: "grammar and spelling"
             },
             gr8: {
-                expr: /\bgr8\b/igm,
+                expr: /\bgr8\b/gi,
                 replacement: "great",
                 reason: "grammar and spelling"
             },
             allways: {
-                expr: /\b(a)llways\b/gmi,
+                expr: /\b(a)llways\b/gi,
                 replacement: "$1lways",
                 reason: "grammar and spelling"
             },
-            appreciated: {
-                expr: /\b(help|suggestion|advice).*(?:appr\w*)\b/gmi,
-                replacement: "",
-                reason: "$1 requests are unnecessary noise"
-            },
-            hopeMaybeHelps: {
-                expr: /\b(maybe|hope)+(?:[\s-,']\w*)*\s(help[s]*)(?:[\s-,']\w*)*[\.!?]/gmi,
-                replacement: "",
-                reason: "$1...$2 is unnecessary noise"
-            },
             // Punctuation & Spacing come last
             multiplesymbols: {
-                expr: /([^\w\s*\-_])\1{2,}/g,
+                expr: /([^\w\s*\-_])\1{1,}/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
             multiplespaces: {
-                expr: /(\S)  +(\S)/g,
-                replacement: "$1 $2",
+                expr: /[ ]{2,}/g,
+                replacement: " ",
                 reason: "punctuation & spacing"
             },
             blanklines: {
@@ -425,15 +410,14 @@
             // Omit code
             App.funcs.omitCode = function(str, type) {
                 return str.replace(App.globals.checks[type], function(match) {
-                    if(match) {
-                        App.globals.replacedStrings[type].push(match);
-                        return App.globals.placeHolders[type]; 
-                    } else return str;
+                    App.globals.replacedStrings[type].push(match);
+                    return App.globals.placeHolders[type]; 
                 });
             };
 
             // Replace code
             App.funcs.replaceCode = function(str, type) {
+                if(!str) return false;
                 var i = 0;
                 str = str.replace(App.globals.placeHolderChecks[type], function(match) {
                     return App.globals.replacedStrings[type][i++];
@@ -506,7 +490,7 @@
 
             // Insert editing button(s)
             App.funcs.createButton = function() {
-                if(!App.selections.redoButton.length) return false
+                if(!App.selections.redoButton.length) return false;
                 
                 App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
                 App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
@@ -632,7 +616,7 @@
                 } catch(e){
                     alert(e);
                 }
-            }
+            };
 
             // Handle pipe output
             App.funcs.output = function(data) {
@@ -693,11 +677,11 @@
                 } else {
                     // Sentence casing
                     var lines = input.split(/\./g), line;
-                    for(var i in lines) {
-                        line = lines[i].trim();
+                    for(var l in lines) {
+                        line = lines[l].trim();
                         line = line.substr(0,1).toUpperCase() + line.substr(1).toLowerCase();
-                        if (lines[i] !== line) {
-                            lines[i] = line;
+                        if (lines[l] !== line) {
+                            lines[l] = line;
                             App.globals.reasons.push('punctuation & spacing');
                         }
                     }
@@ -706,7 +690,7 @@
                 data[i] = input;
             }
             return data;
-        }
+        };
         
         App.globals.pipeMods.edit = function(data) {
             // Visually confirm edit - SE makes it easy because the jQuery color animation plugin seems to be there by default
@@ -782,7 +766,7 @@
         var addApp = function(targetID) {
             if (!targetID) console.log('[!!] No targetID');
             else Apps[targetID] = new EditorToolkit(targetID);
-        }
+        };
         var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
         var targetID;
         var jqcheck = setInterval(function(){
@@ -792,7 +776,7 @@
                     addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
                 });
                 $(window).load(function(){
-                    $('body').append($('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>'));
+                    GM_addStyle('.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }');
                     targetID = $('#post-id').val();
                     if (targetID && !Apps.length) addApp(targetID);
                     else targetID = $('.post-id').text();
@@ -800,6 +784,6 @@
             }
         },100);
     } catch (e) {
-        console.log()
+        console.log(e);
     }
 })();
