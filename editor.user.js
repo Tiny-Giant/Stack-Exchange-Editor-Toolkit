@@ -6,10 +6,10 @@
 // @contributor    Unihedron
 // @contributor    Tiny Giant
 // @contributor    Mogsdad
-// @grant          GM_addStyle
+// @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.16
+// @version        1.5.2.17
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -107,12 +107,12 @@
             "inline": "_xCodexInlinexPlacexHolderx_"
         };
         App.globals.placeHolderChecks = {
-            "block": /_xCodexBlockxPlacexHolderx_/g,
-            "inline": /_xCodexInlinexPlacexHolderx_/g
+            "block": /_xCodexBlockxPlacexHolderx_/gi,
+            "inline": /_xCodexInlinexPlacexHolderx_/gi
         };
         App.globals.checks = {
-            "block": /((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+)+/g,  // block code, markdown link section, tags
-            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*|\<[\/a-z]+\>/gi   // inline code, quoted text or URLs
+            "block": /[^]*\<\!\-\- End of automatically inserted text \-\-\>|((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+)+/g,  // block code, markdown link section, tags
+            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*|\<[\/a-z]+\>|(?:\/[^ ]+)+[\w\d]+\.[\w]+/gi   // inline code, quoted text or URLs
         };
 
         // Assign modules here
@@ -124,6 +124,18 @@
 
         // Define edit rules
         App.edits = {
+            firstcaps: {
+                expr: /(?:(?!\n\n)[^.!?])+[.!?]?\s*/gmi,  // https://regex101.com/r/qR5fO9/8
+                replacement: function( str ) { // find and capitalize first letter https://regex101.com/r/bL9xD7/1
+                    return str.replace(/^(?!\.)(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
+                        console.log(arguments);
+                        if(!pre) pre = '';
+                        if(!post) post = '';
+                        return pre + first.toUpperCase() + post;
+                    });
+                },
+                reason: "Caps at start of sentences"
+            },
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -310,14 +322,20 @@
                 reason: "RegEx$1 is the proper reference"
             },
             badsentences: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|edit|update|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)\b[^,.!\n]*[,.!]*/gi,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|edit|update|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\s*question|appreciate[^.!\n]*help)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
             badwords: {
-                expr: /(pl(?:ease|z|s)|h[ae]?lp)/gi,
+                expr: /(pl(?:ease|z|s)|(?:any\s*)?h[ae]?lp)[,.!?]*/gi,
                 replacement: "",
-                reason: "'$1' unnecessary noise"
+                reason: "'$1' is unnecessary noise"
+            },
+            imnew: {
+                expr: /(i[' ]?a?m\s*new\w*\s*(?:to|in)\s*\w*)\s*(?:and|[.!?])?\s*/gi,
+                replacement: "",
+                reason: "'$1' is unnecessary noise"
+                
             },
             salutations: {
                 expr: /[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
@@ -408,11 +426,7 @@
                         var phrase = matches[phrases[1]]; 
                         return phrase ? phrase : ''; 
                     });
-                    return replacement.replace(/[$](\d)+/g,function(){ 
-                        var phrases = [].slice.call(arguments,0,-2);
-                        var phrase = matches[phrases[1]]; 
-                        return phrase ? phrase : ''; 
-                    }); 
+                    return arguments[0].replace(expression, replacement);
                 });
                 if(input !== tmpinput) {
                     return {
@@ -791,7 +805,7 @@
                     addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
                 });
                 $(window).load(function(){
-                    GM_addStyle('.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }');
+                    $('body').append('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>');
                     targetID = $('#post-id').val();
                     if (targetID && !Apps.length) addApp(targetID);
                     else targetID = $('.post-id').text();
