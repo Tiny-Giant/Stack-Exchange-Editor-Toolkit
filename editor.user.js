@@ -9,7 +9,7 @@
 // @grant          GM_addStyle
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.15
+// @version        1.5.2.16
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -111,8 +111,8 @@
             "inline": /_xCodexInlinexPlacexHolderx_/g
         };
         App.globals.checks = {
-            "block": /((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+|(?:\<[^>]+)[^\n]*\>)+/g,  // block code, markdown link section, tags
-            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*/g   // inline code, quoted text or URLs
+            "block": /((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+)+/g,  // block code, markdown link section, tags
+            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*|\<[\/a-z]+\>/gi   // inline code, quoted text or URLs
         };
 
         // Assign modules here
@@ -309,10 +309,20 @@
                 replacement: "RegEx$1",
                 reason: "RegEx$1 is the proper reference"
             },
-            thanks: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|h[ae]?lp|edit|update|suggestion|advice|pl(?:ease|z|s)|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)\b[^,.!\n]*[,.!]*|[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
+            badsentences: {
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|edit|update|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\squestion)\b[^,.!\n]*[,.!]*/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
+            },
+            badwords: {
+                expr: /(pl(?:ease|z|s)|h[ae]?lp)/gi,
+                replacement: "",
+                reason: "'$1' unnecessary noise"
+            },
+            salutations: {
+                expr: /[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
+                replacement: "",
+                reason: "salutations are unnecessary noise"
             },
             apostrophes: {
                 expr: /\b(can|doesn|don|won|hasn|isn|didn)[^\w']*t\b/gi,
