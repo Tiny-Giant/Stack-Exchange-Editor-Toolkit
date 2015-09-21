@@ -128,7 +128,6 @@
                 expr: /(?:(?!\n\n)[^.!?])+[.!?]?\s*/gmi,  // https://regex101.com/r/qR5fO9/8
                 replacement: function( str ) { // find and capitalize first letter https://regex101.com/r/bL9xD7/1
                     return str.replace(/^(?!\.)(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
-                        console.log(arguments);
                         if(!pre) pre = '';
                         if(!post) post = '';
                         return pre + first.toUpperCase() + post;
