@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.18
+// @version        1.5.2.19
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -108,23 +108,27 @@
             "auto":   "_xAutoxInsertxTextxPlacexHolder_",
             "inline": "_xCodexInlinexPlacexHolderx_",
             "block":  "_xCodexBlockxPlacexHolderx_",
-            "links":  "_xLinkxPlacexHolderx_"
+            "links":  "_xLinkxPlacexHolderx_",
+            "tags":   "_xTagxPlacexHolderx_"
         };
         App.globals.placeHolderChecks = {
             "auto":   /_xAutoxInsertxTextxPlacexHolder_/gi,
             "inline": /_xCodexInlinexPlacexHolderx_/gi,
             "block":  /_xCodexBlockxPlacexHolderx_/gi,
-            "links":  /_xLinkxPlacexHolderx_/gi
+            "links":  /_xLinkxPlacexHolderx_/gi,
+            "tags":   /_xTagxPlacexHolderx_/gi
         };
         App.globals.checks = {
             //        https://regex101.com/r/cI6oK2/1 automatically inserted text
             "auto":   /[^]*\<\!\-\- End of automatically inserted text \-\-\>/g,
-            //        https://regex101.com/r/lL6fH3/1 single-line inline code, tags and html comments
-            "inline": /`[^`\n]+`|\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/gi,
-            //        https://regex101.com/r/eC7mF7/1 Code blocks and multiline inline code.
+            //        https://regex101.com/r/lL6fH3/1 single-line inline code
+            "inline": /`[^`\n]+`/g,
+            //        https://regex101.com/r/eC7mF7/1 code blocks and multiline inline code.
             "block":  /`[^`]+`|(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/g,
             //        https://regex101.com/r/tZ4eY3/5 links and link-sections
-            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+|(?!.net)(?:\/|.:\\|\.[^ \n\r]|\w*:\/\/)(?:\S)*/g
+            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+|(?!.net)(?:\/|.:\\|\.[^ \n\r]|\w*:\/\/)(?:\S)*/g,
+            //        tags and html comments  TODO: needs test 
+            "tags":   /\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/g
         };
 
         // Assign modules here
@@ -135,6 +139,7 @@
 
         // Define edit rules
         App.edits = {
+            // All caps
             noneedtoyell: {
                 expr: /^((?=.*[A-Z])[^a-z]*)$/g,
                 replacement: function(input) {
@@ -142,6 +147,7 @@
                 },
                 reason: 'no need to yell'
             },
+            // Trademark capitalization
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -295,7 +301,7 @@
             facebook: {
                 expr: /\bfacebook\b/gi,
                 replacement: "Facebook",
-                reason: "Facebook is the proper reference"
+                reason: "trademark capitalization"
             },
             python: {
                 expr: /\bpython\b/gi,
@@ -337,37 +343,39 @@
                 replacement: "RegEx$1",
                 reason: "trademark capitalization"
             },
+            // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
                 expr: /(?!(?:edit|update)\s*[^:]*$)(?:^\**)(edit|update)(\s*#?[0-9]+)?:?(?:\**):?/gmi,
                 replacement: "",
-                reason: "'$1' is unnecessary noise"
+                reason: "noise reduction"
             },
             hello: { // TODO: Update badsentences (new) to catch everything hello (old) did.
                 expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
                 replacement: "",
-                reason: "greetings like '$1' are unnecessary noise"
+                reason: "noise reduction"
             },
             badsentences: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\s*question|appreciate[^.!\n]*help)\b[^,.!?\n]*[,.!?]*/gi,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|suggestion|advice|folks?|ki‌nd(‌?:est|ly)|first\s*question|(?:hope|appreciate|pl(?:ease|z|s))[^.!?\n]*helps?)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
-                reason: "'$1' is unnecessary noise"
+                reason: "noise reduction"
             },
             badwords: {
                 expr: /(pl(?:ease|z|s)|(?:any\s*)?h[ae]?lp)[,.!?]*/gi,
                 replacement: "",
-                reason: "'$1' is unnecessary noise"
+                reason: "noise reduction"
             },
             imnew: {
-                expr: /(i[' ]?a?m\s*new\w*\s*(?:to|in)\s*\w*)\s*(?:and|[.!?])?\s*/gi,
+                expr: /[^\n.!?:]*\b((?:i[' ]?a?m)?(?:[ ]*kinda)?[ ]*new\w*[ ]*(?:to|in)[ ]*\w*)[ ]*(?:and|[.!?])?[ ]*/gi,
                 replacement: "",
-                reason: "'$1' is unnecessary noise"
+                reason: "noise reduction"
             },
             salutations: {
                 expr: /[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
                 replacement: "",
-                reason: "salutations are unnecessary noise"
+                reason: "noise reduction"
             },
+            // Grammar and spelling
             apostrophes: {
                 expr: /\b(can|doesn|don|won|hasn|isn|didn)[^\w']*t\b/gi,
                 replacement: "$1't",
@@ -722,7 +730,7 @@
                 str;
             for (var i in replaced) {
                 // https://regex101.com/r/tX9pM3/1       https://regex101.com/r/tX9pM3/2                 https://regex101.com/r/tX9pM3/3
-                if (/^`/.test(replaced[i])) replaced[i] = /(?!`)((?!`)[^])+/.exec(replaced[i])[1].replace(/(.+)/g, '    $1');
+                if (/^`[^]+`$/.test(replaced[i])) replaced[i] = /(?!`)((?!`)[^])+/.exec(replaced[i])[1].replace(/(.+)/g, '    $1');
             }
             return data;
         };
