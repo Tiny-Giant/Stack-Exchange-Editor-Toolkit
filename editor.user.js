@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.19
+// @version        1.5.2.20
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -126,7 +126,7 @@
             //        https://regex101.com/r/eC7mF7/1 code blocks and multiline inline code.
             "block":  /`[^`]+`|(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/g,
             //        https://regex101.com/r/tZ4eY3/5 links and link-sections
-            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+|(?!.net)(?:\/|.:\\|\.[^ \n\r]|\w*:\/\/)(?:\S)*/g,
+            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+|(?!.net)(?:\/\w+|.:\\|\.[^ \n\r.]+|\w+:\/\/)[^\s)]*/g,
             //        tags and html comments  TODO: needs test 
             "tags":   /\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/g
         };
@@ -366,7 +366,7 @@
                 reason: "noise reduction"
             },
             imnew: {
-                expr: /[^\n.!?:]*\b((?:i[' ]?a?m)?(?:[ ]*kinda)?[ ]*new\w*[ ]*(?:to|in)[ ]*\w*)[ ]*(?:and|[.!?])?[ ]*/gi,
+                expr: /(?! )[\w\s]*\bi[' ]?a?m +(?:kinda|really) *new\w* +(?:to|in) *\w* *(?:and|[;,.!?])? */gi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -423,15 +423,15 @@
             },
             // Punctuation & Spacing come last
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/10
-                expr: /(?:(?!\n\n)[^.!?])+([.!?])?\s*/g, 
+                //    https://regex101.com/r/qR5fO9/11
+                expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])?[ ]*/g, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return '';
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
                         if (!post) post = '';
-                        return pre + first.toUpperCase() + post + (endpunc && /\w/.test(post.substr(-1)) ? '' : '.');
+                        return pre + first.toUpperCase() + post + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
                     });
                 },
                 reason: "Caps at start of sentences"
