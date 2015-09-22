@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.17
+// @version        1.5.2.18
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -65,7 +65,7 @@
 // @exclude        *://stackapps.com/questions/tagged/new/*
 // ==/UserScript==
 
-(function(){
+(function() {
     "use strict";
     function EditorToolkit(targetID) {
         if (!(this instanceof EditorToolkit)) return false;
@@ -99,31 +99,49 @@
         App.globals.reasons = [];
 
         App.globals.replacedStrings = {
+            "auto": [],
+            "inline": [],
             "block": [],
-            "inline": []
+            "links": []
         };
         App.globals.placeHolders = {
-            "block": "_xCodexBlockxPlacexHolderx_",
-            "inline": "_xCodexInlinexPlacexHolderx_"
+            "auto":   "_xAutoxInsertxTextxPlacexHolder_",
+            "inline": "_xCodexInlinexPlacexHolderx_",
+            "block":  "_xCodexBlockxPlacexHolderx_",
+            "links":  "_xLinkxPlacexHolderx_"
         };
         App.globals.placeHolderChecks = {
-            "block": /_xCodexBlockxPlacexHolderx_/gi,
-            "inline": /_xCodexInlinexPlacexHolderx_/gi
+            "auto":   /_xAutoxInsertxTextxPlacexHolder_/gi,
+            "inline": /_xCodexInlinexPlacexHolderx_/gi,
+            "block":  /_xCodexBlockxPlacexHolderx_/gi,
+            "links":  /_xLinkxPlacexHolderx_/gi
         };
         App.globals.checks = {
-            "block": /[^]*\<\!\-\- End of automatically inserted text \-\-\>|((?:(?:[ ]{4}|[ ]{0,3}\t)+.+(?:[\r\n](?:[ ]+\n)*))+|(?:  (?:\[\d\]): \w*:+\/\/.*\n)+)+/g,  // block code, markdown link section, tags
-            "inline": /`.+`|\[.+\]\(.+\)|\[.*\]\[.*\]|\w*:+(?:\/\/|\\)[^()\n"'>]*|\<[\/a-z]+\>|(?:\/[^ ]+)+[\w\d]+\.[\w]+/gi   // inline code, quoted text or URLs
+            //        https://regex101.com/r/cI6oK2/1 automatically inserted text
+            "auto":   /[^]*\<\!\-\- End of automatically inserted text \-\-\>/g,
+            //        https://regex101.com/r/lL6fH3/1 single-line inline code, tags and html comments
+            "inline": /`[^`\n]+`|\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/gi,
+            //        https://regex101.com/r/eC7mF7/1 Code blocks and multiline inline code.
+            "block":  /`[^`]+`|(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/g,
+            //        https://regex101.com/r/tZ4eY3/5 links and link-sections
+            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+|(?!.net)(?:\/|.:\\|\.[^ \n\r]|\w*:\/\/)(?:\S)*/g
         };
 
         // Assign modules here
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "edit", "replace"];  //, "casing"]; Temporarily disabled
-
+        App.globals.order = ["omit", "codefix", "edit", "replace"];
 
         // Define edit rules
         App.edits = {
+            noneedtoyell: {
+                expr: /^((?=.*[A-Z])[^a-z]*)$/g,
+                replacement: function(input) {
+                    return input.trim().substr(0, 1).toUpperCase() + input.trim().substr(1).toLowerCase();
+                },
+                reason: 'no need to yell'
+            },
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -147,47 +165,47 @@
             javascript: {
                 expr: /([^\b\w.]|^)(javascript|js)\b/gi,
                 replacement: "$1JavaScript",
-                reason: "'JavaScript' is the proper capitalization"
+                reason: "trademark capitalization"
             },
             jsfiddle: {
                 expr: /\bjsfiddle\b/gi,
                 replacement: "JSFiddle",
-                reason: "'JSFiddle' is the proper capitalization"
+                reason: "trademark capitalization"
             },
             jquery: {
                 expr: /\bjquery\b/gi,
                 replacement: "jQuery",
-                reason: "'jQuery' is the proper capitalization"
+                reason: "trademark capitalization"
             },
             angular: {
                 expr: /\bangular(?:js)?\b/gi,
                 replacement: "AngularJS",
-                reason: "'AngularJS is the proper capitalization"
+                reason: "trademark capitalization"
             },
             html: {
                 expr: /([^\b\w.]|^)html(\d)?\b/gi,
                 replacement: "$1HTML$2",
-                reason: "HTML stands for HyperText Markup Language"
+                reason: "trademark capitalization"
             },
             css: {
                 expr: /([^\b\w.]|^)css\b/gi,
                 replacement: "$1CSS",
-                reason: "CSS stands for Cascading Style Sheets"
+                reason: "trademark capitalization"
             },
             json: {
                 expr: /\bjson\b/gi,
                 replacement: "JSON",
-                reason: "JSON stands for JavaScript Object Notation"
+                reason: "trademark capitalization"
             },
             ajax: {
                 expr: /\bajax\b/gi,
                 replacement: "AJAX",
-                reason: "AJAX stands for Asynchronous JavaScript and XML"
+                reason: "trademark capitalization"
             },
             php: {
                 expr: /([^\b\w.]|^)php\b/gi,
                 replacement: "$1PHP",
-                reason: "PHP stands for PHP: Hypertext Preprocessor"
+                reason: "trademark capitalization"
             },
             voting: {
                 expr: /\b(down|up)\Wvot/gi,
@@ -197,44 +215,44 @@
             c: {
                 expr: /([^\b\w.]|^)c([#+]+)|([^\b.])\bc\b/gi,
                 replacement: "$1C$2",
-                reason: "C$1 is the proper reference"
+                reason: "trademark capitalization"
             },
             java: {
                 expr: /\bjava\b/gi,
                 replacement: "Java",
-                reason: "Java is the proper reference"
+                reason: "trademark capitalization"
             },
             sql: {
                 expr: /([^\b\w.]|^)sql\b/gi,
                 replacement: "$1SQL",
-                reason: "SQL is the proper reference"
+                reason: "trademark capitalization"
             },
             sqlite: {
                 expr: /\bsqlite\s*([0-9]*)\b/gi,
                 replacement: "SQLite $2",
-                reason: "SQLite is the proper reference"
+                reason: "trademark capitalization"
             },
             android: {
                 expr: /\bandroid\b/gi,
                 replacement: "Android",
-                reason: "Android is the proper reference"
+                reason: "trademark capitalization"
             },
             oracle: {
                 expr: /\boracle\b/gi,
                 replacement: "Oracle",
-                reason: "Oracle is the proper reference"
+                reason: "trademark capitalization"
             },
             windows: {
                 // https://regex101.com/r/jF9zK1/5
-                expr: /\b(?:win|windows)\s+(2k|2000|[0-9.]+|ce|me|nt|xp|vista|server)|(?:win|windows)\b/gi,
-                replacement: function(match,ver) {
-                   ver = !ver ? '' : ver.replace(/ce/i, ' CE')
-                                        .replace(/me/i, ' ME')
-                                        .replace(/nt/i, ' NT')
-                                        .replace(/xp/i, ' XP')
-                                        .replace(/2k/i, ' 2000')
-                                        .replace(/vista/i, ' Vista')
-                                        .replace(/server/i, ' Server')
+                expr: /\b(?:win|windows)\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server)|(?:win|windows)\b/gi,
+                replacement: function(match, ver) {
+                    ver = !ver ? '' : ver.replace(/ce/i, ' CE')
+                                         .replace(/me/i, ' ME')
+                                         .replace(/nt/i, ' NT')
+                                         .replace(/xp/i, ' XP')
+                                         .replace(/2k/i, ' 2000')
+                                         .replace(/vista/i, ' Vista')
+                                         .replace(/server/i, ' Server');
                     return 'Windows' + ver;
                 },
                 reason: "trademark capitalization"
@@ -242,37 +260,37 @@
             linux: {
                 expr: /\blinux\b/gi,
                 replacement: "Linux",
-                reason: "Linux is the proper reference"
+                reason: "trademark capitalization"
             },
             wordpress: {
                 expr: /\bwordpress\b/gi,
                 replacement: "WordPress",
-                reason: "WordPress is the proper reference"
+                reason: "trademark capitalization"
             },
             google: {
                 expr: /\bgoogle\b/gi,
                 replacement: "Google",
-                reason: "Google is the proper reference"
+                reason: "trademark capitalization"
             },
             mysql: {
                 expr: /\bmysql\b/gi,
                 replacement: "MySQL",
-                reason: "MySQL is the proper reference"
+                reason: "trademark capitalization"
             },
             apache: {
                 expr: /\bapache\b/gi,
                 replacement: "Apache",
-                reason: "Apache is the proper reference"
+                reason: "trademark capitalization"
             },
             git: {
                 expr: /\bgit\b/gi,
                 replacement: "Git",
-                reason: "Git is the proper reference"
+                reason: "trademark capitalization"
             },
             github: {
                 expr: /\bgithub\b/gi,
                 replacement: "GitHub",
-                reason: "GitHub is the proper reference"
+                reason: "trademark capitalization"
             },
             facebook: {
                 expr: /\bfacebook\b/gi,
@@ -282,42 +300,42 @@
             python: {
                 expr: /\bpython\b/gi,
                 replacement: "Python",
-                reason: "Python is the proper reference"
+                reason: "trademark capitalization"
             },
             urli: {
                 expr: /\bur([li])\b/gi,
                 replacement: "UR$1",
-                reason: "UR$1 is the proper reference"
+                reason: "trademark capitalization"
             },
             ios: {
                 expr: /\bios\b/gi,
                 replacement: "iOS",
-                reason: "iOS is the proper reference"
+                reason: "trademark capitalization"
             },
             iosnum: {
                 expr: /\bios([0-9])\b/gi,
                 replacement: "iOS $1",
-                reason: "the proper usage is 'iOS' followed by a space and the version number"
+                reason: "trademark capitalization"
             },
             ubunto: {
                 expr: /\b[uoa]*b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
                 replacement: "Ubuntu",
-                reason: "Ubuntu is the proper reference"
+                reason: "trademark capitalization"
             },
-           vbnet: {
-              expr: /(?:vb)?(?:\.net|\s?[0-9]+)\s?(?:framework|core)?/gi,
-               replacement: function( str ) {
-                   return str.replace(/vb/i,'VB')
-                             .replace(/net/i,'NET')
-                             .replace(/framework/i,'Framework')
-                             .replace(/core/i,'Core')
-               },
-              reason: "trademark capitalization"
+            vbnet: {
+                expr: /(?:vb)?(?:\.net|\s?[0-9]+)\s?(?:framework|core)?/gi,
+                replacement: function(str) {
+                    return str.replace(/vb/i, 'VB')
+                              .replace(/net/i, 'NET')
+                              .replace(/framework/i, 'Framework')
+                              .replace(/core/i, 'Core');
+                },
+                reason: "trademark capitalization"
             },
             regex: {
                 expr: /\bregex(p)?/gi,
                 replacement: "RegEx$1",
-                reason: "RegEx$1 is the proper reference"
+                reason: "trademark capitalization"
             },
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
@@ -325,7 +343,7 @@
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
-            hello: {  // TODO: Update badsentences (new) to catch everything hello (old) did.
+            hello: { // TODO: Update badsentences (new) to catch everything hello (old) did.
                 expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
                 replacement: "",
                 reason: "greetings like '$1' are unnecessary noise"
@@ -344,7 +362,6 @@
                 expr: /(i[' ]?a?m\s*new\w*\s*(?:to|in)\s*\w*)\s*(?:and|[.!?])?\s*/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
-                
             },
             salutations: {
                 expr: /[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
@@ -398,12 +415,15 @@
             },
             // Punctuation & Spacing come last
             firstcaps: {
-                expr: /(?:(?!\n\n)[^.!?])+[.!?]?\s*/gmi,  // https://regex101.com/r/qR5fO9/8
-                replacement: function( str ) { // find and capitalize first letter https://regex101.com/r/bL9xD7/1
+                //    https://regex101.com/r/qR5fO9/10
+                expr: /(?:(?!\n\n)[^.!?])+([.!?])?\s*/g, 
+                replacement: function(str, endpunc) { 
+                    if (str === "undefined") return '';
+                    //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
-                        if(!pre) pre = '';
-                        if(!post) post = '';
-                        return pre + first.toUpperCase() + post;
+                        if (!pre) pre = '';
+                        if (!post) post = '';
+                        return pre + first.toUpperCase() + post + (endpunc && /\w/.test(post.substr(-1)) ? '' : '.');
                     });
                 },
                 reason: "Caps at start of sentences"
@@ -439,39 +459,21 @@
                 // Scan the post text using the expression to see if there are any matches
                 var matches = expression.exec(input);
                 var tmpinput = input;
-                input = input.replace(expression, function() { 
-                    var matches = [].slice.call(arguments,0,-2); 
-                    reasoning = reasoning.replace(/[$](\d)+/g,function(){ 
-                        var phrases = [].slice.call(arguments,0,-2);
-                        var phrase = matches[phrases[1]]; 
-                        return phrase ? phrase : ''; 
+                input = input.replace(expression, function() {
+                    var matches = [].slice.call(arguments, 0, -2);
+                    reasoning = reasoning.replace(/[$](\d)+/g, function() {
+                        var phrases = [].slice.call(arguments, 0, -2);
+                        var phrase = matches[phrases[1]];
+                        return phrase ? phrase : '';
                     });
                     return arguments[0].replace(expression, replacement);
                 });
-                if(input !== tmpinput) {
+                if (input !== tmpinput) {
                     return {
                         reason: reasoning,
                         fixed: String(input).trim()
                     };
                 } else return false;
-            };
-
-            // Omit code
-            App.funcs.omitCode = function(str, type) {
-                return str.replace(App.globals.checks[type], function(match) {
-                    App.globals.replacedStrings[type].push(match);
-                    return App.globals.placeHolders[type]; 
-                });
-            };
-
-            // Replace code
-            App.funcs.replaceCode = function(str, type) {
-                if(!str) return false;
-                var i = 0;
-                str = str.replace(App.globals.placeHolderChecks[type], function(match) {
-                    return App.globals.replacedStrings[type][i++];
-                });
-                return str.replace(/(\s*[\r\n]){3,}/g,'\n\n');
             };
 
             App.funcs.applyListeners = function() { // Removes default Stack Exchange listeners; see https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/43
@@ -539,8 +541,8 @@
 
             // Insert editing button(s)
             App.funcs.createButton = function() {
-                if(!App.selections.redoButton.length) return false;
-                
+                if (!App.selections.redoButton.length) return false;
+
                 App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
                 App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
                 App.selections.buttonInfo = $('<div class="ToolkitInfo">');
@@ -593,7 +595,7 @@
             };
 
             App.funcs.fixEvent = function(e) {
-                if(e) e.preventDefault();
+                if (e) e.preventDefault();
                 // Refresh item population
                 App.funcs.popOriginals();
                 App.funcs.popItems();
@@ -601,35 +603,35 @@
                 App.pipe(App.items, App.globals.pipeMods, App.globals.order);
             };
 
-            App.funcs.diff = function() { 
+            App.funcs.diff = function() {
                 App.selections.diffTable.empty();
 
-                function maakRij(x, y, type, rij){
+                function maakRij(x, y, type, rij) {
 
                     var tr = $('<tr/>');
-                    
-                    if(type===' ') return false;
-                    if(type==='+') tr.addClass('add');
-                    if(type==='-') tr.addClass('del');
+
+                    if (type === ' ') return false;
+                    if (type === '+') tr.addClass('add');
+                    if (type === '-') tr.addClass('del');
 
                     tr.append($('<td class="codekolom">' + y + '</td>'));
                     tr.append($('<td class="codekolom">' + x + '</td>'));
-                    tr.append($('<td class="bredecode">' + type + ' ' + rij.replace(/\</g,'&lt;') + '</td>'));
+                    tr.append($('<td class="bredecode">' + type + ' ' + rij.replace(/\</g, '&lt;') + '</td>'));
 
                     App.selections.diffTable.append(tr);
                 }
 
-                function getDiff(matrix, a1, a2, x, y){
-                    if(x>0 && y>0 && a1[y-1]===a2[x-1]){
-                        getDiff(matrix, a1, a2, x-1, y-1);
-                        maakRij(x, y, ' ', a1[y-1]);
+                function getDiff(matrix, a1, a2, x, y) {
+                    if (x > 0 && y > 0 && a1[y - 1] === a2[x - 1]) {
+                        getDiff(matrix, a1, a2, x - 1, y - 1);
+                        maakRij(x, y, ' ', a1[y - 1]);
                     } else {
-                        if(x>0 && (y===0 || matrix[y][x-1] >= matrix[y-1][x])){
-                            getDiff(matrix, a1, a2, x-1, y);
-                            maakRij(x, '', '+', a2[x-1]);
-                        } else if(y>0 && (x===0 || matrix[y][x-1] < matrix[y-1][x])){
-                            getDiff(matrix, a1, a2, x, y-1);
-                            maakRij('', y, '-', a1[y-1], '');
+                        if (x > 0 && (y === 0 || matrix[y][x - 1] >= matrix[y - 1][x])) {
+                            getDiff(matrix, a1, a2, x - 1, y);
+                            maakRij(x, '', '+', a2[x - 1]);
+                        } else if (y > 0 && (x === 0 || matrix[y][x - 1] < matrix[y - 1][x])) {
+                            getDiff(matrix, a1, a2, x, y - 1);
+                            maakRij('', y, '-', a1[y - 1], '');
                         } else {
                             return;
                         }
@@ -640,36 +642,36 @@
                 a1 = App.originals.body.split('\n');
                 a2 = App.items.body.split('\n');
 
-                var matrix = new Array(a1.length+1);
+                var matrix = new Array(a1.length + 1);
                 var x, y;
-                for(y=0; y<matrix.length; y++){
-                    matrix[y] = new Array(a2.length+1);
+                for (y = 0; y < matrix.length; y++) {
+                    matrix[y] = new Array(a2.length + 1);
 
-                    for(x=0; x<matrix[y].length; x++){
+                    for (x = 0; x < matrix[y].length; x++) {
                         matrix[y][x] = 0;
                     }
                 }
 
-                for(y=1; y<matrix.length; y++){
-                    for(x=1; x<matrix[y].length; x++){
-                        if(a1[y-1]===a2[x-1]){
-                            matrix[y][x] = 1 + matrix[y-1][x-1];
+                for (y = 1; y < matrix.length; y++) {
+                    for (x = 1; x < matrix[y].length; x++) {
+                        if (a1[y - 1] === a2[x - 1]) {
+                            matrix[y][x] = 1 + matrix[y - 1][x - 1];
                         } else {
-                            matrix[y][x] = Math.max(matrix[y-1][x], matrix[y][x-1]);
+                            matrix[y][x] = Math.max(matrix[y - 1][x], matrix[y][x - 1]);
                         }
                     }
                 }
 
                 try {
-                    getDiff(matrix, a1, a2, x-1, y-1);
-                } catch(e){
+                    getDiff(matrix, a1, a2, x - 1, y - 1);
+                } catch (e) {
                     alert(e);
                 }
             };
 
             // Handle pipe output
             App.funcs.output = function(data) {
-                if(data) { 
+                if (data) {
                     App.selections.title.val(data.title);
                     App.selections.body.val(data.body);
                     App.selections.summary.val(data.summary);
@@ -697,7 +699,7 @@
         App.init = function() {
             App.popFuncs();
             App.funcs.dynamicDelay(function() {
-                if(!App.funcs.popSelections()) return false;
+                if (!App.funcs.popSelections()) return false;
                 App.funcs.createButton();
                 App.funcs.applyListeners();
                 App.funcs.makeDiffTable();
@@ -705,42 +707,37 @@
         };
 
         App.globals.pipeMods.omit = function(data) {
-            data.body = App.funcs.omitCode(data.body, "block");
-            data.body = App.funcs.omitCode(data.body, "inline");
+            if (!data.body) return false;
+            for (var type in App.globals.checks) {
+                data.body = data.body.replace(App.globals.checks[type], function(match) {
+                    App.globals.replacedStrings[type].push(match);
+                    return App.globals.placeHolders[type];
+                });
+            }
+            return data;
+        };
+
+        App.globals.pipeMods.codefix = function(data) {
+            var replaced = App.globals.replacedStrings.block,
+                str;
+            for (var i in replaced) {
+                // https://regex101.com/r/tX9pM3/1       https://regex101.com/r/tX9pM3/2                 https://regex101.com/r/tX9pM3/3
+                if (/^`/.test(replaced[i])) replaced[i] = /(?!`)((?!`)[^])+/.exec(replaced[i])[1].replace(/(.+)/g, '    $1');
+            }
             return data;
         };
 
         App.globals.pipeMods.replace = function(data) {
-            data.body = App.funcs.replaceCode(data.body, "block");
-            data.body = App.funcs.replaceCode(data.body, "inline");
-            return data;
-        };
-
-        App.globals.pipeMods.casing = function(data) {
-            for(var i in data) {
-                var input = data[i];
-                // No need to yell
-                if(/^((?=.*[A-Z])[^a-z]*)$/g.exec(input)) {
-                    input = input.trim().substr(0,1).toUpperCase() + input.trim().substr(1).toLowerCase();
-                    App.globals.reasons.push('no need to yell');
-                } else {
-                    // Sentence casing
-                    var lines = input.split(/\./g), line;
-                    for(var l in lines) {
-                        line = lines[l].trim();
-                        line = line.substr(0,1).toUpperCase() + line.substr(1).toLowerCase();
-                        if (lines[l] !== line) {
-                            lines[l] = line;
-                            App.globals.reasons.push('punctuation & spacing');
-                        }
-                    }
-                    input = lines.join('. ');
-                }
-                data[i] = input;
+            if (!data.body) return false;
+            for (var type in App.globals.checks) {
+                var i = 0;
+                data.body = data.body.replace(App.globals.placeHolderChecks[type], function(match) {
+                    return App.globals.replacedStrings[type][i++];
+                });
             }
             return data;
         };
-        
+
         App.globals.pipeMods.edit = function(data) {
             // Visually confirm edit - SE makes it easy because the jQuery color animation plugin seems to be there by default
             App.selections.body.animate({
@@ -755,7 +752,7 @@
                 if (App.edits.hasOwnProperty(j)) {
                     // Check body
                     var fix = App.funcs.fixIt(data.body, App.edits[j].expr,
-                                              App.edits[j].replacement, App.edits[j].reason);
+                        App.edits[j].replacement, App.edits[j].reason);
                     if (fix) {
                         App.globals.reasons[App.globals.reasons.length] = fix.reason;
                         data.body = fix.fixed;
@@ -764,7 +761,7 @@
 
                     // Check title
                     fix = App.funcs.fixIt(data.title, App.edits[j].expr,
-                                          App.edits[j].replacement, App.edits[j].reason);
+                        App.edits[j].replacement, App.edits[j].reason);
                     if (fix) {
                         data.title = fix.fixed;
                         if (!App.edits[j].fixed) {
@@ -813,25 +810,24 @@
     try {
         var Apps = [];
         var addApp = function(targetID) {
-            if (!targetID) console.log('[!!] No targetID');
-            else Apps[targetID] = new EditorToolkit(targetID);
+            Apps[targetID] = new EditorToolkit(targetID);
         };
         var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
         var targetID;
-        var jqcheck = setInterval(function(){
-            if(typeof($) !== "undefined") {
+        var jqcheck = setInterval(function() {
+            if (typeof($) !== "undefined") {
                 clearInterval(jqcheck);
                 $(document).on('click', selector, function(e) {
                     addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
                 });
-                $(window).load(function(){
+                $(window).load(function() {
                     $('body').append('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>');
                     targetID = $('#post-id').val();
                     if (targetID && !Apps.length) addApp(targetID);
                     else targetID = $('.post-id').text();
                 });
             }
-        },100);
+        }, 100);
     } catch (e) {
         console.log(e);
     }
