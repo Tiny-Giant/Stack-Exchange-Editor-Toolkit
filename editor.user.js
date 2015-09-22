@@ -119,22 +119,11 @@
         App.globals.pipeMods = {};
 
         // Define order in which mods affect  here
-        App.globals.order = ["omit", "edit", "replace"];
+        App.globals.order = ["omit", "edit", "replace"];  //, "casing"]; Temporarily disabled
 
 
         // Define edit rules
         App.edits = {
-            firstcaps: {
-                expr: /(?:(?!\n\n)[^.!?])+[.!?]?\s*/gmi,  // https://regex101.com/r/qR5fO9/8
-                replacement: function( str ) { // find and capitalize first letter https://regex101.com/r/bL9xD7/1
-                    return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
-                        if(!pre) pre = '';
-                        if(!post) post = '';
-                        return pre + first.toUpperCase() + post;
-                    });
-                },
-                reason: "Caps at start of sentences"
-            },
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -236,19 +225,19 @@
                 reason: "Oracle is the proper reference"
             },
             windows: {
-                expr: /\b(?:win|windows)\s*[0-9]+\b/gi,
-                replacement: "Windows $1",
-                reason: "Windows $1 is the proper reference"
-            },
-            windowsXP: {
-                expr: /\b(?:win|windows)\s*xp\b/gi,
-                replacement: "Windows XP",
-                reason: "Windows XP is the proper reference"
-            },
-            windowsVista: {
-                expr: /\b(?:win|windows)\s*vista\b/gi,
-                replacement: "Windows Vista",
-                reason: "Windows Vista is the proper reference"
+                // https://regex101.com/r/jF9zK1/5
+                expr: /\b(?:win|windows)\s+(2k|2000|[0-9.]+|ce|me|nt|xp|vista|server)|(?:win|windows)\b/gi,
+                replacement: function(match,ver) {
+                   ver = !ver ? '' : ver.replace(/ce/i, ' CE')
+                                        .replace(/me/i, ' ME')
+                                        .replace(/nt/i, ' NT')
+                                        .replace(/xp/i, ' XP')
+                                        .replace(/2k/i, ' 2000')
+                                        .replace(/vista/i, ' Vista')
+                                        .replace(/server/i, ' Server')
+                    return 'Windows' + ver;
+                },
+                reason: "trademark capitalization"
             },
             linux: {
                 expr: /\blinux\b/gi,
@@ -315,13 +304,34 @@
                 replacement: "Ubuntu",
                 reason: "Ubuntu is the proper reference"
             },
+           vbnet: {
+              expr: /(?:vb)?(?:\.net|\s?[0-9]+)\s?(?:framework|core)?/gi,
+               replacement: function( str ) {
+                   return str.replace(/vb/i,'VB')
+                             .replace(/net/i,'NET')
+                             .replace(/framework/i,'Framework')
+                             .replace(/core/i,'Core')
+               },
+              reason: "trademark capitalization"
+            },
             regex: {
                 expr: /\bregex(p)?/gi,
                 replacement: "RegEx$1",
                 reason: "RegEx$1 is the proper reference"
             },
+            editupdate: {
+                // https://regex101.com/r/tT2pK6/2
+                expr: /(?!(?:edit|update)\s*[^:]*$)(?:^\**)(edit|update)(\s*#?[0-9]+)?:?(?:\**):?/gmi,
+                replacement: "",
+                reason: "'$1' is unnecessary noise"
+            },
+            hello: {  // TODO: Update badsentences (new) to catch everything hello (old) did.
+                expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
+                replacement: "",
+                reason: "greetings like '$1' are unnecessary noise"
+            },
             badsentences: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|edit|update|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\s*question|appreciate[^.!\n]*help)\b[^,.!?\n]*[,.!?]*/gi,
+                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|suggestion|advice|folks?|hi|hello|ki‌nd(‌?:est|ly)|first\s*question|appreciate[^.!\n]*help)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "'$1' is unnecessary noise"
             },
@@ -387,6 +397,17 @@
                 reason: "grammar and spelling"
             },
             // Punctuation & Spacing come last
+            firstcaps: {
+                expr: /(?:(?!\n\n)[^.!?])+[.!?]?\s*/gmi,  // https://regex101.com/r/qR5fO9/8
+                replacement: function( str ) { // find and capitalize first letter https://regex101.com/r/bL9xD7/1
+                    return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
+                        if(!pre) pre = '';
+                        if(!post) post = '';
+                        return pre + first.toUpperCase() + post;
+                    });
+                },
+                reason: "Caps at start of sentences"
+            },
             multiplesymbols: {
                 expr: /([^\w\s*\-_])\1{1,}/g,
                 replacement: "$1",
