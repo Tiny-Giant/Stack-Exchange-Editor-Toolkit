@@ -647,8 +647,8 @@
 
                 }
 
-                a1 = App.originals.body.split('\n');
-                a2 = App.items.body.split('\n');
+                var a1 = App.originals.body.split('\n');
+                var a2 = App.items.body.split('\n');
 
                 var matrix = new Array(a1.length + 1);
                 var x, y;
