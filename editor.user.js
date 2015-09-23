@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.20
+// @version        1.5.2.21
 // @run-at         document-start
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
@@ -191,17 +191,17 @@
             html: {
                 expr: /([^\b\w.]|^)html(\d)?\b/gi,
                 replacement: "$1HTML$2",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             css: {
                 expr: /([^\b\w.]|^)css\b/gi,
                 replacement: "$1CSS",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             json: {
                 expr: /\bjson\b/gi,
                 replacement: "JSON",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             ajax: {
                 expr: /\bajax\b/gi,
@@ -231,7 +231,7 @@
             sql: {
                 expr: /([^\b\w.]|^)sql\b/gi,
                 replacement: "$1SQL",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             sqlite: {
                 expr: /\bsqlite\s*([0-9]*)\b/gi,
@@ -309,9 +309,11 @@
                 reason: "trademark capitalization"
             },
             urli: {
-                expr: /\bur([li])\b/gi,
-                replacement: "UR$1",
-                reason: "trademark capitalization"
+                expr: /\b(ur[li])\b/gi,
+                replacement: function(match) {
+                    return match.toUpperCase();
+                },
+                reason: "acronym capitalization"
             },
             ios: {
                 expr: /\bios\b/gi,
@@ -341,7 +343,7 @@
             regex: {
                 expr: /\bregex(p)?/gi,
                 replacement: "RegEx$1",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             // Noise reduction
             editupdate: {
