@@ -9,8 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.21
-// @run-at         document-start
+// @version        1.5.2.22
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -67,10 +66,8 @@
 
 (function() {
     "use strict";
-    function EditorToolkit(targetID) {
-        if (!(this instanceof EditorToolkit)) return false;
-
-        var App = this;
+    function extendEditor(targetID) {
+        var App = {};
 
         // Place edit items here
         App.items = {};
@@ -90,22 +87,23 @@
 
         SEETicon.src = '//i.imgur.com/d5ZL09o.png';
 
-        // Check if there was an ID passed (if not, use question ID from URL);
-        if (!targetID) targetID = window.location.href.match(/\/(\d+)\//g)[0].split("/").join("");
         App.globals.targetID = targetID;
+        App.globals.scope = [];
 
         App.globals.spacerHTML = '<li class="wmd-spacer wmd-spacer3" id="wmd-spacer3-' + App.globals.targetID + '" style="left: 400px !important;"></li>';
 
         App.globals.reasons = [];
 
         App.globals.replacedStrings = {
-            "auto": [],
+            "auto":   [],
+            "quote":  [],
             "inline": [],
-            "block": [],
-            "links": []
+            "block":  [],
+            "links":  []
         };
         App.globals.placeHolders = {
             "auto":   "_xAutoxInsertxTextxPlacexHolder_",
+            "quote": "_xBlockxQuotexPlacexHolderx_",
             "inline": "_xCodexInlinexPlacexHolderx_",
             "block":  "_xCodexBlockxPlacexHolderx_",
             "links":  "_xLinkxPlacexHolderx_",
@@ -113,6 +111,7 @@
         };
         App.globals.placeHolderChecks = {
             "auto":   /_xAutoxInsertxTextxPlacexHolder_/gi,
+            "quote": /_xBlockxQuotexPlacexHolderx_/gi,
             "inline": /_xCodexInlinexPlacexHolderx_/gi,
             "block":  /_xCodexBlockxPlacexHolderx_/gi,
             "links":  /_xLinkxPlacexHolderx_/gi,
@@ -121,6 +120,8 @@
         App.globals.checks = {
             //        https://regex101.com/r/cI6oK2/1 automatically inserted text
             "auto":   /[^]*\<\!\-\- End of automatically inserted text \-\-\>/g,
+            //        https://regex101.com/r/fU5lE6/1 blockquotes
+            "quote":  /^\>(?:(?!\n\n)[^])+/gm,
             //        https://regex101.com/r/lL6fH3/1 single-line inline code
             "inline": /`[^`\n]+`/g,
             //        https://regex101.com/r/eC7mF7/1 code blocks and multiline inline code.
@@ -191,17 +192,17 @@
             html: {
                 expr: /([^\b\w.]|^)html(\d)?\b/gi,
                 replacement: "$1HTML$2",
-                reason: "acronym capitalization"
+                reason: "trademark capitalization"
             },
             css: {
                 expr: /([^\b\w.]|^)css\b/gi,
                 replacement: "$1CSS",
-                reason: "acronym capitalization"
+                reason: "trademark capitalization"
             },
             json: {
                 expr: /\bjson\b/gi,
                 replacement: "JSON",
-                reason: "acronym capitalization"
+                reason: "trademark capitalization"
             },
             ajax: {
                 expr: /\bajax\b/gi,
@@ -231,7 +232,7 @@
             sql: {
                 expr: /([^\b\w.]|^)sql\b/gi,
                 replacement: "$1SQL",
-                reason: "acronym capitalization"
+                reason: "trademark capitalization"
             },
             sqlite: {
                 expr: /\bsqlite\s*([0-9]*)\b/gi,
@@ -253,12 +254,12 @@
                 expr: /\b(?:win|windows)\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server)|(?:win|windows)\b/gi,
                 replacement: function(match, ver) {
                     ver = !ver ? '' : ver.replace(/ce/i, ' CE')
-                                         .replace(/me/i, ' ME')
-                                         .replace(/nt/i, ' NT')
-                                         .replace(/xp/i, ' XP')
-                                         .replace(/2k/i, ' 2000')
-                                         .replace(/vista/i, ' Vista')
-                                         .replace(/server/i, ' Server');
+                    .replace(/me/i, ' ME')
+                    .replace(/nt/i, ' NT')
+                    .replace(/xp/i, ' XP')
+                    .replace(/2k/i, ' 2000')
+                    .replace(/vista/i, ' Vista')
+                    .replace(/server/i, ' Server');
                     return 'Windows' + ver;
                 },
                 reason: "trademark capitalization"
@@ -334,16 +335,16 @@
                 expr: /(?:vb)?(?:\.net|\s?[0-9]+)\s?(?:framework|core)?/gi,
                 replacement: function(str) {
                     return str.replace(/vb/i, 'VB')
-                              .replace(/net/i, 'NET')
-                              .replace(/framework/i, 'Framework')
-                              .replace(/core/i, 'Core');
+                    .replace(/net/i, 'NET')
+                    .replace(/framework/i, 'Framework')
+                    .replace(/core/i, 'Core');
                 },
                 reason: "trademark capitalization"
             },
             regex: {
                 expr: /\bregex(p)?/gi,
                 replacement: "RegEx$1",
-                reason: "acronym capitalization"
+                reason: "trademark capitalization"
             },
             // Noise reduction
             editupdate: {
@@ -357,13 +358,13 @@
                 replacement: "",
                 reason: "noise reduction"
             },
-            badsentences: {
-                expr: /[^\n.!?:]*\b(th?anks?|th(?:an)?x|tanx|suggestion|advice|folks?|ki‌nd(‌?:est|ly)|first\s*question|(?:hope|appreciate|pl(?:ease|z|s))[^.!?\n]*helps?)\b[^,.!?\n]*[,.!?]*/gi,
+            badwords: {
+                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|ki‌nd(‌?:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "noise reduction"
             },
-            badwords: {
-                expr: /(pl(?:ease|z|s)|(?:any\s*)?h[ae]?lp)[,.!?]*/gi,
+            badphrases: {
+                expr: /[^\n.!?:]*(?:h[ea]lp|hope|appreciate|pl(?:ease|z|s))[^.!?\n]*(?:helps?|appreciated?)[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -444,7 +445,7 @@
                 reason: "punctuation & spacing"
             },
             spacesbeforesymbols: {
-                expr: /\s+([^\w\s*\-_])(?!\w)/g,
+                expr: /\s+([.,!?;:])(?!\w)/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
@@ -460,237 +461,219 @@
             }
         };
 
-        // Populate funcs
-        App.popFuncs = function() {
-            // This is where the magic happens: this function takes a few pieces of information and applies edits to the post with a couple exceptions
-            App.funcs.fixIt = function(input, expression, replacement, reasoning) {
-                // If there is nothing to search, exit
-                if (!input) return false;
-                // Scan the post text using the expression to see if there are any matches
-                var matches = expression.exec(input);
-                var tmpinput = input;
-                input = input.replace(expression, function() {
-                    var matches = [].slice.call(arguments, 0, -2);
-                    reasoning = reasoning.replace(/[$](\d)+/g, function() {
-                        var phrases = [].slice.call(arguments, 0, -2);
-                        var phrase = matches[phrases[1]];
-                        return phrase ? phrase : '';
-                    });
-                    return arguments[0].replace(expression, replacement);
+        // This is where the magic happens: this function takes a few pieces of information and applies edits to the post with a couple exceptions
+        App.funcs.fixIt = function(input, expression, replacement, reasoning) {
+            // If there is nothing to search, exit
+            if (!input) return false;
+            // Scan the post text using the expression to see if there are any matches
+            var matches = expression.exec(input);
+            var tmpinput = input;
+            input = input.replace(expression, function() {
+                var matches = [].slice.call(arguments, 0, -2);
+                reasoning = reasoning.replace(/[$](\d)+/g, function() {
+                    var phrases = [].slice.call(arguments, 0, -2);
+                    var phrase = matches[phrases[1]];
+                    return phrase ? phrase : '';
                 });
-                if (input !== tmpinput) {
-                    return {
-                        reason: reasoning,
-                        fixed: String(input).trim()
-                    };
-                } else return false;
-            };
+                return arguments[0].replace(expression, replacement);
+            });
+            if (input !== tmpinput) {
+                return {
+                    reason: reasoning,
+                    fixed: String(input).trim()
+                };
+            } else return false;
+        };
 
-            App.funcs.applyListeners = function() { // Removes default Stack Exchange listeners; see https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/43
-                function removeEventListeners(e) {
-                    if (e.which === 13) {
-                        if (e.metaKey || e.ctrlKey) {
-                            // CTRL/CMD + Enter -> Activate the auto-editor
-                            App.selections.buttonFix.click();
-                        } else {
-                            // It's possible to remove the event listeners, because of the way outerHTML works.
-                            this.outerHTML = this.outerHTML;
-                            App.selections.submitButton.click();
-                        }
-                    }
-                }
-
-                // Tags box
-                App.selections.tagField.keydown(removeEventListeners);
-
-                // Edit summary box
-                App.selections.summary.keydown(removeEventListeners);
-            };
-
-            // Wait for relevant dynamic content to finish loading
-            App.funcs.dynamicDelay = function(callback) {
-                setTimeout(callback, 1000);
-            };
-
-            // Populate or refresh DOM selections
-            App.funcs.popSelections = function() {
-                var targetID = App.globals.targetID;
-                var scope = $('div[data-questionid="' + targetID + '"]');
-                if (!scope.length) scope = $('div[data-answerid="' + targetID + '"]');
-                if (!scope.length) scope = '';
-                if ($('.ToolkitButtonWrapper', scope).length) return false;
-                App.selections.buttonBar = $('[id^="wmd-button-bar"]', scope);
-                App.selections.buttonBar.unbind();
-                App.selections.redoButton = $('[id^="wmd-redo-button"]', scope);
-                App.selections.body = $('[id^="wmd-input"]', scope);
-                App.selections.title = $('[class*="title-field"]', scope);
-                App.selections.summary = $('[id^="edit-comment"]', scope);
-                App.selections.tagField = $(".tag-editor", scope);
-                App.selections.submitButton = $('[id^="submit-button"]', scope);
-                App.selections.helpButton = $('[id^="wmd-help-button"]', scope);
-                App.selections.editor = $('.post-editor', scope);
-                console.log(App.selections);
-                return !!App.selections.redoButton.length;
-            };
-
-            // Populate edit item sets from DOM selections
-            App.funcs.popItems = function() {
-                var i = App.items, s = App.selections;
-                ['title', 'body', 'summary'].forEach(function(v) {
-                    i[v] = String(s[v].val()).trim();
-                });
-            };
-
-            // Populate original item sets from DOM selections
-            App.funcs.popOriginals = function() {
-                var i = App.originals, s = App.selections;
-                ['title', 'body', 'summary'].forEach(function(v) {
-                    i[v] = String(s[v].val()).trim();
-                });
-            };
-
-            // Insert editing button(s)
-            App.funcs.createButton = function() {
-                if (!App.selections.redoButton.length) return false;
-
-                App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
-                App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
-                App.selections.buttonInfo = $('<div class="ToolkitInfo">');
-
-                // Build the button
-                App.selections.buttonWrapper.append(App.selections.buttonFix);
-                App.selections.buttonWrapper.append(App.selections.buttonInfo);
-
-                // Insert button
-                App.selections.redoButton.after(App.selections.buttonWrapper);
-                // Insert spacer
-                App.selections.redoButton.after(App.globals.spacerHTML);
-
-                // Attach the event listener to the button
-                App.selections.buttonFix.click(App.funcs.fixEvent);
-
-                App.selections.helpButton.css({
-                    'padding': '0px'
-                });
-                App.selections.buttonWrapper.css({
-                    'position': 'relative',
-                    'left': '430px',
-                    'padding-top': '2%'
-                });
-                App.selections.buttonFix.css({
-                    'position': 'static',
-                    'float': 'left',
-                    'border-width': '0px',
-                    'background-color': 'white',
-                    'background-image': 'url("//i.imgur.com/79qYzkQ.png")',
-                    'background-size': '100% 100%',
-                    'width': '18px',
-                    'height': '18px',
-                    'outline': 'none',
-                    'box-shadow': 'none'
-                });
-                App.selections.buttonInfo.css({
-                    'position': 'static',
-                    'float': 'left',
-                    'margin-left': '5px',
-                    'font-size': '12px',
-                    'color': '#424242',
-                    'line-height': '19px'
-                });
-            };
-
-            App.funcs.makeDiffTable = function() {
-                App.selections.diffTable = $('<table class="diffTable"/>');
-                App.selections.editor.append(App.selections.diffTable);
-            };
-
-            App.funcs.fixEvent = function(e) {
-                if (e) e.preventDefault();
-                // Refresh item population
-                App.funcs.popOriginals();
-                App.funcs.popItems();
-                // Pipe data through editing modules
-                App.pipe(App.items, App.globals.pipeMods, App.globals.order);
-            };
-
-            App.funcs.diff = function() {
-                App.selections.diffTable.empty();
-
-                function maakRij(x, y, type, rij) {
-
-                    var tr = $('<tr/>');
-
-                    if (type === ' ') return false;
-                    if (type === '+') tr.addClass('add');
-                    if (type === '-') tr.addClass('del');
-
-                    tr.append($('<td class="codekolom">' + y + '</td>'));
-                    tr.append($('<td class="codekolom">' + x + '</td>'));
-                    tr.append($('<td class="bredecode">' + type + ' ' + rij.replace(/\</g, '&lt;') + '</td>'));
-
-                    App.selections.diffTable.append(tr);
-                }
-
-                function getDiff(matrix, a1, a2, x, y) {
-                    if (x > 0 && y > 0 && a1[y - 1] === a2[x - 1]) {
-                        getDiff(matrix, a1, a2, x - 1, y - 1);
-                        maakRij(x, y, ' ', a1[y - 1]);
+        App.funcs.applyListeners = function() { // Removes default Stack Exchange listeners; see https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/43
+            function removeEventListeners(e) {
+                if (e.which === 13) {
+                    if (e.metaKey || e.ctrlKey) {
+                        // CTRL/CMD + Enter -> Activate the auto-editor
+                        App.selections.buttonFix.click();
                     } else {
-                        if (x > 0 && (y === 0 || matrix[y][x - 1] >= matrix[y - 1][x])) {
-                            getDiff(matrix, a1, a2, x - 1, y);
-                            maakRij(x, '', '+', a2[x - 1]);
-                        } else if (y > 0 && (x === 0 || matrix[y][x - 1] < matrix[y - 1][x])) {
-                            getDiff(matrix, a1, a2, x, y - 1);
-                            maakRij('', y, '-', a1[y - 1], '');
-                        } else {
-                            return;
-                        }
-                    }
-
-                }
-
-                var a1 = App.originals.body.split('\n');
-                var a2 = App.items.body.split('\n');
-
-                var matrix = new Array(a1.length + 1);
-                var x, y;
-                for (y = 0; y < matrix.length; y++) {
-                    matrix[y] = new Array(a2.length + 1);
-
-                    for (x = 0; x < matrix[y].length; x++) {
-                        matrix[y][x] = 0;
+                        // It's possible to remove the event listeners, because of the way outerHTML works.
+                        this.outerHTML = this.outerHTML;
+                        App.selections.submitButton.click();
                     }
                 }
+            }
 
-                for (y = 1; y < matrix.length; y++) {
-                    for (x = 1; x < matrix[y].length; x++) {
-                        if (a1[y - 1] === a2[x - 1]) {
-                            matrix[y][x] = 1 + matrix[y - 1][x - 1];
-                        } else {
-                            matrix[y][x] = Math.max(matrix[y - 1][x], matrix[y][x - 1]);
-                        }
-                    }
-                }
+            // Tags box
+            App.selections.tagField.keydown(removeEventListeners);
 
-                try {
+            // Edit summary box
+            App.selections.summary.keydown(removeEventListeners);
+        };
+
+        // Populate or refresh DOM selections
+        App.funcs.popSelections = function() {
+            var scope = App.globals.scope;
+            App.selections.redoButton = $('[id^="wmd-redo-button"]', scope);
+            App.selections.body = $('[id^="wmd-input"]', scope);
+            App.selections.title = $('[class*="title-field"]', scope);
+            App.selections.summary = $('[id^="edit-comment"]', scope);
+            App.selections.tagField = $(".tag-editor", scope);
+            App.selections.submitButton = $('[id^="submit-button"]', scope);
+            App.selections.helpButton = $('[id^="wmd-help-button"]', scope);
+            App.selections.editor = $('.post-editor', scope);
+        };
+
+        // Populate edit item sets from DOM selections
+        App.funcs.popItems = function() {
+            var i = App.items, s = App.selections;
+            ['title', 'body', 'summary'].forEach(function(v) {
+                i[v] = String(s[v].val()).trim();
+            });
+        };
+
+        // Populate original item sets from DOM selections
+        App.funcs.popOriginals = function() {
+            var i = App.originals, s = App.selections;
+            ['title', 'body', 'summary'].forEach(function(v) {
+                i[v] = String(s[v].val()).trim();
+            });
+        };
+
+        // Insert editing button(s)
+        App.funcs.createButton = function() {
+            if (!App.selections.redoButton.length) return false;
+
+            App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
+            App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
+            App.selections.buttonInfo = $('<div class="ToolkitInfo">');
+
+            // Build the button
+            App.selections.buttonWrapper.append(App.selections.buttonFix);
+            App.selections.buttonWrapper.append(App.selections.buttonInfo);
+
+            // Insert button
+            App.selections.redoButton.after(App.selections.buttonWrapper);
+            // Insert spacer
+            App.selections.redoButton.after(App.globals.spacerHTML);
+
+            // Attach the event listener to the button
+            App.selections.buttonFix.click(App.funcs.fixEvent);
+
+            App.selections.helpButton.css({
+                'padding': '0px'
+            });
+            App.selections.buttonWrapper.css({
+                'position': 'relative',
+                'left': '430px',
+                'padding-top': '2%'
+            });
+            App.selections.buttonFix.css({
+                'position': 'static',
+                'float': 'left',
+                'border-width': '0px',
+                'background-color': 'white',
+                'background-image': 'url("//i.imgur.com/79qYzkQ.png")',
+                'background-size': '100% 100%',
+                'width': '18px',
+                'height': '18px',
+                'outline': 'none',
+                'box-shadow': 'none'
+            });
+            App.selections.buttonInfo.css({
+                'position': 'static',
+                'float': 'left',
+                'margin-left': '5px',
+                'font-size': '12px',
+                'color': '#424242',
+                'line-height': '19px'
+            });
+        };
+
+        App.funcs.makeDiffTable = function() {
+            App.selections.diffTable = $('<table class="diffTable"/>');
+            App.selections.editor.append(App.selections.diffTable);
+        };
+
+        App.funcs.fixEvent = function(e) {
+            if (e) e.preventDefault();
+            // Refresh item population
+            App.funcs.popOriginals();
+            App.funcs.popItems();
+            // Pipe data through editing modules
+            App.pipe(App.items, App.globals.pipeMods, App.globals.order);
+        };
+
+        App.funcs.diff = function() {
+            App.selections.diffTable.empty();
+
+            function maakRij(x, y, type, rij) {
+
+                var tr = $('<tr/>');
+
+                if (type === ' ') return false;
+                if (type === '+') tr.addClass('add');
+                if (type === '-') tr.addClass('del');
+
+                tr.append($('<td class="codekolom">' + y + '</td>'));
+                tr.append($('<td class="codekolom">' + x + '</td>'));
+                tr.append($('<td class="bredecode">' + type + ' ' + rij.replace(/\</g, '&lt;') + '</td>'));
+
+                App.selections.diffTable.append(tr);
+            }
+
+            function getDiff(matrix, a1, a2, x, y) {
+                if (x > 0 && y > 0 && a1[y - 1] === a2[x - 1]) {
                     getDiff(matrix, a1, a2, x - 1, y - 1);
-                } catch (e) {
-                    alert(e);
-                }
-            };
-
-            // Handle pipe output
-            App.funcs.output = function(data) {
-                if (data) {
-                    App.selections.title.val(data.title);
-                    App.selections.body.val(data.body);
-                    App.selections.summary.val(data.summary);
-                    App.selections.summary.focus();
-                    App.selections.editor.append(App.funcs.diff());
+                    maakRij(x, y, ' ', a1[y - 1]);
+                } else {
+                    if (x > 0 && (y === 0 || matrix[y][x - 1] >= matrix[y - 1][x])) {
+                        getDiff(matrix, a1, a2, x - 1, y);
+                        maakRij(x, '', '+', a2[x - 1]);
+                    } else if (y > 0 && (x === 0 || matrix[y][x - 1] < matrix[y - 1][x])) {
+                        getDiff(matrix, a1, a2, x, y - 1);
+                        maakRij('', y, '-', a1[y - 1], '');
+                    } else {
+                        return;
+                    }
                 }
 
-                App.selections.buttonInfo.text(App.globals.reasons.length + ' changes made');
-            };
+            }
+
+            a1 = App.originals.body.split('\n');
+            a2 = App.items.body.split('\n');
+
+            var matrix = new Array(a1.length + 1);
+            var x, y;
+            for (y = 0; y < matrix.length; y++) {
+                matrix[y] = new Array(a2.length + 1);
+
+                for (x = 0; x < matrix[y].length; x++) {
+                    matrix[y][x] = 0;
+                }
+            }
+
+            for (y = 1; y < matrix.length; y++) {
+                for (x = 1; x < matrix[y].length; x++) {
+                    if (a1[y - 1] === a2[x - 1]) {
+                        matrix[y][x] = 1 + matrix[y - 1][x - 1];
+                    } else {
+                        matrix[y][x] = Math.max(matrix[y - 1][x], matrix[y][x - 1]);
+                    }
+                }
+            }
+
+            try {
+                getDiff(matrix, a1, a2, x - 1, y - 1);
+            } catch (e) {
+                alert(e);
+            }
+        };
+
+        // Handle pipe output
+        App.funcs.output = function(data) {
+            App.selections.title.val(data.title);
+            App.selections.body.val(data.body);
+            App.selections.summary.val(data.summary);
+            App.selections.summary.focus();
+            App.selections.editor.append(App.funcs.diff());
+            StackExchange.MarkdownEditor.refreshAllPreviews();
+            App.selections.buttonInfo.text(App.globals.reasons.length + ' changes made');
         };
 
         // Pipe data through modules in proper order, returning the result
@@ -699,21 +682,10 @@
             for (var i in order) {
                 if (order.hasOwnProperty(i)) {
                     modName = order[i];
-                    data = mods[modName](data);
+                    mods[modName](data);
                 }
             }
             App.funcs.output(data);
-        };
-
-        // Init app
-        App.init = function() {
-            App.popFuncs();
-            App.funcs.dynamicDelay(function() {
-                if (!App.funcs.popSelections()) return false;
-                App.funcs.createButton();
-                App.funcs.applyListeners();
-                App.funcs.makeDiffTable();
-            });
         };
 
         App.globals.pipeMods.omit = function(data) {
@@ -727,14 +699,12 @@
             return data;
         };
 
-        App.globals.pipeMods.codefix = function(data) {
-            var replaced = App.globals.replacedStrings.block,
-                str;
+        App.globals.pipeMods.codefix = function() {
+            var replaced = App.globals.replacedStrings.block, str;
             for (var i in replaced) {
                 // https://regex101.com/r/tX9pM3/1       https://regex101.com/r/tX9pM3/2                 https://regex101.com/r/tX9pM3/3
                 if (/^`[^]+`$/.test(replaced[i])) replaced[i] = /(?!`)((?!`)[^])+/.exec(replaced[i])[1].replace(/(.+)/g, '    $1');
             }
-            return data;
         };
 
         App.globals.pipeMods.replace = function(data) {
@@ -762,7 +732,7 @@
                 if (App.edits.hasOwnProperty(j)) {
                     // Check body
                     var fix = App.funcs.fixIt(data.body, App.edits[j].expr,
-                        App.edits[j].replacement, App.edits[j].reason);
+                                              App.edits[j].replacement, App.edits[j].reason);
                     if (fix) {
                         App.globals.reasons[App.globals.reasons.length] = fix.reason;
                         data.body = fix.fixed;
@@ -771,7 +741,7 @@
 
                     // Check title
                     fix = App.funcs.fixIt(data.title, App.edits[j].expr,
-                        App.edits[j].replacement, App.edits[j].reason);
+                                          App.edits[j].replacement, App.edits[j].reason);
                     if (fix) {
                         data.title = fix.fixed;
                         if (!App.edits[j].fixed) {
@@ -815,29 +785,43 @@
             return data;
         };
 
-        App.init();
+        // Init app
+        App.init = function() {
+            if (!App.globals.targetID) App.globals.targetID = $('#post-id').val();
+            var targetID = App.globals.targetID;
+            
+            App.globals.scope = $('form[action^="/posts/' + targetID + '"]');
+            var toolbarchk = setInterval(function(){
+                console.log('waiting for toolbar');
+                if(!App.globals.scope.find('.wmd-button-row').length) return;
+                clearInterval(toolbarchk);
+                console.log('found toolbar');
+                App.funcs.popSelections();
+                App.funcs.createButton();
+                App.funcs.applyListeners();
+                App.funcs.makeDiffTable();
+            }, 100);
+            return App;
+        };
+
+        return App.init();
     }
     try {
-        var Apps = [];
-        var addApp = function(targetID) {
-            Apps[targetID] = new EditorToolkit(targetID);
-        };
-        var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
-        var targetID;
-        var jqcheck = setInterval(function() {
-            if (typeof($) !== "undefined") {
-                clearInterval(jqcheck);
-                $(document).on('click', selector, function(e) {
-                    addApp(e.target.href ? e.target.href.match(/\d/g).join("") : targetID);
-                });
-                $(window).load(function() {
-                    $('body').append('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>');
-                    targetID = $('#post-id').val();
-                    if (targetID && !Apps.length) addApp(targetID);
-                    else targetID = $('.post-id').text();
-                });
+        var test = window.location.href.match(/.posts.(\d+).edit/);
+        if(test) extendEditor(test[1]);
+        else  $(document).ajaxComplete(function() { 
+            console.log(arguments);
+            test = arguments[2].url.match(/posts.(\d+).edit-inline/);
+            if(!test) {
+                test = arguments[2].url.match(/review.inline-edit-post/)
+                if(!test) return;
+                test = arguments[2].data.match(/id=(\d+)/);
+                if(!test) return;
             }
-        }, 100);
+            extendEditor(test[1]);
+        });
+        // This is the styling for the diff output.
+        $('body').append('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>');
     } catch (e) {
         console.log(e);
     }
