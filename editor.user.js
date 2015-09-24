@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.22
+// @version        1.5.2.23
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -66,7 +66,7 @@
 
 (function() {
     "use strict";
-    function extendEditor(targetID) {
+    function extendEditor(root) {
         var App = {};
 
         // Place edit items here
@@ -87,10 +87,9 @@
 
         SEETicon.src = '//i.imgur.com/d5ZL09o.png';
 
-        App.globals.targetID = targetID;
-        App.globals.scope = [];
+        App.globals.root = root;
 
-        App.globals.spacerHTML = '<li class="wmd-spacer wmd-spacer3" id="wmd-spacer3-' + App.globals.targetID + '" style="left: 400px !important;"></li>';
+        App.globals.spacerHTML = '<li class="wmd-spacer wmd-spacer3" id="wmd-spacer3" style="left: 400px !important;"></li>';
 
         App.globals.reasons = [];
 
@@ -508,15 +507,14 @@
 
         // Populate or refresh DOM selections
         App.funcs.popSelections = function() {
-            var scope = App.globals.scope;
-            App.selections.redoButton = $('[id^="wmd-redo-button"]', scope);
-            App.selections.body = $('[id^="wmd-input"]', scope);
-            App.selections.title = $('[class*="title-field"]', scope);
-            App.selections.summary = $('[id^="edit-comment"]', scope);
-            App.selections.tagField = $(".tag-editor", scope);
-            App.selections.submitButton = $('[id^="submit-button"]', scope);
-            App.selections.helpButton = $('[id^="wmd-help-button"]', scope);
-            App.selections.editor = $('.post-editor', scope);
+            App.selections.redoButton   = App.globals.root.find('[id^="wmd-redo-button"]');
+            App.selections.body         = App.globals.root.find('[id^="wmd-input"]');
+            App.selections.title        = App.globals.root.find('[class*="title-field"]');
+            App.selections.summary      = App.globals.root.find('[id^="edit-comment"]');
+            App.selections.tagField     = App.globals.root.find(".tag-editor");
+            App.selections.submitButton = App.globals.root.find('[id^="submit-button"]');
+            App.selections.helpButton   = App.globals.root.find('[id^="wmd-help-button"]');
+            App.selections.editor       = App.globals.root.find('.post-editor');
         };
 
         // Populate edit item sets from DOM selections
@@ -606,7 +604,6 @@
 
                 var tr = $('<tr/>');
 
-                if (type === ' ') return false;
                 if (type === '+') tr.addClass('add');
                 if (type === '-') tr.addClass('del');
 
@@ -635,9 +632,10 @@
 
             }
 
-            a1 = App.originals.body.split('\n');
-            a2 = App.items.body.split('\n');
-
+            
+            var a1 = App.originals.body.split('\n');
+            var a2 = App.items.body.split('\n');
+            
             var matrix = new Array(a1.length + 1);
             var x, y;
             for (y = 0; y < matrix.length; y++) {
@@ -787,13 +785,9 @@
 
         // Init app
         App.init = function() {
-            if (!App.globals.targetID) App.globals.targetID = $('#post-id').val();
-            var targetID = App.globals.targetID;
-            
-            App.globals.scope = $('form[action^="/posts/' + targetID + '"]');
             var toolbarchk = setInterval(function(){
                 console.log('waiting for toolbar');
-                if(!App.globals.scope.find('.wmd-button-row').length) return;
+                if(!App.globals.root.find('.wmd-button-row').length) return;
                 clearInterval(toolbarchk);
                 console.log('found toolbar');
                 App.funcs.popSelections();
@@ -808,9 +802,8 @@
     }
     try {
         var test = window.location.href.match(/.posts.(\d+).edit/);
-        if(test) extendEditor(test[1]);
-        else  $(document).ajaxComplete(function() { 
-            console.log(arguments);
+        if(test) extendEditor($('form[action^="/posts/' + test[1] + '"]'));
+        else $(document).ajaxComplete(function() { 
             test = arguments[2].url.match(/posts.(\d+).edit-inline/);
             if(!test) {
                 test = arguments[2].url.match(/review.inline-edit-post/)
@@ -818,8 +811,9 @@
                 test = arguments[2].data.match(/id=(\d+)/);
                 if(!test) return;
             }
-            extendEditor(test[1]);
+            extendEditor($('form[action^="/posts/' + test[1] + '"]'));
         });
+        if($('#post-form').length) extendEditor($('#post-form'));
         // This is the styling for the diff output.
         $('body').append('<style>.diff { max-width: 100%; overflow: auto; } td.bredecode, td.codekolom { padding: 1px 2px; } td.bredecode { width: 100%; padding-left: 4px; white-space: pre-wrap; word-wrap: break-word; } td.codekolom { text-align: right; min-width: 3em; background-color: #ECECEC; border-right: 1px solid #DDD; color: #AAA; } tr.add { background: #DFD; } tr.del { background: #FDD; }</style>');
     } catch (e) {
