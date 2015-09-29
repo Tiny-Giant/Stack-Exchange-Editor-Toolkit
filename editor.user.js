@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.24
+// @version        1.5.2.25
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -51,7 +51,8 @@
             "quote":  [],
             "inline": [],
             "block":  [],
-            "links":  []
+            "links":  [],
+            "tags":  []
         };
         App.globals.placeHolders = {
             "auto":   "_xAutoxInsertxTextxPlacexHolder_",
@@ -154,12 +155,12 @@
             json: {
                 expr: /\bjson\b/gi,
                 replacement: "JSON",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             ajax: {
                 expr: /\bajax\b/gi,
                 replacement: "AJAX",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             php: {
                 expr: /([^\b\w.]|^)php\b/gi,
@@ -301,7 +302,7 @@
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
-                expr: /(?!(?:edit|update)\s*[^:]*$)(?:^\**)(edit|update)(\s*#?[0-9]+)?:?(?:\**):?/gmi,
+                expr: /(?!(?:edit|update)\w*\s*[^:]*$)(?:^\**)(edit|update)\w*(\s*#?[0-9]+)?:?(?:\**):?/gmi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -331,9 +332,29 @@
                 reason: "noise reduction"
             },
             // Grammar and spelling
-            apostrophes: {
-                expr: /\b(can|doesn|don|won|hasn|isn|didn)[^\w']*t\b/gi,
-                replacement: "$1't",
+            apostrophe_d: {
+                expr: /\b(he|she|who|you)[^\w']*(d)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_ll: {
+                expr: /\b(they|what|who|you)[^\w']*(ll)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_re: {
+                expr: /\b(they|what|you)[^\w']*(re)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_s: {
+                expr: /\b(he|she|that|there|what|where)[^\w']*(s)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_t: {
+                expr: /\b(aren|can|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
+                replacement: "$1'$2",
                 reason: "grammar and spelling"
             },
             prolly: {
@@ -342,7 +363,7 @@
                 reason: "grammar and spelling"
             },
             i: {
-                expr: /\bi\b/g,
+                expr: /\bi('|\b)/g,  // i or i-apostrophe
                 replacement: "I",
                 reason: "grammar and spelling"
             },
@@ -378,21 +399,28 @@
             },
             // Punctuation & Spacing come last
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/11
-                expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])?[ ]*/g, 
+                //    https://regex101.com/r/qR5fO9/12
+                // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
+                //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
+                expr: /((?!\n\n)(?:[^?.!])*([?.!]|\n\n)?\)*)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return '';
+                    console.log('str: '+str);
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
                         if (!post) post = '';
-                        return pre + first.toUpperCase() + post + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
+                        console.log('sentence ('+sentence+') pre ('+pre+') first ('+first+') post ('+post+') endpunc ('+endpunc+')');
+                        var update = pre + first.toUpperCase() + post// + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
+                        console.log('update ('+update+')');
+                        return update;
                     });
                 },
                 reason: "Caps at start of sentences"
             },
             multiplesymbols: {
-                expr: /([^\w\s*\-_])\1{1,}/g,
+                //    https://regex101.com/r/bE9zM6/1
+                expr: /([^\w\s*#.\-_])\1{1,}/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
@@ -687,6 +715,9 @@
                         var fix = App.funcs.fixIt(data[field], App.edits[j].expr,
                                                   App.edits[j].replacement, App.edits[j].reason);
                         if (fix) {
+                            // HACK ALERT
+                            if (j === 'firstcaps') fix.count = 1;
+
                             if (!App.globals.reasons.hasOwnProperty(fix.reason)) {
                                 App.globals.reasons[fix.reason] = {reason:fix.reason, editId:j, count:fix.count};
                             }
@@ -708,9 +739,11 @@
             App.globals.changes = 0;
           
             for (var z in App.globals.reasons) {
+                // For each type of change made, add a reason string with the reason text,
+                // optionally the rule ID, and the number of repeats if 2 or more.
                 reasons.push(App.globals.reasons[z].reason
                              + (App.globals.showRules ? ' ['+ App.globals.reasons[z].editId +']' : '')
-                             + ' ('+App.globals.reasons[z].count+')');
+                             + ((App.globals.reasons[z].count > 1) ? ' ('+App.globals.reasons[z].count+')' : '') );
                 App.globals.changes += App.globals.reasons[z].count;
             }
           
@@ -731,11 +764,11 @@
         App.init = function() {
             var count = 0;
             var toolbarchk = setInterval(function(){
-                console.log('waiting for toolbar');
+                //console.log('waiting for toolbar');
                 if(++count === 10) clearInterval(toolbarchk)
                 if(!App.globals.root.find('.wmd-button-row').length) return;
                 clearInterval(toolbarchk);
-                console.log('found toolbar');
+                //console.log('found toolbar');
                 App.funcs.popSelections();
                 App.funcs.createButton();
                 App.funcs.applyListeners();
