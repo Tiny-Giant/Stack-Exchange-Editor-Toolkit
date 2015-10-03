@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.24
+// @version        1.5.2.25
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -31,6 +31,9 @@
 
         // Place "helper" functions here
         App.funcs = {};
+        
+        // True to display rule names in Edit Summary
+        App.globals.showRules = false;
 
         //Preload icon alt
         var SEETicon = new Image();
@@ -41,18 +44,19 @@
 
         App.globals.spacerHTML = '<li class="wmd-spacer wmd-spacer3" id="wmd-spacer3" style="left: 400px !important;"></li>';
 
-        App.globals.reasons = [];
+        App.globals.reasons = {};
 
         App.globals.replacedStrings = {
             "auto":   [],
             "quote":  [],
             "inline": [],
             "block":  [],
-            "links":  []
+            "links":  [],
+            "tags":  []
         };
         App.globals.placeHolders = {
             "auto":   "_xAutoxInsertxTextxPlacexHolder_",
-            "quote": "_xBlockxQuotexPlacexHolderx_",
+            "quote":  "_xBlockxQuotexPlacexHolderx_",
             "inline": "_xCodexInlinexPlacexHolderx_",
             "block":  "_xCodexBlockxPlacexHolderx_",
             "links":  "_xLinkxPlacexHolderx_",
@@ -151,12 +155,12 @@
             json: {
                 expr: /\bjson\b/gi,
                 replacement: "JSON",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             ajax: {
                 expr: /\bajax\b/gi,
                 replacement: "AJAX",
-                reason: "trademark capitalization"
+                reason: "acronym capitalization"
             },
             php: {
                 expr: /([^\b\w.]|^)php\b/gi,
@@ -169,8 +173,8 @@
                 reason: "the proper spelling (despite the tag name) is '$1vote' (one word)"
             },
             c: {
-                expr: /([^\b\w.]|^)c([#+]+)|([^\b.])\bc\b/gi,
-                replacement: "$1C$2",
+                expr: /\bc\b([#+]+)?/gi,
+                replacement: "C$1",
                 reason: "trademark capitalization"
             },
             java: {
@@ -298,7 +302,7 @@
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
-                expr: /(?!(?:edit|update)\s*[^:]*$)(?:^\**)(edit|update)(\s*#?[0-9]+)?:?(?:\**):?/gmi,
+                expr: /(?!(?:edit|update)\w*\s*[^:]*$)(?:^\**)(edit|update)\w*(\s*#?[0-9]+)?:?(?:\**):?/gmi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -328,9 +332,29 @@
                 reason: "noise reduction"
             },
             // Grammar and spelling
-            apostrophes: {
-                expr: /\b(can|doesn|don|won|hasn|isn|didn)[^\w']*t\b/gi,
-                replacement: "$1't",
+            apostrophe_d: {
+                expr: /\b(he|she|who|you)[^\w']*(d)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_ll: {
+                expr: /\b(they|what|who|you)[^\w']*(ll)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_re: {
+                expr: /\b(they|what|you)[^\w']*(re)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_s: {
+                expr: /\b(he|she|that|there|what|where)[^\w']*(s)\b/gi,
+                replacement: "$1'$2",
+                reason: "grammar and spelling"
+            },
+            apostrophe_t: {
+                expr: /\b(aren|can|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
+                replacement: "$1'$2",
                 reason: "grammar and spelling"
             },
             prolly: {
@@ -339,17 +363,17 @@
                 reason: "grammar and spelling"
             },
             i: {
-                expr: /\bi\b/gi,
+                expr: /\bi('|\b)/g,  // i or i-apostrophe
                 replacement: "I",
                 reason: "grammar and spelling"
             },
             im: {
-                expr: /\bi\W*m\b/gi,
+                expr: /\bim\b/gi,
                 replacement: "I'm",
                 reason: "grammar and spelling"
             },
             ive: {
-                expr: /\bi\W*ve\b/gi,
+                expr: /\bive\b/gi,
                 replacement: "I've",
                 reason: "grammar and spelling"
             },
@@ -375,21 +399,28 @@
             },
             // Punctuation & Spacing come last
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/11
-                expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])?[ ]*/g, 
+                //    https://regex101.com/r/qR5fO9/12
+                // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
+                //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
+                expr: /((?!\n\n)(?:[^?.!])*([?.!]|\n\n)?\)*)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return '';
+                    console.log('str: '+str);
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
                         if (!post) post = '';
-                        return pre + first.toUpperCase() + post + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
+                        console.log('sentence ('+sentence+') pre ('+pre+') first ('+first+') post ('+post+') endpunc ('+endpunc+')');
+                        var update = pre + first.toUpperCase() + post// + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
+                        console.log('update ('+update+')');
+                        return update;
                     });
                 },
                 reason: "Caps at start of sentences"
             },
             multiplesymbols: {
-                expr: /([^\w\s*\-_])\1{1,}/g,
+                //    https://regex101.com/r/bE9zM6/1
+                expr: /([^\w\s*#.\-_])\1{1,}/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
@@ -399,13 +430,9 @@
                 reason: "punctuation & spacing"
             },
             multiplespaces: {
-                expr: /[ ]{2,}/g,
+                // https://regex101.com/r/hY9hQ3/1
+                expr: /[ ]{2,}(?!$)/g,
                 replacement: " ",
-                reason: "punctuation & spacing"
-            },
-            blanklines: {
-                expr: /(\s*[\r\n])+/gm,
-                replacement: "\n\n",
                 reason: "punctuation & spacing"
             }
         };
@@ -415,7 +442,10 @@
             // If there is nothing to search, exit
             if (!input) return false;
             // Scan the post text using the expression to see if there are any matches
-            var matches = expression.exec(input);
+            var matches = input.match(expression);
+            if (!matches) return false;
+            console.log(JSON.stringify(matches))
+            var count = matches.length;  // # replacements to do
             var tmpinput = input;
             input = input.replace(expression, function() {
                 var matches = [].slice.call(arguments, 0, -2);
@@ -429,7 +459,8 @@
             if (input !== tmpinput) {
                 return {
                     reason: reasoning,
-                    fixed: String(input).trim()
+                    fixed: String(input).trim(),
+                    count: count
                 };
             } else return false;
         };
@@ -621,7 +652,7 @@
             App.selections.summary.focus();
             App.selections.editor.append(App.funcs.diff());
             StackExchange.MarkdownEditor.refreshAllPreviews();
-            App.selections.buttonInfo.text(App.globals.reasons.length + ' changes made');
+            App.selections.buttonInfo.text(App.globals.changes + (App.globals.changes>1 ? ' changes' : ' change')+' made');
         };
 
         // Pipe data through modules in proper order, returning the result
@@ -675,25 +706,25 @@
                 backgroundColor: '#fff'
             }, 1000);
 
+            // List of fields to be edited
+            var fields = {body:'body',title:'title'};
             // Loop through all editing rules
             for (var j in App.edits) {
-                if (App.edits.hasOwnProperty(j)) {
-                    // Check body
-                    var fix = App.funcs.fixIt(data.body, App.edits[j].expr,
-                                              App.edits[j].replacement, App.edits[j].reason);
-                    if (fix) {
-                        App.globals.reasons[App.globals.reasons.length] = fix.reason;
-                        data.body = fix.fixed;
-                        App.edits[j].fixed = true;
-                    }
+                for (var field in fields) {
+                    if (App.edits.hasOwnProperty(j)) {
+                        var fix = App.funcs.fixIt(data[field], App.edits[j].expr,
+                                                  App.edits[j].replacement, App.edits[j].reason);
+                        if (fix) {
+                            // HACK ALERT
+                            if (j === 'firstcaps') fix.count = 1;
 
-                    // Check title
-                    fix = App.funcs.fixIt(data.title, App.edits[j].expr,
-                                          App.edits[j].replacement, App.edits[j].reason);
-                    if (fix) {
-                        data.title = fix.fixed;
-                        if (!App.edits[j].fixed) {
-                            App.globals.reasons[App.globals.reasons.length] = fix.reason;
+                            if (!App.globals.reasons.hasOwnProperty(fix.reason)) {
+                                App.globals.reasons[fix.reason] = {reason:fix.reason, editId:j, count:fix.count};
+                            }
+                            else {
+                                App.globals.reasons[fix.reason].count += fix.count;
+                            }
+                            data[field] = fix.fixed;
                             App.edits[j].fixed = true;
                         }
                     }
@@ -701,45 +732,43 @@
             }
 
             // If there are no reasons, exit
-            if (!App.globals.reasons.length) return false;
+            if (App.globals.reasons == {}) return false;
 
             // We need a place to store the reasons being applied to the summary. 
             var reasons = [];
-
-            for (var z = App.globals.reasons.length - 1, x = 0; z >= 0; --z) {
-                // Check that summary is not getting too long
-                if (data.summary.length + reasons.join('; ').length + App.globals.reasons[z].length + 2 > 300) break;
-
-                // If the reason is already in the summary, or we've put it in the reasons array already, skip it.
-                if (data.summary.indexOf(App.globals.reasons[z].substr(1)) !== -1 || reasons.join('; ').indexOf(App.globals.reasons[z].substr(1)) !== -1) continue;
-
-                // Capitalize first letter
-                if (!data.summary && x === 0) App.globals.reasons[z] = App.globals.reasons[z][0].toUpperCase() + App.globals.reasons[z].substring(1);
-
-                // Append the reason to our temporary reason array
-                reasons.push(App.globals.reasons[z]);
-                ++x;
+            App.globals.changes = 0;
+          
+            for (var z in App.globals.reasons) {
+                // For each type of change made, add a reason string with the reason text,
+                // optionally the rule ID, and the number of repeats if 2 or more.
+                reasons.push(App.globals.reasons[z].reason
+                             + (App.globals.showRules ? ' ['+ App.globals.reasons[z].editId +']' : '')
+                             + ((App.globals.reasons[z].count > 1) ? ' ('+App.globals.reasons[z].count+')' : '') );
+                App.globals.changes += App.globals.reasons[z].count;
             }
+          
+            var reasonStr = reasons.join('; ')+'.';  // Unique reasons separated by ; and terminated by .
+            reasonStr = reasonStr.charAt(0).toUpperCase() + reasonStr.slice(1);  // Cap first letter.
 
-            // If no reasons have been applied, exit
-            if (!reasons.length) return false;
-
-            // Store the summary for readability
-            var summary = data.summary;
-
-            // This whole ternary mess is for if the summary is not empty, and if this is the first time around or not.                 vvv Join the reasons with a semicolon and append a period.
-            data.summary = (summary ? (summary.substr(-1) !== -1 ? summary.substr(0, summary.length - 1) : summary) + '; ' : '') + reasons.join('; ') + '.';
+            if (!data.summaryOrig) data.summaryOrig = data.summary.trim(); // Remember original summary
+            if (data.summaryOrig.length) data.summaryOrig = data.summaryOrig + ' ';
+          
+            data.summary = data.summaryOrig + reasonStr;
+            // Limit summary to 300 chars
+            if (data.summary.length > 300) data.summary = data.summary.substr(0,300-3) + '...';
 
             return data;
         };
 
         // Init app
         App.init = function() {
+            var count = 0;
             var toolbarchk = setInterval(function(){
-                console.log('waiting for toolbar');
+                //console.log('waiting for toolbar');
+                if(++count === 10) clearInterval(toolbarchk)
                 if(!App.globals.root.find('.wmd-button-row').length) return;
                 clearInterval(toolbarchk);
-                console.log('found toolbar');
+                //console.log('found toolbar');
                 App.funcs.popSelections();
                 App.funcs.createButton();
                 App.funcs.applyListeners();
