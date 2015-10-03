@@ -299,6 +299,11 @@
                 replacement: "RegEx$1",
                 reason: "trademark capitalization"
             },
+            postgresql: {
+                expr: /\bpostgres(ql|s)?/gi,
+                replacement: "PostgreSQL",
+                reason: "trademark capitalization"
+            },
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
