@@ -422,6 +422,137 @@
                 replacement: "$1lways",
                 reason: "grammar and spelling"
             },
+            expect: {
+                expr: /\b(e)spect(s)?\b/gi,
+                replacement: "$1xpect$2",
+                reason: "grammar and spelling"
+            },
+            employe: {
+                expr: /\b(e)mploye\b/gi,
+                replacement: "$1mployee",
+                reason: "grammar and spelling"
+            },
+            retrieve: {
+                expr: /\b(r)etreive(d)?\b/gi,
+                replacement: "$1etrieve$2",
+                reason: "grammar and spelling"
+            },
+            // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
+            ie: {
+                expr: /\b(i)e\b/gi,
+                replacement: "$1.e.",
+                reason: "grammar and spelling"
+            },
+            eg: {
+                expr: /\b(e)g\b/gi,
+                replacement: "$1.g.",
+                reason: "grammar and spelling"
+            },
+            unfortunately: {
+                expr: /\b(u)nfortu?na?tly\b/gi,
+                replacement: "$1nfortunately",
+                reason: "grammar and spelling"
+            },
+            whether: {
+                expr: /\b(w)h?eth?er\b/gi,
+                replacement: "$1hether",
+                reason: "grammar and spelling"
+            },
+            through: {
+                expr: /\b(?:(t)hru|rough)\b/gi,
+                replacement: "$1hrough",
+                reason: "grammar and spelling"
+            },
+            throughout: {
+                expr: /\b(t)(?:hruout|roughout)\b/gi,
+                replacement: "$1hroughout",
+                reason: "grammar and spelling"
+            },
+            breakthrough: {
+                expr: /\b(b)reak\s+through(s)?\b/gi,
+                replacement: "$1reakthrough$2",
+                reason: "grammar and spelling"
+            },
+            though: {
+                expr: /\b(t)(?:ho|hou|hogh)\b/gi,
+                replacement: "$1hough",
+                reason: "grammar and spelling"
+            },
+            although: {
+                expr: /\b(a)l(?:tho|thou|thogh|tough)\b/gi,
+                replacement: "$1lthough",
+                reason: "grammar and spelling"
+            },
+            thought: {
+                expr: /\b(t)r?ought(s)?\b/gi,
+                replacement: "$1hough$2",
+                reason: "grammar and spelling"
+            },
+            throwing: {
+                expr: /\b(t)hroughing\b/gi,       // Peter says this is "thoroughly", but a survey of SO questions indicates "throwing"
+                replacement: "$1hrowing",
+                reason: "grammar and spelling"
+            },
+            a_lot: {
+                expr: /\b(a)lot\b/gi,
+                replacement: "$1 lot",
+                reason: "grammar and spelling"
+            },
+            one_r_two_r: {
+                expr: /\b(refe|prefe|occu)r(ed|ing)\b/gi,
+                replacement: "$1rr$2",
+                reason: "grammar and spelling"
+            },
+            preferably: {
+                expr: /\b(p)referrably\b/gi,
+                replacement: "$1referably",
+                reason: "grammar and spelling"
+            },
+            command_line: {
+                expr: /\b(c)ommandline\b/gi,
+                replacement: "$1ommand-line",
+                reason: "grammar and spelling"
+            },
+            benefits: {
+                expr: /\b(b)enifits\b/gi,
+                replacement: "$1enefits",
+                reason: "grammar and spelling"
+            },
+            authorization: {
+                expr: /\b(a)uth\b/gi,           // This may be too ambiguous, could also mean "authentication"
+                replacement: "$1uthorization",
+                reason: "grammar and spelling"
+            },
+            persistent: {
+                expr: /\b(p)ersistan(t|ce)\b/gi,
+                replacement: "$1ersisten$2",
+                reason: "grammar and spelling"
+            },
+            _ibility: {
+                expr: /\b(comp|incomp|access)abilit(y|ies)\b/gi,
+                replacement: "$1ibilit$2",
+                reason: "grammar and spelling"
+            },
+            separate: {
+                expr: /\b(s)epe?rate?(d|ly|s)?\b/gi,
+                replacement: "$1eparate$2",
+                reason: "grammar and spelling"
+            },
+            separation: {
+                expr: /\b(s)eperation(s)?\b/gi,
+                replacement: "$1eparation$2",
+                reason: "grammar and spelling"
+            },
+            definite: {
+                expr: /\b(d)efin(?:ate?|ite?|al|te?)(ly)?\b/gi,  // Catches correct spelling, too.
+                replacement: "$1efinite$2",
+                reason: "grammar and spelling"
+            },
+            definitive: {
+                expr: /\b(d)efina?tive(ly)\b/gi,
+                replacement: "$1efinitive$2",
+                reason: "grammar and spelling"
+            },
             // Punctuation & Spacing come last
             firstcaps: {
                 //    https://regex101.com/r/qR5fO9/12
