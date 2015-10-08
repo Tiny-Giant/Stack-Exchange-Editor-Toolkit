@@ -158,7 +158,7 @@
                 reason: "acronym capitalization"
             },
             ajax: {
-                expr: /\bajax\b/gi,
+                expr: /\bajax\b/g,     // Leave "Ajax" alone. See https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/45
                 replacement: "AJAX",
                 reason: "acronym capitalization"
             },
