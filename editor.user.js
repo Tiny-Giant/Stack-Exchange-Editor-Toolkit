@@ -767,14 +767,14 @@
                 expr: /((?!\n\n)(?:[^?.!])*([?.!]|\n\n)?\)*)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
-                    console.log('str('+str+')');
+                    //console.log('str('+str+')');
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
                         if (!post) post = '';
-                        console.log('sentence ('+sentence+') pre ('+pre+') first ('+first+') post ('+post+') endpunc ('+endpunc+')');
+                        //console.log('sentence ('+sentence+') pre ('+pre+') first ('+first+') post ('+post+') endpunc ('+endpunc+')');
                         var update = pre + first.toUpperCase() + post// + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
-                        console.log('update ('+update+')');
+                        //console.log('update ('+update+')');
                         return update;
                     });
                 },
