@@ -64,7 +64,7 @@
         };
         App.globals.placeHolderChecks = {
             "auto":   /_xAutoxInsertxTextxPlacexHolder_/gi,
-            "quote": /_xBlockxQuotexPlacexHolderx_/gi,
+            "quote":  /_xBlockxQuotexPlacexHolderx_/gi,
             "inline": /_xCodexInlinexPlacexHolderx_/gi,
             "block":  /_xCodexBlockxPlacexHolderx_/gi,
             "links":  /_xLinkxPlacexHolderx_/gi,
@@ -853,7 +853,7 @@
             App.selections.redoButton   = App.globals.root.find('[id^="wmd-redo-button"]');
             App.selections.body         = App.globals.root.find('[id^="wmd-input"]');
             App.selections.title        = App.globals.root.find('[class*="title-field"]');
-            App.selections.summary      = App.globals.root.find('[id^="edit-comment"]');
+            App.selections.summary      = App.globals.root.find('[id^="edit-comment"], .edit-comment');
             App.selections.tagField     = App.globals.root.find(".tag-editor");
             App.selections.submitButton = App.globals.root.find('[id^="submit-button"]');
             App.selections.helpButton   = App.globals.root.find('[id^="wmd-help-button"]');
