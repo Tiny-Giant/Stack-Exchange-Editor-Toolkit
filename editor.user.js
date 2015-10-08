@@ -766,8 +766,8 @@
                 //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
                 expr: /((?!\n\n)(?:[^?.!])*([?.!]|\n\n)?\)*)/gm, 
                 replacement: function(str, endpunc) { 
-                    if (str === "undefined") return '';
-                    console.log('str: '+str);
+                    if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
+                    console.log('str('+str+')');
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
