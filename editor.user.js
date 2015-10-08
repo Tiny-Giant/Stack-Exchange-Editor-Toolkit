@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.27
+// @version        1.5.2.28
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -462,6 +462,56 @@
                 replacement: "$1nyone's",
                 reason: "grammar and spelling"
             },
+            length: {
+                expr: /\b(l)en(?:gh?t|th)\b/g,
+                replacement: "$1ength",
+                reason: "grammar and spelling"
+            },
+            height: {
+                expr: /\b(h)(?:ei|i|ie)(?:gt|th|ghth|gth)\b/g,
+                replacement: "$1eight",
+                reason: "grammar and spelling"
+            },
+            width: {
+                expr: /\b(w)idh?t\b/g,
+                replacement: "$1idth",
+                reason: "grammar and spelling"
+            },
+            centered: {
+                expr: /\b(c)ent(?:red|erd)\b/g,
+                replacement: "$1entered",
+                reason: "grammar and spelling"
+            },
+            center: {
+                expr: /\b(c)entre\b/g,    // "Centre" is a word, however in most cases on SO "center" is meant
+                replacement: "$1enter",
+                reason: "grammar and spelling"
+            },
+            aint_isnt: {
+                expr: /\bain't\b/gi,
+                replacement: "isn't",
+                reason: "grammar and spelling"
+            },
+            coordinates: {
+                expr: /\b(c)ordinate(s|d)?\b/,
+                replacement: "$1oordinate$2",
+                reason: "grammar and spelling"
+            },
+            argument: {
+                expr: /\b(a)rguement(s)?\b/,
+                replacement: "$1rgument$2",
+                reason: "grammar and spelling"
+            },
+            gui: {
+                expr: /\bgui(s)?\b/gi,
+                replacement: "GUI$1",
+                reason: "acronym capitalization"
+            },
+            iterate: { // https://regex101.com/r/iL6bV3/1
+                expr: /\b(i)(?:tter|tar)at(e[ds]?|ing|ion|ions)\b/gi,
+                replacement: "$1terat$2",
+                reason: "grammar and spelling"
+            },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {
                 expr: /\bie\b/g,   // Careful here; IE is Internet Explorer
@@ -483,8 +533,8 @@
                 replacement: "$1hether",
                 reason: "grammar and spelling"
             },
-            through: {  // https://regex101.com/r/gQ0dZ1/3
-                expr: /\b(t)(?:hru|rough)\b/gi,
+            through: {  // https://regex101.com/r/gQ0dZ1/4
+                expr: /\b(t)(?:hru|rough|hroug)\b/gi,
                 replacement: "$1hrough",
                 reason: "grammar and spelling"
             },
@@ -641,6 +691,66 @@
             preceding: {
                 expr: /\b(p)receeding\b/gi,
                 replacement: "$1receding",
+                reason: "grammar and spelling"
+            },
+            no_one: {
+                expr: /\b(n)o-?one\b/gi,
+                replacement: "$1o one",
+                reason: "grammar and spelling"
+            },
+            de_facto: {
+                expr: /\b(d)e-?facto\b/gi,
+                replacement: "$1e facto",
+                reason: "grammar and spelling"
+            },
+            accommodate: { // https://regex101.com/r/cL3mD9/1
+                expr: /\b(a)(?:c+om|com+)odate\b/gi,
+                replacement: "$1ccommodate",
+                reason: "grammar and spelling"
+            },
+            matlab: {
+                expr: /\bmath?lab\b/gi,
+                replacement: "MATLAB",
+                reason: "trademark capitalization"
+            },
+            internet: {
+                expr: /\binternet\b/g,
+                replacement: "Internet",
+                reason: "trademark capitalization"
+            },
+            web_services: {
+                expr: /\bweb services\b/g,
+                replacement: "Web services",
+                reason: "trademark capitalization"
+            },
+            kind_of: {
+                expr: /\b(k)inda\b/gi,
+                replacement: "$1ind of",
+                reason: "grammar and spelling"
+            },
+            want_to: {
+                expr: /\b(w)anna\b/gi,
+                replacement: "$1ant to",
+                reason: "grammar and spelling"
+            },
+            sort_of: {
+                expr: /\b(s)orta\b/gi,
+                replacement: "$1ort of",
+                reason: "grammar and spelling"
+            },
+            got_to: { // https://regex101.com/r/rK6xR5/1
+                expr: /\b(have\s+)?(g)otta\b/gi,
+                replacement: "$1$2ot to",
+                reason: "grammar and spelling"
+            },
+            dont_know: { // https://regex101.com/r/rK6xR5/1
+                expr: /\b(d)[uo]nn?o\b/gi,
+                replacement: "$1on't know",
+                reason: "grammar and spelling"
+            },
+            going_to: {
+                expr: /\b(g)[ou]nna\b/gi,
+                replacement: "$1oing to",
                 reason: "grammar and spelling"
             },
             // Punctuation & Spacing come last
