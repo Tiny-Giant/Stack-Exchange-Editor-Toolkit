@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.26
+// @version        1.5.2.27
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -437,9 +437,34 @@
                 replacement: "$1etrieve$2",
                 reason: "grammar and spelling"
             },
+            firefox: {
+                expr: /\bfire?fox\b/gi,
+                replacement: "Firefox",
+                reason: "trademark capitalization"
+            },
+            success: { // https://regex101.com/r/hK2vG4/1
+                expr: /\b(s)ucc?ess?(ful|fully)?l?\b/gi,
+                replacement: "$1uccess$2",
+                reason: "grammar and spelling"
+            },
+            safari: {
+                expr: /\bsafari\b/g,
+                replacement: "Safari",
+                reason: "trademark capitalization"
+            },
+            chrome: {
+                expr: /\bchrome\b/g,
+                replacement: "Chrome",
+                reason: "trademark capitalization"
+            },
+            anyones: {
+                expr: /\b(a)nyones\b/g,
+                replacement: "$1nyone's",
+                reason: "grammar and spelling"
+            },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {
-                expr: /\b(i)e\b/gi,
+                expr: /\bie\b/g,   // Careful here; IE is Internet Explorer
                 replacement: "$1.e.",
                 reason: "grammar and spelling"
             },
@@ -458,8 +483,8 @@
                 replacement: "$1hether",
                 reason: "grammar and spelling"
             },
-            through: {
-                expr: /\b(?:(t)hru|rough)\b/gi,
+            through: {  // https://regex101.com/r/gQ0dZ1/3
+                expr: /\b(t)(?:hru|rough)\b/gi,
                 replacement: "$1hrough",
                 reason: "grammar and spelling"
             },
@@ -549,8 +574,73 @@
                 reason: "grammar and spelling"
             },
             definitive: {
-                expr: /\b(d)efina?tive(ly)\b/gi,
+                expr: /\b(d)efina?tive(ly)?\b/gi,
                 replacement: "$1efinitive$2",
+                reason: "grammar and spelling"
+            },
+            independent: {
+                expr: /\b(i)ndependant(ly)?\b/gi,
+                replacement: "$1ndependent$2",
+                reason: "grammar and spelling"
+            },
+            recommend: {
+                expr: /\b(r)ecomm?and(ation)?\b/gi,
+                replacement: "$1ecommend$2",
+                reason: "grammar and spelling"
+            },
+            compatibility: {
+                expr: /\b(c)ompatability\b/gi,
+                replacement: "$1ompatibility$2",
+                reason: "grammar and spelling"
+            },
+            ps: {
+                expr: /\bps\b/g,
+                replacement: "PS",
+                reason: "grammar and spelling"
+            },
+            ok: {
+                expr: /\bok\b/g,
+                replacement: "OK",
+                reason: "grammar and spelling"
+            },
+            etc: {
+                expr: /\betc\b/g,
+                replacement: "etc.",
+                reason: "grammar and spelling"
+            },
+            back_end: {  // Interesting fact: backend 3x more common than back-end
+                expr: /\b(b)ackend\b/g,
+                replacement: "$1ack-end",
+                reason: "grammar and spelling"
+            },
+            front_end: {
+                expr: /\b(f)rontend\b/g,
+                replacement: "$1ront-end",
+                reason: "grammar and spelling"
+            },
+            data_type: {
+                expr: /\b(d)atatype\b/g,
+                replacement: "$1ata type",
+                reason: "grammar and spelling"
+            },
+            allotted: {
+                expr: /\b(a)l+ot+ed\b/g,
+                replacement: "$1llotted",
+                reason: "grammar and spelling"
+            },
+            every_time: {
+                expr: /\b(e)ve?rytime\b/g,
+                replacement: "$1very time",
+                reason: "grammar and spelling"
+            },
+            straightforward: {
+                expr: /\b(s)traig?h?t[ -]forward\b/g,
+                replacement: "$1traightforward",
+                reason: "grammar and spelling"
+            },
+            preceding: {
+                expr: /\b(p)receeding\b/gi,
+                replacement: "$1receding",
                 reason: "grammar and spelling"
             },
             // Punctuation & Spacing come last
