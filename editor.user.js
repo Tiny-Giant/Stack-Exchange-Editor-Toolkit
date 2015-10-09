@@ -796,6 +796,16 @@
                 expr: /[ ]{2,}(?!$)/g,
                 replacement: " ",
                 reason: "punctuation & spacing"
+            },
+            blanklines: {
+                expr: /(?:\s*[\r\n]){3,}/gm,
+                replacement: "\n\n",
+                reason: "punctuation & spacing"
+            },
+            endblanklines: {
+                expr: /[\s\r\n]+$/g,
+                replacement: "",
+                reason: "punctuation & spacing"
             }
         };
 
