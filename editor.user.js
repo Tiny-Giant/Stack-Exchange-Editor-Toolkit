@@ -399,7 +399,7 @@
                 reason: "grammar and spelling"
             },
             im: {
-                expr: /\bim\b/gi,
+                expr: /\bi ?m\b/gi,
                 replacement: "I'm",
                 reason: "grammar and spelling"
             },
@@ -786,8 +786,8 @@
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
-            spacesbeforesymbols: {
-                expr: /\s+([.,!?;:])(?!\w)/g,
+            spacesbeforesymbols: {  // https://regex101.com/r/vS3dS3/1
+                expr: /[ \t]+([.,!?;:])(?!\w)/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
