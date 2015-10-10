@@ -107,7 +107,15 @@
                 },
                 reason: 'no need to yell'
             },
-            // Trademark capitalization
+        // The title says it all
+        thetitlesaysitall: {
+            // https://regex101.com/r/bX1qB4/3
+            expr: /(?:the )?title( says it all)/gi,
+            replacement: function(){
+                return '"' + App.selections.title.val() + '"';
+            },
+            reason: "the title says it all"
+        },            // Trademark capitalization
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -316,13 +324,45 @@
                 reason: "trademark capitalization"
             },
             pdf: {
-                expr: /\bpdf(s)*/gi,
+                expr: /\bpdf(s)?/gi,
                 replacement: "PDF$1",
                 reason: "trademark capitalization"
             },
             api: {
-                expr: /\bapi(s)*\b/gi,
+                expr: /\bapi(s)?\b/gi,
                 replacement: "API$1",
+                reason: "acronym capitalization"
+            },
+            ssl: {
+                expr: /\bssl\b/g,
+                replacement: "SSL",
+                reason: "acronym capitalization"
+            },
+            tomcat: {
+                expr: /\btomcat([0-9.]*)/gi,
+                replacement: "Tomcat$1",
+                reason: "trademark capitalization"
+            },
+            npm: {
+                expr: /\bnpm(s)?\b/g,
+                replacement: "NPM$1",
+                reason: "acronym capitalization"
+            },
+            nodejs: {
+                expr: /\bnode.?js/gi,
+                replacement: "Node.js",
+                reason: "trademark capitalization"
+            },
+            succeed: {
+                expr: /\b(s)ucc?ee?d(ed|s)?\b/gi,
+                replacement: "$1ucceed$2",
+                reason: "grammar and spelling"
+            },
+            ftp: {
+                expr: /\bs?ftp\b/g,
+                replacement: function(str) {
+                    return str.toUpperCase();
+                },
                 reason: "acronym capitalization"
             },
             // Noise reduction
