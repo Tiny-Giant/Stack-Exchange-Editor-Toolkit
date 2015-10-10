@@ -107,15 +107,6 @@
                 },
                 reason: 'no need to yell'
             },
-        // The title says it all
-        thetitlesaysitall: {
-            // https://regex101.com/r/bX1qB4/3
-            expr: /(?:the )?title( says it all)/gi,
-            replacement: function(){
-                return '"' + App.selections.title.val() + '"';
-            },
-            reason: "the title says it all"
-        },            // Trademark capitalization
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
