@@ -248,6 +248,11 @@
                 replacement: "MySQL",
                 reason: "trademark capitalization"
             },
+            nodejs: {
+                expr: /\bnode\.?js\b/gi,
+                replacement: "Node.js",
+                reason: "trademark capitalization"
+            },
             apache: {
                 expr: /\bapache\b/gi,
                 replacement: "Apache",
@@ -1053,7 +1058,7 @@
             var replaced = App.globals.replacedStrings.block, str;
             for (var i in replaced) {
                 // https://regex101.com/r/tX9pM3/1              https://regex101.com/r/tX9pM3/2                 https://regex101.com/r/tX9pM3/3
-                if (/^`[^]+`$/.test(replaced[i])) replaced[i] = /(?!`)((?!`)[^])+/.exec(replaced[i])[0].replace(/(.+)/g, '    $1');
+                if (/^`[^]+`$/.test(replaced[i])) replaced[i] = '\n\n' + /(?!`)((?!`)[^])+/.exec(replaced[i])[0].replace(/(.+)/g, '    $1');
             }
         };
 
