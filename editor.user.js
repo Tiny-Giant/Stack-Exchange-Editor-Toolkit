@@ -780,7 +780,7 @@
                         return update;
                     });
                 },
-                reason: "Caps at start of sentences"
+                reason: "caps at start of sentences"
             },
             multiplesymbols: {
                 //    https://regex101.com/r/bE9zM6/1
@@ -793,9 +793,14 @@
                 replacement: "$1 ",
                 reason: "punctuation & spacing"
             },
+            emptylines: {
+                expr: /(\n[ ]*\n)+/g,
+                replacement: "\n\n",
+                reason: "punctuation & spacing"
+            },
             multiplespaces: {
                 // https://regex101.com/r/hY9hQ3/1
-                expr: /[ ]{2,}(?!$)/gm,
+                expr: /[ ]{2,}(?!\n)/g,
                 replacement: " ",
                 reason: "punctuation & spacing"
             },
@@ -817,24 +822,17 @@
             // Scan the post text using the expression to see if there are any matches
             var matches = input.match(expression);
             if (!matches) return false;
-            var count = matches.length;  // # replacements to do
-            var tmpinput = input;
-            input = input.replace(expression, function() {
-                var matches = [].slice.call(arguments, 0, -2);
-                reasoning = reasoning.replace(/[$](\d)+/g, function() {
-                    var phrases = [].slice.call(arguments, 0, -2);
-                    var phrase = matches[phrases[1]];
-                    return phrase ? phrase : '';
-                });
-                return arguments[0].replace(expression, replacement);
+            var count = 0;  // # replacements to do
+            input = input.replace(expression, function(before){ 
+                var after = before.replace(expression, replacement);
+                if(after !== before) ++count; 
+                return after;
             });
-            if (input !== tmpinput) {
-                return {
-                    reason: reasoning,
-                    fixed: String(input).trim(),
-                    count: count
-                };
-            } else return false;
+            return count > 0 ? {
+                reason: reasoning,
+                fixed: String(input).trim(),
+                count: count
+            } : false;
         };
 
         App.funcs.applyListeners = function() { // Removes default Stack Exchange listeners; see https://github.com/AstroCB/Stack-Exchange-Editor-Toolkit/issues/43
@@ -846,7 +844,7 @@
                     } else {
                         // It's possible to remove the event listeners, because of the way outerHTML works.
                         this.outerHTML = this.outerHTML;
-                        App.selections.submitButton.click();
+                        App.funcs.fixEvent();
                     }
                 }
             }
@@ -889,7 +887,7 @@
             });
         };
 
-        // Populate original item sets from DOM selections
+        // Populate original item sets from edit items for the diff
         App.funcs.popOriginals = function() {
             var i = App.originals, s = App.items;
             ['title', 'body', 'summary'].forEach(function(v) {
@@ -897,7 +895,7 @@
             });
         }
         
-        // Insert editing button(s)
+        // Insert editing button
         App.funcs.createButton = function() {
             if (!App.selections.redoButton.length) return false;
 
@@ -947,15 +945,11 @@
             });
         };
 
-        App.funcs.fixEvent = function(e) {
-            if (e) e.preventDefault();
-            // Refresh item population
-            App.funcs.popItems();
-            // Pipe data through editing modules
-            App.pipe(App.items, App.pipeMods, App.globals.order);
+        App.funcs.fixEvent = function() {
+            return App.funcs.popItems(), App.pipe(App.items, App.pipeMods, App.globals.order), false;
         };
 
-        App.funcs.diff = function(a1, a2, title) {
+        App.funcs.diff = function(a1, a2) {
             var strings = [];
             function maakRij(type, rij) {
                 if (!type) return strings.push(rij.replace(/\</g, '&lt;')), true;
@@ -980,8 +974,8 @@
                 }
             }
             
-            a1 = a1.split(/(?=\b|\n)/g);
-            a2 = a2.split(/(?=\b|\n)/g);
+            a1 = a1.split(/(?=\b|\W)/g);
+            a2 = a2.split(/(?=\b|\W)/g);
 
             var matrix = new Array(a1.length + 1);
             var x, y;
@@ -1005,7 +999,7 @@
 
             try {
                 getDiff(matrix, a1, a2, x - 1, y - 1);
-                return title ? '<div class="difftitle">' + strings.join('') + '</div>' : strings.join('');
+                return strings.join('');
             } catch (e) {
                 console.log(e);
             }
@@ -1043,39 +1037,24 @@
 
         App.pipeMods.edit = function(data) {
             App.funcs.popOriginals();
+            
             // Visually confirm edit - SE makes it easy because the jQuery color animation plugin seems to be there by default
-            App.selections.body.animate({
-                backgroundColor: '#c8ffa7'
-            }, 10);
-            App.selections.body.animate({
-                backgroundColor: '#fff'
-            }, 1000);
+            App.selections.body.animate({ backgroundColor: '#c8ffa7' }, 10);
+            App.selections.body.animate({ backgroundColor: '#fff' }, 1000);
 
             // List of fields to be edited
             var fields = {body:'body',title:'title'};
+            
             // Loop through all editing rules
-            for (var j in App.edits) {
-                for (var field in fields) {
-                    if (App.edits.hasOwnProperty(j)) {
-                        var fix = App.funcs.fixIt(data[field], App.edits[j].expr,
-                                                  App.edits[j].replacement, App.edits[j].reason);
-                        if (fix) {
-                            // HACK ALERT
-                            if (j === 'firstcaps') fix.count = 1;
-
-                            if (!App.globals.reasons.hasOwnProperty(fix.reason)) {
-                                App.globals.reasons[fix.reason] = {reason:fix.reason, editId:j, count:fix.count};
-                            }
-                            else {
-                                App.globals.reasons[fix.reason].count += fix.count;
-                            }
-                            data[field] = fix.fixed;
-                            App.edits[j].fixed = true;
-                        }
-                    }
-                }
+            for (var j in App.edits) for (var field in fields) {
+                var fix = App.funcs.fixIt(data[field], App.edits[j].expr, App.edits[j].replacement, App.edits[j].reason);
+                if (!fix) continue;
+                if (fix.reason in App.globals.reasons) App.globals.reasons[fix.reason].count += fix.count;
+                else App.globals.reasons[fix.reason] = { reason:fix.reason, editId:j, count:fix.count };
+                data[field] = fix.fixed;
+                App.edits[j].fixed = true;
             }
-
+            
             // If there are no reasons, exit
             if (App.globals.reasons == {}) return false;
 
@@ -1108,7 +1087,7 @@
         // Populate the diff
         App.pipeMods.diff = function() {
             App.selections.diff.empty();
-            App.selections.diff.append(App.funcs.diff(App.originals.title, App.items.title, true));
+            App.selections.diff.append('<div class="difftitle">' + App.funcs.diff(App.originals.title, App.items.title, true) + '</div>');
             App.selections.diff.append('<div class="diffbody">' + App.pipeMods.replace({body:App.funcs.diff(App.originals.body, App.items.body)}, true).body + '</div>');
         }
 
@@ -1119,7 +1098,6 @@
                 var i = 0;
                 data.body = data.body.replace(App.globals.placeHolderChecks[type], function(match) {
                     var replace = App.globals.replacedStrings[type][i++];
-                    if(!replace) return '';
                     if(literal && /block|lsec/.test(type))  return '<pre><code>' + replace.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>';
                     if(literal) return '<code>' + replace.replace(/</g,'&lt;') + '</code><sup>(' + type + ')</sup>';
                     return replace;
@@ -1133,7 +1111,7 @@
             App.selections.title.val(data.title);
             App.selections.body.val(data.body);
             App.selections.summary.val(data.summary);
-            App.selections.buttonInfo.text(App.globals.changes + (App.globals.changes>1 ? ' changes' : ' change')+' made');
+            App.selections.buttonInfo.text(App.globals.changes + (App.globals.changes != 1 ? ' changes' : ' change')+' made');
             StackExchange.MarkdownEditor.refreshAllPreviews();
         };
 
