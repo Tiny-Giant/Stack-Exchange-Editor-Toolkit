@@ -858,27 +858,49 @@
 
         // Populate or refresh DOM selections
         App.funcs.popSelections = function() {
-            App.selections.redoButton   = App.globals.root.find('[id^="wmd-redo-button"]');
-            App.selections.body         = App.globals.root.find('[id^="wmd-input"]');
-            App.selections.title        = App.globals.root.find('[class*="title-field"]');
-            App.selections.summary      = App.globals.root.find('[id^="edit-comment"], .edit-comment');
-            App.selections.tagField     = App.globals.root.find(".tag-editor");
-            App.selections.submitButton = App.globals.root.find('[id^="submit-button"]');
-            App.selections.helpButton   = App.globals.root.find('[id^="wmd-help-button"]');
-            App.selections.editor       = App.globals.root.find('.post-editor');
-            App.selections.preview      = App.globals.root.find('.wmd-preview');
-            $('.hide-preview').off('click').attr('href','javascript:void(0)').click(function(){
-                if(/hide/.test(this.textContent)) return this.textContent = 'show preview', App.selections.preview.toggle(), true;
-                if(/show/.test(this.textContent)) return this.textContent = 'hide preview', App.selections.preview.toggle(), true;
-            });
-            var diffMenu = $('<div class="preview-options post-menu" style="margin-top:5px;margin-bottom:8px;"/>').appendTo(App.selections.editor);
-            var hideDiff = $('<a href="javascript:void(0)" class="hide-preview" style="margin-left:-2px;">hide diff</a>').click(function(){
-                if(/hide/.test(this.textContent)) return this.textContent = 'show diff', App.selections.diff.toggle(), true;
-                if(/show/.test(this.textContent)) return this.textContent = 'hide diff', App.selections.diff.toggle(), true;
-            }).appendTo(diffMenu);
-            App.selections.diff         = $('<div class="wmd-preview"/>').appendTo(App.selections.editor);
+            App.selections.redoButton     = App.globals.root.find('[id^="wmd-redo-button"]');
+            App.selections.body           = App.globals.root.find('[id^="wmd-input"]');
+            App.selections.title          = App.globals.root.find('[class*="title-field"]');
+            App.selections.summary        = App.globals.root.find('[id^="edit-comment"], .edit-comment');
+            App.selections.tagField       = App.globals.root.find(".tag-editor");
+            App.selections.submitButton   = App.globals.root.find('[id^="submit-button"]');
+            App.selections.helpButton     = App.globals.root.find('[id^="wmd-help-button"]');
+            App.selections.editor         = App.globals.root.find('.post-editor');
+            App.selections.preview        = App.globals.root.find('.wmd-preview');
+            App.selections.previewMenu    = App.globals.root.find('.preview-options').append('&nbsp;&nbsp;');
+            App.selections.previewToggle  = App.globals.root.find('.hide-preview').off('click').attr('href','javascript:void(0)').click(App.funcs.togglePreview);
+            App.selections.diffToggle     = $('<a href="javascript:void(0)" class="hide-preview" style="margin-left:-2px;">show diff</a>').click(App.funcs.toggleDiff).appendTo(App.selections.previewMenu);
+            App.selections.diff           = $('<div class="wmd-preview"/>').hide().appendTo(App.selections.editor);
         };
 
+        App.funcs.showPreview = function() {
+            App.selections.diff.hide();
+            App.selections.diffToggle.text('show diff');
+            App.selections.preview.show();
+            App.selections.previewToggle.text('hide preview');
+        }
+        
+        App.funcs.showDiff = function() {
+            App.selections.preview.hide();
+            App.selections.previewToggle.text('show preview');
+            App.selections.diff.show();
+            App.selections.diffToggle.text('hide diff');
+        }
+        
+        App.funcs.togglePreview = function() {
+            App.selections.diff.hide();
+            App.selections.diffToggle.text('show diff');
+            if(/hide/.test(App.selections.previewToggle.text())) return App.selections.previewToggle.text('show preview'), App.selections.preview.toggle(), true;
+            if(/show/.test(App.selections.previewToggle.text())) return App.selections.previewToggle.text('hide preview'), App.selections.preview.toggle(), true;
+        }
+        
+        App.funcs.toggleDiff = function() {
+            App.selections.preview.hide();
+            App.selections.previewToggle.text('show preview');
+            if(/hide/.test(App.selections.diffToggle.text())) return App.selections.diffToggle.text('show diff'), App.selections.diff.toggle(), true;
+            if(/show/.test(App.selections.diffToggle.text())) return App.selections.diffToggle.text('hide diff'), App.selections.diff.toggle(), true;
+        }
+        
         // Populate edit item sets from DOM selections
         App.funcs.popItems = function() {
             var i = App.items, s = App.selections;
@@ -1086,9 +1108,9 @@
         
         // Populate the diff
         App.pipeMods.diff = function() {
-            App.selections.diff.empty();
-            App.selections.diff.append('<div class="difftitle">' + App.funcs.diff(App.originals.title, App.items.title, true) + '</div>');
-            App.selections.diff.append('<div class="diffbody">' + App.pipeMods.replace({body:App.funcs.diff(App.originals.body, App.items.body)}, true).body + '</div>');
+            App.selections.diff.empty().append('<div class="difftitle">' + App.funcs.diff(App.originals.title, App.items.title, true) + '</div>' +
+                                               '<div class="diffbody">' + App.pipeMods.replace({body:App.funcs.diff(App.originals.body, App.items.body)}, true).body + '</div>');
+            App.funcs.showDiff();
         }
 
         // Replace the previously omitted code
@@ -1111,6 +1133,8 @@
             App.selections.title.val(data.title);
             App.selections.body.val(data.body);
             App.selections.summary.val(data.summary);
+            App.globals.root.find('.actual-edit-overlay').remove();
+            App.selections.summary.css({opacity:1});
             App.selections.buttonInfo.text(App.globals.changes + (App.globals.changes != 1 ? ' changes' : ' change')+' made');
             StackExchange.MarkdownEditor.refreshAllPreviews();
         };
