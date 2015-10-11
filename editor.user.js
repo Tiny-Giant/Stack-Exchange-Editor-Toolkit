@@ -789,7 +789,7 @@
             },
             multiplesymbols: {
                 //    https://regex101.com/r/bE9zM6/1
-                expr: /([^\w\s*#.\-_])\1{1,}/g,
+                expr: /([^\w\s*#.\-_+])\1{1,}/g,
                 replacement: "$1",
                 reason: "punctuation & spacing"
             },
@@ -799,7 +799,7 @@
                 reason: "punctuation & spacing"
             },
             emptylines: {
-                expr: /(\n[ ]*\n)+/g,
+                expr: /(\n[ ]*\n)+\n+/g,
                 replacement: "\n\n",
                 reason: "punctuation & spacing"
             },
@@ -1136,7 +1136,8 @@
                         var after = replace.replace(/^\n\n/,'');
                         var prepend = after !== replace ? '<span class="add">\n\n</span><span class="del">`</span>' : '';
                         var append  = after !== replace ? '<span class="del">`</span>' : '';
-                        return prepend + '<pre><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>' + append;
+                        var klass   = /lsec/.test(type) ? ' class="lang-none prettyprint prettyprinted"' : '';
+                        return prepend + '<pre' + klass + '><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>' + append;
                     }
                     if(literal) return '<code>' + replace.replace(/</g,'&lt;').replace(/(?:^`|`$)/g,'') + '</code>';
                     return replace;
