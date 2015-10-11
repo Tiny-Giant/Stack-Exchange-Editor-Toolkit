@@ -215,7 +215,7 @@
             },
             windows: {
                 // https://regex101.com/r/jF9zK1/5
-                expr: /\b(?:win|windows)\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server)|(?:win|windows)\b/gi,
+                expr: /\b(?:win|windows)(?:\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server))?\b/gi,
                 replacement: function(match, ver) {
                     ver = !ver ? '' : ver.replace(/ce/i, ' CE')
                     .replace(/me/i, ' ME')
@@ -774,7 +774,7 @@
                 //    https://regex101.com/r/qR5fO9/14
                 // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
                 //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
-                expr: /((?!\n\n)[A-z](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z][^?.!A-Z]+)?([?.!])?)/gm, 
+                expr: /((?!\n\n)[A-z\d](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z\d][^?.!A-Z]+)?([?.!])?)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return '';
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
@@ -794,7 +794,7 @@
                 reason: "punctuation & spacing"
             },
             spacesbeforesymbols: {
-                expr: /[ ]*(?:([,!?;:])[ ]*(?!\n))/g,
+                expr: /[ ]*(?:([,!?;:])(?!\))[ ]*(?!\n))/g,
                 replacement: "$1 ",
                 reason: "punctuation & spacing"
             },
@@ -1139,6 +1139,7 @@
                         var klass   = /lsec/.test(type) ? ' class="lang-none prettyprint prettyprinted"' : '';
                         return prepend + '<pre' + klass + '><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>' + append;
                     }
+                    if(literal && /quote/.test(type)) return '<blockquote>' + replace.replace(/</g,'&lt;').replace(/^>/gm,'') + '</blockquote>';
                     if(literal) return '<code>' + replace.replace(/</g,'&lt;').replace(/(?:^`|`$)/g,'') + '</code>';
                     return replace;
                 });
@@ -1149,7 +1150,7 @@
         // Handle pipe output
         App.pipeMods.output = function(data) {
             App.selections.title.val(data.title);
-            App.selections.body.val(data.body);
+            App.selections.body.val(data.body.replace(/\n{3,}/,'\n\n'));
             App.selections.summary.val(data.summary);
             App.globals.root.find('.actual-edit-overlay').remove();
             App.selections.summary.css({opacity:1});
