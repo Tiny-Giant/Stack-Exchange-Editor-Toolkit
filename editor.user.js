@@ -873,7 +873,14 @@
             App.selections.editor         = App.globals.root.find('.post-editor');
             App.selections.preview        = App.globals.root.find('.wmd-preview');
             App.selections.previewMenu    = App.globals.root.find('.preview-options').append('&nbsp;&nbsp;');
-            App.selections.previewToggle  = App.globals.root.find('.hide-preview').off('click').attr('href','javascript:void(0)').click(App.funcs.togglePreview);
+            if(!App.selections.previewMenu.length) {
+                App.selections.previewMenu   = $('<div class="preview-options post-menu" style="margin-top:5px;margin-bottom:8px;"/>').insertBefore(App.selections.preview);
+                var previewToggleText = App.selections.preview.is(':visible') ? 'hide preview' : 'show preview';
+                App.selections.previewToggle = $('<a href="javascript:void(0)" class="hide-preview" style="margin-left:-2px;">' + previewToggleText + '</a>').click(App.funcs.togglePreview).appendTo(App.selections.previewMenu);
+                App.selections.previewMenu.append('&nbsp;&nbsp;');
+            } else {
+                App.selections.previewToggle  = App.globals.root.find('.hide-preview').off('click').attr('href','javascript:void(0)').click(App.funcs.togglePreview);
+            }
             App.selections.diffToggle     = $('<a href="javascript:void(0)" class="hide-preview" style="margin-left:-2px;">show diff</a>').click(App.funcs.toggleDiff).appendTo(App.selections.previewMenu);
             App.selections.diff           = $('<div class="wmd-preview"/>').hide().appendTo(App.selections.editor);
         };
@@ -1125,8 +1132,12 @@
                 var i = 0;
                 data.body = data.body.replace(App.globals.placeHolderChecks[type], function(match) {
                     var replace = App.globals.replacedStrings[type][i++];
-                    if(literal && /block|lsec/.test(type))  return '<pre><code>' + replace.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>';
-                    if(literal) return '<code>' + replace.replace(/</g,'&lt;') + '</code><sup>(' + type + ')</sup>';
+                    if(literal && /block|lsec/.test(type)) { 
+                        var after = replace.replace(/^\n\n/,'');
+                        var prepend = after !== replace ? '\n\n' : '';
+                        return prepend + '<pre><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>';
+                    }
+                    if(literal) return '<code>' + replace.replace(/</g,'&lt;').replace(/(?:^`|`$)/g,'') + '</code>';
                     return replace;
                 });
             }
@@ -1148,7 +1159,7 @@
         App.init = function() {
             var count = 0;
             var toolbarchk = setInterval(function(){
-                if(++count === 10) clearInterval(toolbarchk)
+                if(++count === 10) clearInterval(toolbarchk);
                 if(!App.globals.root.find('.wmd-button-row').length) return;
                 clearInterval(toolbarchk);
                 App.funcs.popSelections();
@@ -1166,14 +1177,14 @@
         else $(document).ajaxComplete(function() { 
             test = arguments[2].url.match(/posts.(\d+).edit-inline/);
             if(!test) {
-                test = arguments[2].url.match(/review.inline-edit-post/)
+                test = arguments[2].url.match(/review.inline-edit-post/);
                 if(!test) return;
                 test = arguments[2].data.match(/id=(\d+)/);
                 if(!test) return;
             }
             extendEditor($('form[action^="/posts/' + test[1] + '"]'));
         });
-        if($('#post-form').length) extendEditor($('#post-form'));
+        if($('#post-form').length) $('#post-form').each(function(){ extendEditor($(this)); });
         // This is the styling for the diff output.
         $('body').append('<style>' +
                          '.difftitle {' +
