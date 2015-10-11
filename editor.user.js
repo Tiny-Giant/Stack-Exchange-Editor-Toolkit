@@ -1134,8 +1134,9 @@
                     var replace = App.globals.replacedStrings[type][i++];
                     if(literal && /block|lsec/.test(type)) { 
                         var after = replace.replace(/^\n\n/,'');
-                        var prepend = after !== replace ? '\n\n' : '';
-                        return prepend + '<pre><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>';
+                        var prepend = after !== replace ? '<span class="add">\n\n</span><span class="del">`</span>' : '';
+                        var append  = after !== replace ? '<span class="del">`</span>' : '';
+                        return prepend + '<pre><code>' + after.replace(/</g,'&lt;').replace(/^    /gm,'') + '</code></pre>' + append;
                     }
                     if(literal) return '<code>' + replace.replace(/</g,'&lt;').replace(/(?:^`|`$)/g,'') + '</code>';
                     return replace;
