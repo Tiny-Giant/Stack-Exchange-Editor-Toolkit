@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.29
+// @version        1.5.2.30
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -153,9 +153,11 @@
                 replacement: "AngularJS",
                 reason: "trademark capitalization"
             },
-            html: {
-                expr: /([^\b\w.]|^)html(\d)?\b/gi,
-                replacement: "$1HTML$2",
+            x_html: {
+                expr: /\b(g|ht|x|xht)ml\b/gi,
+                replacement: function(match) {
+                    return match.toUpperCase();
+                },
                 reason: "trademark capitalization"
             },
             css: {
@@ -214,7 +216,7 @@
                 reason: "trademark capitalization"
             },
             windows: {
-                // https://regex101.com/r/jF9zK1/5
+                // https://regex101.com/r/jF9zK1/6
                 expr: /\b(?:win|windows)(?:\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server))?\b/gi,
                 replacement: function(match, ver) {
                     ver = !ver ? '' : ver.replace(/ce/i, ' CE')
@@ -326,13 +328,77 @@
                 reason: "trademark capitalization"
             },
             pdf: {
-                expr: /\bpdf(s)*/gi,
+                expr: /\bpdf(s)?/gi,
                 replacement: "PDF$1",
                 reason: "trademark capitalization"
             },
             api: {
-                expr: /\bapi(s)*\b/gi,
+                expr: /\bapi(s)?\b/gi,
                 replacement: "API$1",
+                reason: "acronym capitalization"
+            },
+            ssl: {
+                expr: /\bssl\b/g,
+                replacement: "SSL",
+                reason: "acronym capitalization"
+            },
+            tomcat: {
+                expr: /\btomcat([0-9.]*)/gi,
+                replacement: "Tomcat$1",
+                reason: "trademark capitalization"
+            },
+            npm: {
+                expr: /\bnpm(s)?\b/g,
+                replacement: "NPM$1",
+                reason: "acronym capitalization"
+            },
+            nodejs: {
+                expr: /\bnode.?js/gi,
+                replacement: "Node.js",
+                reason: "trademark capitalization"
+            },
+            succeed: {
+                expr: /\b(s)ucc?ee?d(ed|s)?\b/gi,
+                replacement: "$1ucceed$2",
+                reason: "grammar and spelling"
+            },
+            ftp: {
+                expr: /\b[st]?ftps?\b/g,
+                replacement: function(str) {
+                    return str.toUpperCase();
+                },
+                reason: "acronym capitalization"
+            },
+            ipa: {
+                expr: /\bipa\b/g,
+                replacement: "IPA",
+                reason: "acronym capitalization"
+            },
+            avl: {
+                expr: /\bavl\b/g,
+                replacement: "AVL",
+                reason: "acronym capitalization"
+            },
+            netbeans: {
+                expr: /\b(netbeans|net-beans|net beans)\b/gi,
+                replacement: "NetBeans",
+                reason: "trademark capitalization"
+            },
+            cli_cgi: {
+                expr: /\bc[lg]i\b/g,
+                replacement: function(str) {
+                    return str.toUpperCase();
+                },
+                reason: "acronym capitalization"
+            },
+            nginx: {
+                expr: /\bnginx\b/g,
+                replacement: "NGINX",
+                reason: "trademark capitalization"
+            },
+            dll: {
+                expr: /\bdll\b/g,
+                replacement: "DLL",
                 reason: "acronym capitalization"
             },
             // Noise reduction
@@ -348,7 +414,7 @@
                 reason: "noise reduction"
             },
             badwords: {
-                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|ki‌nd(‌?:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
+                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|ki?nd(??:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -409,7 +475,7 @@
                 reason: "grammar and spelling"
             },
             im: {
-                expr: /\bim\b/gi,
+                expr: /\bi ?m\b/gi,
                 replacement: "I'm",
                 reason: "grammar and spelling"
             },
@@ -464,42 +530,42 @@
                 reason: "grammar and spelling"
             },
             safari: {
-                expr: /\bsafari\b/g,
+                expr: /\bsafari\b/gi,
                 replacement: "Safari",
                 reason: "trademark capitalization"
             },
             chrome: {
-                expr: /\bchrome\b/g,
+                expr: /\bchrome\b/gi,
                 replacement: "Chrome",
                 reason: "trademark capitalization"
             },
             anyones: {
-                expr: /\b(a)nyones\b/g,
+                expr: /\b(a)nyones\b/gi,
                 replacement: "$1nyone's",
                 reason: "grammar and spelling"
             },
             length: {
-                expr: /\b(l)en(?:gh?t|th)\b/g,
+                expr: /\b(l)en(?:gh?t|th)\b/gi,
                 replacement: "$1ength",
                 reason: "grammar and spelling"
             },
             height: {
-                expr: /\b(h)(?:ei|i|ie)(?:gt|th|ghth|gth)\b/g,
+                expr: /\b(h)(?:ei|i|ie)(?:gt|th|ghth|gth)\b/gi,
                 replacement: "$1eight",
                 reason: "grammar and spelling"
             },
             width: {
-                expr: /\b(w)idh?t\b/g,
+                expr: /\b(w)idh?t\b/gi,
                 replacement: "$1idth",
                 reason: "grammar and spelling"
             },
             centered: {
-                expr: /\b(c)ent(?:red|erd)\b/g,
+                expr: /\b(c)ent(?:red|erd)\b/gi,
                 replacement: "$1entered",
                 reason: "grammar and spelling"
             },
             center: {
-                expr: /\b(c)entre\b/g,    // "Centre" is a word, however in most cases on SO "center" is meant
+                expr: /\b(c)entre\b/gi,    // "Centre" is a word, however in most cases on SO "center" is meant
                 replacement: "$1enter",
                 reason: "grammar and spelling"
             },
@@ -509,12 +575,12 @@
                 reason: "grammar and spelling"
             },
             coordinates: {
-                expr: /\b(c)ordinate(s|d)?\b/,
+                expr: /\b(c)ordinate(s|d)?\b/gi,
                 replacement: "$1oordinate$2",
                 reason: "grammar and spelling"
             },
             argument: {
-                expr: /\b(a)rguement(s)?\b/,
+                expr: /\b(a)rguement(s)?\b/gi,
                 replacement: "$1rgument$2",
                 reason: "grammar and spelling"
             },
@@ -528,9 +594,76 @@
                 replacement: "$1terat$2",
                 reason: "grammar and spelling"
             },
+            below: {
+                expr: /\b(b)ellow\b/gi,          // "Bellow" is a word, but extremely uncommon on StackOverflow.com.
+                replacement: "$1elow",
+                reason: "grammar and spelling"
+            },
+            encrypt: {
+                expr: /\b(en|de)cript(s|ing)?\b/gi,
+                replacement: "$1crypt$2",
+                reason: "grammar and spelling"
+            },
+            gnu: {
+                expr: /\bgnu\b/g,
+                replacement: "GNU",
+                reason: "trademark capitalization"
+            },
+            gcc: {
+                expr: /\bgcc\b/g,
+                replacement: "GCC",
+                reason: "trademark capitalization"
+            },
+            stp: {
+                expr: /\bstp\b/gi,
+                replacement: "STP",
+                reason: "acronym capitalization"
+            },
+            tcp: {
+                expr: /\btcp\b/gi,
+                replacement: "TCP",
+                reason: "acronym capitalization"
+            },
+            ipv_n: {
+                expr: /\bip(v[46])?\b/gi,
+                replacement: "IP$1",
+                reason: "acronym capitalization"
+            },
+            fq_dn_s: {  // FQDN, DN, DNS
+                expr: /\b(fq)?dns?\b/gi,
+                replacement: function(str) {
+                    return str.toUpperCase();
+                },
+                reason: "acronym capitalization"
+            },
+            icmp: {
+                expr: /\bicmp\b/gi,
+                replacement: "ICMP",
+                reason: "acronym capitalization"
+            },
+            rsvp: {
+                expr: /\brsvp\b/gi,
+                replacement: "RSVP",
+                reason: "acronym capitalization"
+            },
+            snmp: {
+                expr: /\bsnmp\b/gi,
+                replacement: "SNMP",
+                reason: "acronym capitalization"
+            },
+            cpu: {
+                expr: /\bcpu(s)?\b/gi,
+                replacement: "CPU$1",
+                reason: "acronym capitalization"
+            },
+            rss: {
+                expr: /\brss?\b/gi,
+                replacement: "RSS",
+                reason: "acronym capitalization"
+            },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
-            ie: {
-                expr: /\bie\b/g,   // Careful here; IE is Internet Explorer
+            ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
+                expr: /\b(i|I)e\b/g,   // Careful here; IE is Internet Explorer
                 replacement: "$1.e.",
                 reason: "grammar and spelling"
             },
@@ -776,7 +909,7 @@
                 //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
                 expr: /((?!\n\n)[A-z\d](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z\d][^?.!A-Z]+)?([?.!])?)/gm, 
                 replacement: function(str, endpunc) { 
-                    if (str === "undefined") return '';
+                    if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
                     return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
                         if (!pre) pre = '';
@@ -794,19 +927,26 @@
                 reason: "punctuation & spacing"
             },
             spacesbeforesymbols: {
+         // MERGE CONFLICT - both changed regex, test and select one.
                 expr: /[ ]*(?:([,!?;:])(?!\))[ ]*(?!\n))/g,
+                // expr: /[ \t]+([.,!?;:])(?!\w)/g,  // https://regex101.com/r/vS3dS3/2, for Issue #8
                 replacement: "$1 ",
-                reason: "punctuation & spacing"
-            },
-            emptylines: {
-                expr: /(\n[ ]*\n)+\n+/g,
-                replacement: "\n\n",
                 reason: "punctuation & spacing"
             },
             multiplespaces: {
                 // https://regex101.com/r/hY9hQ3/1
                 expr: /[ ]{2,}(?!\n)/g,
                 replacement: " ",
+                reason: "punctuation & spacing"
+            },
+            blanklines: {
+                expr: /(?:\s*[\r\n]){3,}/gm,
+                replacement: "\n\n",
+                reason: "punctuation & spacing"
+            },
+            endblanklines: {
+                expr: /[\s\r\n]+$/g,
+                replacement: "",
                 reason: "punctuation & spacing"
             },
             // The title says it all
@@ -1214,3 +1354,4 @@
         console.log(e);
     }
 })();
+
