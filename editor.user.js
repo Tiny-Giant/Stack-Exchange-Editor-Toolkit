@@ -385,6 +385,11 @@
                 replacement: "NGINX",
                 reason: "trademark capitalization"
             },
+            dll: {
+                expr: /\bdll\b/g,
+                replacement: "DLL",
+                reason: "acronym capitalization"
+            },
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
