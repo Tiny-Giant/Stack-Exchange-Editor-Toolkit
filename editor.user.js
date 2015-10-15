@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.30
+// @version        1.5.2.31
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -84,8 +84,8 @@
             "block":  /`[^`]+`|(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/g,
             //        https://regex101.com/r/tZ4eY3/7 link-sections 
             "lsec":   /(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+/g,
-            //        https://regex101.com/r/tZ4eY3/14 links and pathnames
-            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:\/\w+\/|.:\\|\w*:\/\/|\.+\/\S+)\S*/g,
+            //        https://regex101.com/r/tZ4eY3/17 links and pathnames
+            "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:\/\w+\/|.:\\|\w*:\/\/|\.+\/[./\w\d]+|(?:\w+\.\w+){2,})[./\w\d]*/g,
             //        tags and html comments  TODO: needs test 
             "tags":   /\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/g
         };
@@ -112,7 +112,6 @@
                 },
                 reason: 'no need to yell'
             },
-            // Trademark capitalization
             so: {
                 expr: /\bstack\s*overflow\b/gi,
                 replacement: "Stack Overflow",
@@ -134,7 +133,7 @@
                 reason: "'Stack Exchange' is the legal name"
             },
             javascript: {
-                expr: /([^\b\w.]|^)(javascript|js)\b/gi,
+                expr: /([^\b\w.]|^)(javascript|js|java script)\b/gi,
                 replacement: "$1JavaScript",
                 reason: "trademark capitalization"
             },
@@ -352,11 +351,6 @@
                 replacement: "NPM$1",
                 reason: "acronym capitalization"
             },
-            nodejs: {
-                expr: /\bnode.?js/gi,
-                replacement: "Node.js",
-                reason: "trademark capitalization"
-            },
             succeed: {
                 expr: /\b(s)ucc?ee?d(ed|s)?\b/gi,
                 replacement: "$1ucceed$2",
@@ -401,6 +395,36 @@
                 replacement: "DLL",
                 reason: "acronym capitalization"
             },
+            source: {
+                expr: /\b(s)orce(s|d)?\b/gi,
+                replacement: "$1ource$2",
+                reason: "grammar and spelling"
+            },
+            standardize: {  // https://regex101.com/r/vN7pM0/1
+                expr: /\b(s)tandari([sz](?:e|es|ed|ation))\b/gi,
+                replacement: "$1tandardi$2",
+                reason: "grammar and spelling"
+            },
+            different: {  // https://regex101.com/r/vN7pM0/1
+                expr: /\b(d)iff?e?ren(t|ce)\b/gi,
+                replacement: "$1ifferen$2",
+                reason: "grammar and spelling"
+            },
+            personally: { // https://regex101.com/r/oL9aM1/1
+                expr: /\b(p)ersona?l?(ly)?\b/gi,
+                replacement: "$1ersonal$2",
+                reason: "grammar and spelling"
+            },
+            problem: {
+                expr: /\b(p)orblem(s)?\b/gi,
+                replacement: "$1roblem$2",
+                reason: "grammar and spelling"
+            },
+            maybe: {
+                expr: /\b(m)aby\b/gi,
+                replacement: "$1aybe",
+                reason: "grammar and spelling"
+            },
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
@@ -414,7 +438,7 @@
                 reason: "noise reduction"
             },
             badwords: {
-                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|ki?nd(??:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
+                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|ki‌nd(‌?:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -464,9 +488,19 @@
                 replacement: "$1'$2",
                 reason: "grammar and spelling"
             },
+            doesn_t: {
+                expr: /\b(d)ose?nt\b/gi,
+                replacement: "$1oesn't",
+                reason: "grammar and spelling"
+            },
             prolly: {
-                expr: /\bproll?y\b/gi,
-                replacement: "probably",
+                expr: /\b(p)roll?y\b/gi,
+                replacement: "$1robably",
+                reason: "grammar and spelling"
+            },
+            keyboard: {
+                expr: /\b(k)ey?boa?rd\b/gi,
+                replacement: "$1eyboard",
                 reason: "grammar and spelling"
             },
             i: {
@@ -658,8 +692,46 @@
             },
             rss: {
                 expr: /\brss?\b/gi,
-                replacement: "RSS",
+                replacement: String.toUpperCase,
+                // replacement: "RSS",
                 reason: "acronym capitalization"
+            },
+            mvc: {
+                expr: /\bmvc\b/gi,
+                replacement: String.toUpperCase,
+                reason: "acronym capitalization"
+            },
+            mvn: {
+                expr: /\bmvn\b/gi,
+                replacement: String.toUpperCase,
+                reason: "trademark capitalization"
+            },
+            maven: {
+                expr: /\bmaven\b/gi,
+                replacement: "Maven",
+                reason: "trademark capitalization"
+            },
+            youtube: {
+                expr: /\byoutube\b/gi,
+                replacement: "YouTube",
+                reason: "trademark capitalization"
+            },
+            amazon: {
+                // https://regex101.com/r/dR0pJ7/1
+                expr: /\b(amazon(?: )?(?:redshift|web services|cloudfront|console)?)((?: )?(?:ec2|aws|s3|rds|sqs|iam|elb|emr|vpc))?\b/gi,
+                replacement: function(str,titlecase,uppercase) {
+                    var fixed = titlecase.toTitleCase() + (uppercase ? uppercase.toUpperCase() : '');
+                    return fixed;
+                },
+                reason: "trademark capitalization"
+            },
+            zend: {
+                expr: /\bzend((?: )?(?:framework|studio|guard))?\b/gi,
+                //replacement: String.toTitleCase,  // Doesn't work like built-in toUpperCase, returns 'undefined'. Load order?
+                replacement: function(str,prod) {
+                    return str.toTitleCase();
+                },
+               reason: "trademark capitalization"
             },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
@@ -898,7 +970,7 @@
                 reason: "grammar and spelling"
             },
             going_to: {
-                expr: /\b(g)[ou]nna\b/gi,
+                expr: /\b(g)[ou]nn?a\b/gi,
                 replacement: "$1oing to",
                 reason: "grammar and spelling"
             },
@@ -927,9 +999,7 @@
                 reason: "punctuation & spacing"
             },
             spacesbeforesymbols: {
-         // MERGE CONFLICT - both changed regex, test and select one.
-                expr: /[ ]*(?:([,!?;:])(?!\))[ ]*(?!\n))/g,
-                // expr: /[ \t]+([.,!?;:])(?!\w)/g,  // https://regex101.com/r/vS3dS3/2, for Issue #8
+                expr: /[ \t]*(?:([,!?;:](?!\)|\d)|[ \t](\.))(?=\s))[ \t]*/g,  // https://regex101.com/r/vS3dS3/6
                 replacement: "$1 ",
                 reason: "punctuation & spacing"
             },
@@ -1057,7 +1127,7 @@
         App.funcs.popItems = function() {
             var i = App.items, s = App.selections;
             ['title', 'body', 'summary'].forEach(function(v) {
-                i[v] = String(s[v].val()).trim();
+                i[v] = s[v].length ? s[v].val().trim() : '';
             });
         };
 
@@ -1127,8 +1197,8 @@
             var strings = [];
             function maakRij(type, rij) {
                 if (!type) return strings.push(rij.replace(/\</g, '&lt;')), true;
-                if (type === '+') return strings.push('<span class="add">' + rij.replace(/\</g, '&lt;') + '</span>'), true;
-                if (type === '-') return strings.push('<span class="del">' + rij.replace(/\</g, '&lt;') + '</span>'), true;
+                if (type === '+') return strings.push('<span class="add">' + rij.replace(/\</g, '&lt;').replace(/(?=\n)/g,'↵') + '</span>'), true;
+                if (type === '-') return strings.push('<span class="del">' + rij.replace(/\</g, '&lt;').replace(/(?=\n)/g,'↵') + '</span>'), true;
             }
 
             function getDiff(matrix, a1, a2, x, y) {
@@ -1211,7 +1281,7 @@
 
         App.pipeMods.edit = function(data) {
             App.funcs.popOriginals();
-            
+
             // Visually confirm edit - SE makes it easy because the jQuery color animation plugin seems to be there by default
             App.selections.body.animate({ backgroundColor: '#c8ffa7' }, 10);
             App.selections.body.animate({ backgroundColor: '#fff' }, 1000);
@@ -1248,7 +1318,7 @@
             var reasonStr = reasons.join('; ')+'.';  // Unique reasons separated by ; and terminated by .
             reasonStr = reasonStr.charAt(0).toUpperCase() + reasonStr.slice(1);  // Cap first letter.
 
-            if (!data.summaryOrig) data.summaryOrig = data.summary.trim(); // Remember original summary
+            if (!data.hasOwnProperty('summaryOrig')) data.summaryOrig = data.summary.trim(); // Remember original summary
             if (data.summaryOrig.length) data.summaryOrig = data.summaryOrig + ' ';
 
             data.summary = data.summaryOrig + reasonStr;
@@ -1342,11 +1412,9 @@
                          '    font-family: "courier new", "lucida sans typewriter", mono, monospace' + 
                          '}' +
                          '.add {' +
-                         '    padding: 0 3px;' +
                          '    background: #CFC;' +
                          '}' +
                          '.del {' +
-                         '    padding: 0 3px;' +
                          '    background: #FCC;' +
                          '}' +
                          '</style>');
@@ -1355,3 +1423,26 @@
     }
 })();
 
+/* 
+  * To Title Case 2.1 – http://individed.com/code/to-title-case/
+  * Copyright © 2008–2013 David Gouch. Licensed under the MIT License.
+ */
+
+String.prototype.toTitleCase = function(){
+  var smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
+
+  return this.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, function(match, index, title){
+    if (index > 0 && index + match.length !== title.length &&
+      match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" &&
+      (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') &&
+      title.charAt(index - 1).search(/[^\s-]/) < 0) {
+      return match.toLowerCase();
+    }
+
+    if (match.substr(1).search(/[A-Z]|\../) > -1) {
+      return match;
+    }
+
+    return match.charAt(0).toUpperCase() + match.substr(1);
+  });
+};
