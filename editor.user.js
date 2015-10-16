@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.31
+// @version        1.5.2.32
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -32,7 +32,8 @@
         // Place "helper" functions here
         App.funcs = {};
 
-        // True to display rule names in Edit Summary
+        // True to display counts and / or rule names in Edit Summary
+        App.globals.showCounts = false;
         App.globals.showRules = false;
 
         //Preload icon alt
@@ -1307,7 +1308,7 @@
                 // optionally the rule ID, and the number of repeats if 2 or more.
                 reasons.push(App.globals.reasons[z].reason
                              + (App.globals.showRules ? ' ['+ App.globals.reasons[z].editId +']' : '')
-                             + ((App.globals.reasons[z].count > 1) ? ' ('+App.globals.reasons[z].count+')' : '') );
+                             + (App.globals.showCounts ? ((App.globals.reasons[z].count > 1) ? ' ('+App.globals.reasons[z].count+')' : '') : '') );
                 App.globals.changes += App.globals.reasons[z].count;
             }
 
