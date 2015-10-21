@@ -1006,10 +1006,10 @@
             },
             // Punctuation & Spacing come last
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/14
+                //    https://regex101.com/r/qR5fO9/18
                 // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
                 //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
-                expr: /((?!\n\n)[A-z\d](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z\d][^?.!A-Z]+)?([?.!])?)/gm, 
+                expr: /((?!\n\n)[A-z](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z][^?.!A-Z]+)*([?.!])?)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
                     //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
