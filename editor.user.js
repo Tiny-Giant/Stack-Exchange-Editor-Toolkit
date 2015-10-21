@@ -763,6 +763,11 @@
                 replacement: "iPhone",
                 reason: "trademark capitalization"
             },
+            google_apps_script: {
+                expr: /google ?(?:apps?) ?script\b/gi,
+                replacement: "Google Apps Script",
+                reason: "trademark capitalization"
+            },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
                 expr: /\b(i|I)e\b/g,   // Careful here; IE is Internet Explorer
