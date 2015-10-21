@@ -764,7 +764,7 @@
                 reason: "trademark capitalization"
             },
             google_apps_script: {
-                expr: /\google ?apps? ?script\b/gi,
+                expr: /google ?(?:apps?) ?script\b/gi,
                 replacement: "Google Apps Script",
                 reason: "trademark capitalization"
             },
