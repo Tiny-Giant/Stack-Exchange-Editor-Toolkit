@@ -441,8 +441,13 @@
                 replacement: "",
                 reason: "noise reduction"
             },
-            hello: { // TODO: Update badsentences (new) to catch everything hello (old) did.
+            hello: { // TODO: Update badphrases (new) to catch everything hello and thanks (old) did.
                 expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
+                replacement: "",
+                reason: "noise reduction"
+            },
+            thanks: { // https://regex101.com/r/tV6uM4/2
+                expr: /[^\n.!?:]*\b(?:thanks|pl(?:ease|z|s)\s+h[ea]lp|cheers|regards|tanx|thx|thank\s+you|my\s+first\s+question|kind(?:ly)\shelp).*$/gmi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -836,13 +841,13 @@
             },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
-                expr: /\b(i|I)e\b/g,   // Careful here; IE is Internet Explorer
-                replacement: "$1.e.",
+                expr: /\b(i|I)e[.\s]+/g,   // Careful here; IE is Internet Explorer
+                replacement: "$1.e. ",
                 reason: "grammar and spelling"
             },
-            eg: {
-                expr: /\b(e)g\b/gi,
-                replacement: "$1.g.",
+            eg: { // https://regex101.com/r/qH2oT0/2
+                expr: /\b(e)g[.\s]+/gi,
+                replacement: "$1.g. ",
                 reason: "grammar and spelling"
             },
             unfortunately: {
