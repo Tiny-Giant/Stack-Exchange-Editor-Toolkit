@@ -293,8 +293,8 @@
                 replacement: "Ubuntu",
                 reason: "trademark capitalization"
             },
-            vbnet: {  // https://regex101.com/r/bB9pP3/4
-                expr: /(?:vb|asp|\s+|\()(?:\.net|\s*[0-9]+)\s*(?:framework|core)?/gi,
+            vbnet: {  // https://regex101.com/r/bB9pP3/6
+                expr: /(?:vb\.net|vb|\.net)(?:\s*[0-9]+)?\s*(?:framework|core)?/gi,
                 replacement: function(str) {
                     return str.replace(/vb/i, 'VB')
                     .replace(/asp/i, 'ASP')
