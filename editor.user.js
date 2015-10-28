@@ -1443,7 +1443,7 @@
                 App.globals.changes += App.globals.reasons[z].count;
             }
 
-            var reasonStr = reasons.join('; ')+'.';  // Unique reasons separated by ; and terminated by .
+            var reasonStr = reasons.length ? reasons.join('; ')+'.' : '';  // Unique reasons separated by ; and terminated by .
             reasonStr = reasonStr.charAt(0).toUpperCase() + reasonStr.slice(1);  // Cap first letter.
 
             if (!data.hasOwnProperty('summaryOrig')) data.summaryOrig = data.summary.trim(); // Remember original summary
