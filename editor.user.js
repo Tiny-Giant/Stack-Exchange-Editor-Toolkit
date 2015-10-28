@@ -414,8 +414,8 @@
                 replacement: "$1ersonal$2",
                 reason: "grammar and spelling"
             },
-            problem: { // https://regex101.com/r/yA8jM7/1
-                expr: /\b(p)(?:or|ro)b(?:le|el)m(s)?\b/gi,
+            problem: { // https://regex101.com/r/yA8jM7/3
+                expr: /\b(p)(?:or|ro)b(?:le|el|e)m(s)?\b/gi,
                 replacement: "$1roblem$2",
                 reason: "grammar and spelling"
             },
