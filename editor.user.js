@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.32
+// @version        1.5.2.34
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -144,7 +144,7 @@
                 reason: "trademark capitalization"
             },
             jquery: {
-                expr: /\bjquery\b/gi,
+                expr: /\bjque?rr?y\b/gi,  // jqury, jquerry, jqurry... ~600 spelling mistakes
                 replacement: "jQuery",
                 reason: "trademark capitalization"
             },
@@ -238,11 +238,6 @@
                 replacement: "WordPress",
                 reason: "trademark capitalization"
             },
-            google: {
-                expr: /\bgoogle\b/gi,
-                replacement: "Google",
-                reason: "trademark capitalization"
-            },
             mysql: {
                 expr: /\bmysql\b/gi,
                 replacement: "MySQL",
@@ -298,14 +293,20 @@
                 replacement: "Ubuntu",
                 reason: "trademark capitalization"
             },
-            vbnet: {  // https://regex101.com/r/bB9pP3/1
-                expr: /(?:vb|\s+)(?:\.net|\s*[0-9]+)\s*(?:framework|core)?/gi,
+            vbnet: {  // https://regex101.com/r/bB9pP3/4
+                expr: /(?:vb|asp|\s+|\()(?:\.net|\s*[0-9]+)\s*(?:framework|core)?/gi,
                 replacement: function(str) {
                     return str.replace(/vb/i, 'VB')
+                    .replace(/asp/i, 'ASP')
                     .replace(/net/i, 'NET')
                     .replace(/framework/i, 'Framework')
                     .replace(/core/i, 'Core');
                 },
+                reason: "trademark capitalization"
+            },
+            asp: {
+                expr: /([^\b\w.]|^)asp/gi,
+                replacement: function (match) { return match.toUpperCase(); },
                 reason: "trademark capitalization"
             },
             regex: {
@@ -403,20 +404,50 @@
                 replacement: "$1ifferen$2",
                 reason: "grammar and spelling"
             },
-            personally: { // https://regex101.com/r/oL9aM1/1
-                expr: /\b(p)ersona?l?(ly)?\b/gi,
+            personally: { // https://regex101.com/r/oL9aM1/2
+                expr: /\b(p)erso(?:nl|nl|nal)(ly)?\b/gi,
                 replacement: "$1ersonal$2",
                 reason: "grammar and spelling"
             },
-            problem: {
-                expr: /\b(p)orblem(s)?\b/gi,
+            problem: { // https://regex101.com/r/yA8jM7/5
+                expr: /\b(p)(?:or?|ro|rο|r0)b(?:le|el|e|re|l|[|]e)m(s)?\b/gi,
                 replacement: "$1roblem$2",
+                reason: "grammar and spelling"
+            },
+            written: {
+                expr: /\b(w)riten\b/gi,
+                replacement: "$1ritten",
                 reason: "grammar and spelling"
             },
             maybe: {
                 expr: /\b(m)aby\b/gi,
                 replacement: "$1aybe",
                 reason: "grammar and spelling"
+            },
+            pseudo: {
+                expr: /\b(p)suedo\b/gi,
+                replacement: "$1seudo",
+                reason: "grammar and spelling"
+            },
+            application: {
+                expr: /\b(a)pp?l[ia]ca(?:ti|it)on\b/gi,
+                replacement: "$1pplication",
+                reason: "grammar and spelling"
+            },
+            calendar: {
+                expr: /\b(c)al[ea]nd[ae]r\b/gi,
+                replacement: "$1alendar",
+                reason: "grammar and spelling"
+            },
+            commit: {  // https://regex101.com/r/kY6sN8/1
+                expr: /\b(c)omm?it?(s|ted|ters?|ting)?\b/gi,
+                replacement: "$1ommit$2",
+                reason: "grammar and spelling"
+            },
+            mp3: {
+                expr: /([^\b\w.]|^)mp3(s)?\b/gi,
+                replacement: "$1MP3$2",
+                reason: "acronym capitalization"
             },
             // Noise reduction
             editupdate: {
@@ -425,8 +456,13 @@
                 replacement: "",
                 reason: "noise reduction"
             },
-            hello: { // TODO: Update badsentences (new) to catch everything hello (old) did.
+            hello: { // TODO: Update badphrases (new) to catch everything hello and thanks (old) did.
                 expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
+                replacement: "",
+                reason: "noise reduction"
+            },
+            thanks: { // https://regex101.com/r/tV6uM4/2
+                expr: /[^\n.!?:]*\b(?:thanks|pl(?:ease|z|s)\s+h[ea]lp|cheers|regards|tanx|thx|thank\s+you|my\s+first\s+question|kind(?:ly)\shelp).*$/gmi,
                 replacement: "",
                 reason: "noise reduction"
             },
@@ -481,9 +517,14 @@
                 replacement: "$1'$2",
                 reason: "grammar and spelling"
             },
-            doesn_t: {
-                expr: /\b(d)ose?nt\b/gi,
+            doesn_t: { // https://regex101.com/r/sL0uO9/1
+                expr: /\b(d)ose?n'?t\b/gi,
                 replacement: "$1oesn't",
+                reason: "grammar and spelling"
+            },
+            doesn_t_work: {  // >4K instances of this (Oct 2015)
+                expr: /\b(d)oesn\'t (work|like|think|want|put|save|load|get|help|make)s\b/gi,
+                replacement: "$1oesn't $2",
                 reason: "grammar and spelling"
             },
             prolly: {
@@ -496,8 +537,8 @@
                 replacement: "$1eyboard",
                 reason: "grammar and spelling"
             },
-            i: {
-                expr: /\bi('|\b)/g,  // i or i-apostrophe
+            i: { // https://regex101.com/r/uO7qG0/1
+                expr: /\bi('|\b)(?!.e.)/g,  // i or i-apostrophe
                 replacement: "I",
                 reason: "grammar and spelling"
             },
@@ -507,7 +548,7 @@
                 reason: "grammar and spelling"
             },
             ive: {
-                expr: /\bive\b/gi,
+                expr: /\biv'?e\b/gi,
                 replacement: "I've",
                 reason: "grammar and spelling"
             },
@@ -536,7 +577,7 @@
                 replacement: "$1xpect$2",
                 reason: "grammar and spelling"
             },
-            employe: {
+            employee: {
                 expr: /\b(e)mploye\b/gi,
                 replacement: "$1mployee",
                 reason: "grammar and spelling"
@@ -651,6 +692,26 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: "acronym capitalization"
             },
+            wpf: {
+                expr: /(?:[^\b\w.]|^)wpf\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: "acronym capitalization"
+            },
+            http: {
+                expr: /(?:[^\b\w.]|^)https?\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: "acronym capitalization"
+            },
+            woff: {
+                expr: /(?:[^\b\w.]|^)woff\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: "acronym capitalization"
+            },
+            ttf: {
+                expr: /(?:[^\b\w.]|^)ttf\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: "acronym capitalization"
+            },
             ipv_n: {
                 expr: /\bip(v[46])?\b/gi,
                 replacement: "IP$1",
@@ -743,6 +804,31 @@
                 replacement: "$1rogramm$2",
                 reason: "grammar and spelling"
             },
+            bear_with_me: {
+                expr: /\b(b)are (with me|it|in mind)\b/gi,
+                replacement: "$1ear $2",
+                reason: "grammar and spelling"
+            },
+            weird: {
+                expr: /\b(w)ierd(ness|ly)\b/gi,
+                replacement: "$1eird$2",
+                reason: "grammar and spelling"
+            },
+            believe: {
+                expr: /\b(b)eleive(r|s|d)?\b/gi,
+                replacement: "$1elieve$2",
+                reason: "grammar and spelling"
+            },
+            piece: {
+                expr: /\b(p)eice(s|d)?\b/gi,
+                replacement: "$1iece$2",
+                reason: "grammar and spelling"
+            },
+            sample: {
+                expr: /\b(s)maple(s|d)?\b/gi,
+                replacement: "$1ample$2",
+                reason: "grammar and spelling"
+            },
             twitter: {
                 expr: /\btwitter\b/gi,
                 replacement: "Twitter",
@@ -763,6 +849,13 @@
                 replacement: "iPhone",
                 reason: "trademark capitalization"
             },
+            google: {
+                expr: /\bgoogle[ \t]+(?:maps?|sheets?|docs?|drive)?\b/gi,
+                replacement: function(str) {
+                    return str.toTitleCase();
+                },
+                reason: "trademark capitalization"
+            },
             google_apps_script: {
                 expr: /\bgoogle ?(?:apps?)? ?script\b/gi,
                 replacement: "Google Apps Script",
@@ -770,13 +863,13 @@
             },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
-                expr: /\b(i|I)e\b/g,   // Careful here; IE is Internet Explorer
-                replacement: "$1.e.",
+                expr: /\b(i|I)e[.\s]+/g,   // Careful here; IE is Internet Explorer
+                replacement: "$1.e. ",
                 reason: "grammar and spelling"
             },
-            eg: {
-                expr: /\b(e)g\b/gi,
-                replacement: "$1.g.",
+            eg: { // https://regex101.com/r/qH2oT0/2
+                expr: /\b(e)g[.\s]+/gi,
+                replacement: "$1.g. ",
                 reason: "grammar and spelling"
             },
             unfortunately: {
@@ -889,8 +982,8 @@
                 replacement: "$1ndependent$2",
                 reason: "grammar and spelling"
             },
-            recommend: {
-                expr: /\b(r)ecomm?and(ation)?\b/gi,
+            recommend: { // https://regex101.com/r/pP9lB7/1
+                expr: /\b(r)ecomm?[ao]nd(ation)?\b/gi,
                 replacement: "$1ecommend$2",
                 reason: "grammar and spelling"
             },
@@ -909,8 +1002,8 @@
                 replacement: "OK",
                 reason: "grammar and spelling"
             },
-            etc: {
-                expr: /\betc\b/g,
+            etc: {  // https://regex101.com/r/dE7cV1/3
+                expr: /\betc(?!\.)/g,
                 replacement: "etc.",
                 reason: "grammar and spelling"
             },
@@ -1065,7 +1158,7 @@
             }
         };
 
-        // This is where the magic happens: this function takes a few pieces of information and applies edits to the post with a couple exceptions
+        // This is where the magic happens: this function takes a few pieces of information and applies edits to the post
         App.funcs.fixIt = function(input, expression, replacement, reasoning) {
             // If there is nothing to search, exit
             if (!input) return false;
@@ -1162,7 +1255,7 @@
         App.funcs.popItems = function() {
             var i = App.items, s = App.selections;
             ['title', 'body', 'summary'].forEach(function(v) {
-                i[v] = s[v].length ? s[v].val().trim() : '';
+                i[v] = s[v].length ? s[v].val() : '';
             });
         };
 
@@ -1350,7 +1443,7 @@
                 App.globals.changes += App.globals.reasons[z].count;
             }
 
-            var reasonStr = reasons.join('; ')+'.';  // Unique reasons separated by ; and terminated by .
+            var reasonStr = reasons.length ? reasons.join('; ')+'.' : '';  // Unique reasons separated by ; and terminated by .
             reasonStr = reasonStr.charAt(0).toUpperCase() + reasonStr.slice(1);  // Cap first letter.
 
             if (!data.hasOwnProperty('summaryOrig')) data.summaryOrig = data.summary.trim(); // Remember original summary
