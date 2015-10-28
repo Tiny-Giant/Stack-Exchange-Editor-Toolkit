@@ -562,7 +562,7 @@
                 replacement: "$1xpect$2",
                 reason: "grammar and spelling"
             },
-            employe: {
+            employee: {
                 expr: /\b(e)mploye\b/gi,
                 replacement: "$1mployee",
                 reason: "grammar and spelling"
@@ -980,8 +980,8 @@
                 replacement: "OK",
                 reason: "grammar and spelling"
             },
-            etc: {
-                expr: /\betc\b/g,
+            etc: {  // https://regex101.com/r/dE7cV1/3
+                expr: /\betc(?!\.)/g,
                 replacement: "etc.",
                 reason: "grammar and spelling"
             },
