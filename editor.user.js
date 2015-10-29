@@ -449,7 +449,7 @@
                 reason: App.consts.reasons.spelling
             },
             maybe: {
-                expr: /\b(m)aby\b/gi,
+                expr: /\b(m)(?:aby|yabe)\b/gi,
                 replacement: "$1aybe",
                 reason: App.consts.reasons.spelling
             },
@@ -878,8 +878,8 @@
                 replacement: "iPhone",
                 reason: App.consts.reasons.trademark
             },
-            google: {
-                expr: /\bgoogle[ \t]+(?:maps?|sheets?|docs?|drive)?\b/gi,
+            google: { // https://regex101.com/r/iS5fO1/1
+                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive)?\b/gi,
                 replacement: function(str) {
                     return str.toTitleCase();
                 },
@@ -889,6 +889,31 @@
                 expr: /\bgoogle ?(?:apps?)? ?script\b/gi,
                 replacement: "Google Apps Script",
                 reason: App.consts.reasons.trademark
+            },
+            bluetooth: {
+                expr: /\bbl(?:ue|oo)too?th?\b/gi,
+                replacement: "Bluetooth",
+                reason: App.consts.reasons.trademark
+            },
+            lenovo: {
+                expr: /\bleno?vo\b/gi,
+                replacement: "Lenovo",
+                reason: App.consts.reasons.trademark
+            },
+            really: {
+                expr: /\b(r)ea?ll?y\b/gi,
+                replacement: "$1eally",
+                reason: App.consts.reasons.spelling
+            },
+            finally_: {
+                expr: /\b(f)inall?y\b/gi,
+                replacement: "$1inally",
+                reason: App.consts.reasons.spelling
+            },
+            behaviour: { // https://regex101.com/r/rU1eB7/1
+                expr: /\b(b)eha?i?vi?o(r|ur|rs|urs)\b/gi,
+                replacement: "$1ehavio$2",
+                reason: App.consts.reasons.spelling
             },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
             ie: {  // http://english.stackexchange.com/questions/30106/can-i-start-a-sentence-with-i-e
