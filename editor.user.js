@@ -879,14 +879,14 @@
                 reason: App.consts.reasons.trademark
             },
             google: { // https://regex101.com/r/iS5fO1/1
-                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive)?\b/gi,
+                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|documents?|drive|sites?|spreadsheets?|analytics)?\b/gi,
                 replacement: function(str) {
                     return str.toTitleCase();
                 },
                 reason: App.consts.reasons.trademark
             },
             google_apps_script: {
-                expr: /\bgoogle ?(?:apps?)? ?script\b/gi,
+                expr: /\bgoogle[- ]?(?:apps?)?[- ]?script\b/gi,
                 replacement: "Google Apps Script",
                 reason: App.consts.reasons.trademark
             },
