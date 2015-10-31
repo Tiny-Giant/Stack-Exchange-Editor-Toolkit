@@ -478,6 +478,11 @@
                 replacement: "$1MP3$2",
                 reason: App.consts.reasons.acronym
             },
+            autocomplete: { // https://regex101.com/r/rZ9gW5/1
+                expr: /\b(a)uto?[ -]?co?m?p?l?ete?(s)?\b/gi,
+                replacement: "$1utocomplete$2",
+                reason: App.consts.reasons.spelling
+            },
             // Noise reduction
             editupdate: {
                 // https://regex101.com/r/tT2pK6/2
@@ -879,7 +884,7 @@
                 reason: App.consts.reasons.trademark
             },
             google: { // https://regex101.com/r/iS5fO1/1
-                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|documents?|drive|sites?|spreadsheets?|analytics)?\b/gi,
+                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive|sites?)?\b/gi,
                 replacement: function(str) {
                     return str.toTitleCase();
                 },
