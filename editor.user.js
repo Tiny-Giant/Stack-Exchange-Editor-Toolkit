@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.36
+// @version        1.5.2.35
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -233,8 +233,8 @@
                 reason: App.consts.reasons.trademark
             },
             windows: {
-                // https://regex101.com/r/jF9zK1/6
-                expr: /\b(?:win|windows)(?:\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server))?\b/gi,
+                // https://regex101.com/r/jF9zK1/8
+                expr: /\b(?:win(?=(?:\s+(?:2k|[0-9.]+|ce|me|nt|xp|vista|server)))|windows)(?:\s+(2k|[0-9.]+|ce|me|nt|xp|vista|server))?\b/gi,
                 replacement: function(match, ver) {
                     ver = !ver ? '' : ver.replace(/ce/i, ' CE')
                     .replace(/me/i, ' ME')
