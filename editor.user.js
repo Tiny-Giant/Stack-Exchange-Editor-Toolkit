@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.35
+// @version        1.5.2.36
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -218,8 +218,8 @@
                 reason: App.consts.reasons.acronym
             },
             sqlite: {
-                expr: /\bsqlite\s*([0-9]*)\b/gi,
-                replacement: "SQLite $2",
+                expr: /\bsqlite(\s*[0-9]*)\b/gi,
+                replacement: "SQLite$1",
                 reason: App.consts.reasons.trademark
             },
             android: {
@@ -339,7 +339,7 @@
                 reason: App.consts.reasons.acronym
             },
             regex: {
-                expr: /\bregex(p)?\b/gi,
+                expr: /\bregg?[ea]?x(p)?\b/gi,
                 replacement: "RegEx$1",
                 reason: App.consts.reasons.trademark
             },
@@ -547,7 +547,7 @@
                 reason: App.consts.reasons.grammar
             },
             apostrophe_t: {
-                expr: /\b(aren|can|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
+                expr: /\b(aren|can|couldn|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.grammar
             },
@@ -833,6 +833,11 @@
                 replacement: "$1rocess$2",
                 reason: App.consts.reasons.spelling
             },
+            program: {
+                expr: /\b(p)rogramm\b/gi,
+                replacement: "$1rogram",
+                reason: App.consts.reasons.spelling
+            },
             programming: {
                 expr: /\b(p)rogram(ing|ed|er)\b/gi,
                 replacement: "$1rogramm$2",
@@ -918,6 +923,16 @@
             behaviour: { // https://regex101.com/r/rU1eB7/1
                 expr: /\b(b)eha?i?vi?o(r|ur|rs|urs)\b/gi,
                 replacement: "$1ehavio$2",
+                reason: App.consts.reasons.spelling
+            },
+            crashes: {
+                expr: /\b(c)rashs\b/gi,
+                replacement: "$1rashes",
+                reason: App.consts.reasons.spelling
+            },
+            pattern: {
+                expr: /\b(p)at?(?:trn|tren|tern)(s)?\b/gi,
+                replacement: "$1attern$2",
                 reason: App.consts.reasons.spelling
             },
             // From Peter Mortensen list (http://pvm-professionalengineering.blogspot.de/2011/04/word-list-for-editing-stack-exchange.html)
@@ -1057,7 +1072,7 @@
                 reason: App.consts.reasons.spelling
             },
             ok: {
-                expr: /\bok\b/g,
+                expr: /\bok\b/gi,
                 replacement: "OK",
                 reason: App.consts.reasons.spelling
             },
