@@ -1388,7 +1388,7 @@
             if (!App.selections.redoButton.length) return false;
 
             App.selections.buttonWrapper = $('<div class="ToolkitButtonWrapper"/>');
-            App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" />');
+            App.selections.buttonFix = $('<button class="wmd-button ToolkitFix" title="Fix the content!" onclick="return false;" />');
             App.selections.buttonInfo = $('<div class="ToolkitInfo">');
 
             // Build the button
@@ -1462,8 +1462,8 @@
                 }
             }
             
-            a1 = a1.split(/(?=\b|\W)/g);
-            a2 = a2.split(/(?=\b|\W)/g);
+            a1 = a1.split(/(?=\b|\W|_)/g);
+            a2 = a2.split(/(?=\b|\W|_)/g);
 
             var matrix = new Array(a1.length + 1);
             var x, y;
