@@ -410,7 +410,7 @@
                 reason: App.consts.reasons.trademark
             },
             google_apps_script: {
-                expr: /\bgoogle[- ]?(?:apps?)?[- ]?script\b/gi,
+                expr: /\bgoogle[- ]?(?:apps?)?[- ]?script(?:ing)?\b/gi,
                 replacement: "Google Apps Script",
                 reason: App.consts.reasons.trademark
             },
@@ -703,7 +703,7 @@
                 reason: App.consts.reasons.spelling
             },
             apostrophe_s: {
-                expr: /\b(he|she|that|there|what|where)[^\w']*(s)\b/gi,
+                expr: /\b(he|she|that|there|what|where|here)[^\w']*(s)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1124,18 +1124,38 @@
                 reason: App.consts.reasons.spelling
             },
             syntax: {
-                expr: /\b(s)[yi]nt[ae]?x\b/g,
+                expr: /\b(s)[yi]nt[ae]?x\b/gi,
                 replacement: "$1yntax",
                 reason: App.consts.reasons.spelling
             },
             correct: {
-                expr: /\b(c)orr?ec[ty]\b/g,
+                expr: /\b(c)orr?ec[ty]/gi,  // No \b at end, to include correction, correcting, corrected
                 replacement: "$1orrect",
                 reason: App.consts.reasons.spelling
             },
             correctly: {
-                expr: /\b(c)orr?ec(?:lt?|t?l)y\b/g,
+                expr: /\b(c)orr?ec(?:lt?|t?l)y\b/ig,
                 replacement: "$1orrectly",
+                reason: App.consts.reasons.spelling
+            },
+            integer: {
+                expr: /\b(i)nte?r?ger(s)?\b/gi,
+                replacement: "$1nteger$2",
+                reason: App.consts.reasons.spelling
+            },
+            several: {
+                expr: /\b(s)er?v[ea]?r[ae]?l\b/gi,
+                replacement: "$1everal",
+                reason: App.consts.reasons.spelling
+            },
+            solution: {
+                expr: /\b(s)ou?lu?ti?on\b/gi,
+                replacement: "$1olution",
+                reason: App.consts.reasons.spelling
+            },
+            somebody: {
+                expr: /\b(s)ombody\b/gi,
+                replacement: "$1omebody",
                 reason: App.consts.reasons.spelling
             },
             /*
