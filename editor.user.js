@@ -1198,6 +1198,12 @@
                 replacement: "$1",
                 reason: App.consts.reasons.grammar
             },
+            spacesaftersymbols: {  // https://regex101.com/r/pS1pG5/2
+                expr: /([^.,!?;:][.,!?;:])(?=[a-z])/gi,
+                //replacement: "$1-",
+                replacement: "$1 ",
+                reason: App.consts.reasons.grammar
+            },
             i: { // https://regex101.com/r/uO7qG0/1
                 expr: /\bi('|\b)(?!.e.)/g,  // i or i-apostrophe
                 replacement: "I",
@@ -1313,15 +1319,24 @@
         App.funcs.fixIt = function(input, expression, replacement, reasoning) {
             // If there is nothing to search, exit
             if (!input) return false;
+            if (replacement === "$1 ") { /////////////////////////////////////////////////// spacesaftersymbols
+                console.log( "input:"+input );
+                var xyzzy = true;
+            }
             // Scan the post text using the expression to see if there are any matches
             var matches = input.match(expression);
+            if (xyzzy) console.log( "matches:"+JSON.stringify( matches ) );  ///////////////////////////////////////// Confirmed.
             if (!matches) return false;
             var count = 0;  // # replacements to do
             input = input.replace(expression, function(before){ 
                 var after = before.replace(expression, replacement);
+                if (xyzzy) console.log( "replacement>"+replacement+"<" );  ///////////////////////////////////////// same as "before"
+                if (xyzzy) console.log( "after>"+after+"<" );  ///////////////////////////////////////// same as "before"
                 if(after !== before) ++count; 
                 return after;
             });
+            if (xyzzy) console.log( "output:"+input );  ///////////////////////////////////////// Same as input -> fail.
+            if (xyzzy) console.log( "count:"+count );  ///////////////////////////////////////// 0
             return count > 0 ? {
                 reason: reasoning,
                 fixed: String(input).trim(),
