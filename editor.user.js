@@ -1178,8 +1178,8 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            spacesbeforesymbols: {  // https://regex101.com/r/vS3dS3/7
-                expr: /[ \t]+(?=[.,!?;:])([.,!?;:])/g,
+            spacesbeforesymbols: {  // https://regex101.com/r/vS3dS3/8
+                expr: /[ \t]+(?=[.,!?;:])([.,!?;:])(?!\S)/g,
                 replacement: "$1",
                 reason: App.consts.reasons.grammar
             },
