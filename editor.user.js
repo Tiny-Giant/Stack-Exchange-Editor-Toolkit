@@ -160,7 +160,7 @@
                 reason: App.consts.reasons.trademark
             },
             javascript: {
-                expr: /([^\b\w.]|^)(javascript|js|java script)\b/gi,
+                expr: /([^\b\w.]|^)(javascr?ipt|js|java script)\b/gi,
                 replacement: "$1JavaScript",
                 reason: App.consts.reasons.trademark
             },
@@ -274,8 +274,8 @@
                 replacement: "iOS $1",
                 reason: App.consts.reasons.trademark
             },
-            ubuntu: {
-                expr: /\b[uoa]*b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
+            ubuntu: {  // https://regex101.com/r/sT8wV5/1
+                expr: /\b[uoa]+b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
                 replacement: "Ubuntu",
                 reason: App.consts.reasons.trademark
             },
@@ -1156,6 +1156,21 @@
             somebody: {
                 expr: /\b(s)ombody\b/gi,
                 replacement: "$1omebody",
+                reason: App.consts.reasons.spelling
+            },
+            everything: {
+                expr: /\b(e)ve?r[yi]?thing\b/gi,
+                replacement: "$1verything",
+                reason: App.consts.reasons.spelling
+            },
+            button: {
+                expr: /\b(b)[uo]+tt?[ou]n\b/gi,
+                replacement: "$1utton",
+                reason: App.consts.reasons.spelling
+            },
+            before: {
+                expr: /\b(b)e?fo?re?\b/gi,
+                replacement: "$1efore",
                 reason: App.consts.reasons.spelling
             },
             /*
