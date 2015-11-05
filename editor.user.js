@@ -1178,9 +1178,9 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            spacesbeforesymbols: {
-                expr: /[ \t]*(?:([,!?;:](?!\)|\d)|[ \t](\.))(?=\s))[ \t]*/g,  // https://regex101.com/r/vS3dS3/6
-                replacement: "$1 ",
+            spacesbeforesymbols: {  // https://regex101.com/r/vS3dS3/7
+                expr: /[ \t]+(?=[.,!?;:])([.,!?;:])/g,
+                replacement: "$1",
                 reason: App.consts.reasons.grammar
             },
             i: { // https://regex101.com/r/uO7qG0/1
