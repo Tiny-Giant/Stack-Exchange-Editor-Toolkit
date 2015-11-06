@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.36
+// @version        1.5.2.37
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1193,15 +1193,14 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            spacesbeforesymbols: {  // https://regex101.com/r/vS3dS3/8
-                expr: /[ \t]+(?=[.,!?;:])([.,!?;:])(?!\S)/g,
-                replacement: "$1",
+            spacesbeforesymbols: {  // https://regex101.com/r/fN6lL7/2
+                expr: /(?:[ \t]([(&])[ \t]+|[ \t]*([(&])(?=[a-z]|$))/gim,
+                replacement: " $1$2",
                 reason: App.consts.reasons.grammar
             },
-            spacesaftersymbols: {  // https://regex101.com/r/pS1pG5/2
-                expr: /([^.,!?;:][.,!?;:])(?=[a-z])/gi,
-                //replacement: "$1-",
-                replacement: "$1 ",
+            spacesaftersymbols: {  // https://regex101.com/r/jB5aN0/2
+                expr: /(?:[ \t]([.,!?;:])[ \t]+|[ \t]*([.,!?;:])(?=[a-z]|$))/gim,
+                replacement: "$1$2 ",
                 reason: App.consts.reasons.grammar
             },
             i: { // https://regex101.com/r/uO7qG0/1
@@ -1288,6 +1287,11 @@
             ** Spacing - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
             **/
+            trailingspaces: {
+                expr: /[ \t]*$/gm,
+                replacement: "",
+                reason: App.consts.reasons.spacing
+            },
             multiplespaces: {
                 // https://regex101.com/r/hY9hQ3/1
                 expr: /[ ]{2,}(?!\n)/g,
@@ -1319,24 +1323,15 @@
         App.funcs.fixIt = function(input, expression, replacement, reasoning) {
             // If there is nothing to search, exit
             if (!input) return false;
-            if (replacement === "$1 ") { /////////////////////////////////////////////////// spacesaftersymbols
-                console.log( "input:"+input );
-                var xyzzy = true;
-            }
             // Scan the post text using the expression to see if there are any matches
             var matches = input.match(expression);
-            if (xyzzy) console.log( "matches:"+JSON.stringify( matches ) );  ///////////////////////////////////////// Confirmed.
             if (!matches) return false;
             var count = 0;  // # replacements to do
             input = input.replace(expression, function(before){ 
                 var after = before.replace(expression, replacement);
-                if (xyzzy) console.log( "replacement>"+replacement+"<" );  ///////////////////////////////////////// same as "before"
-                if (xyzzy) console.log( "after>"+after+"<" );  ///////////////////////////////////////// same as "before"
                 if(after !== before) ++count; 
                 return after;
             });
-            if (xyzzy) console.log( "output:"+input );  ///////////////////////////////////////// Same as input -> fail.
-            if (xyzzy) console.log( "count:"+count );  ///////////////////////////////////////// 0
             return count > 0 ? {
                 reason: reasoning,
                 fixed: String(input).trim(),
