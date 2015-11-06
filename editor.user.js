@@ -403,7 +403,7 @@
                 reason: App.consts.reasons.trademark
             },
             google: { // https://regex101.com/r/iS5fO1/1
-                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive|sites?)?\b/gi,
+                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive|sites?|forms?)?\b/gi,
                 replacement: function(str) {
                     return str.toTitleCase();
                 },
@@ -713,7 +713,7 @@
                 reason: App.consts.reasons.spelling
             },
             doesn_t: { // https://regex101.com/r/sL0uO9/1
-                expr: /\b(d)ose?n'?t\b/gi,
+                expr: /\b(d)(?:ose?n'?t|oens'?t)\b/gi,
                 replacement: "$1oesn't",
                 reason: App.consts.reasons.spelling
             },
@@ -1171,6 +1171,11 @@
             before: {
                 expr: /\b(b)e?fo?re?\b/gi,
                 replacement: "$1efore",
+                reason: App.consts.reasons.spelling
+            },
+            example: {
+                expr: /\b(e)(?:xsample|xamle|x?ample?)\b/gi,
+                replacement: "$1xample",
                 reason: App.consts.reasons.spelling
             },
             /*
