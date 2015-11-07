@@ -118,6 +118,7 @@
             noise:         "noise reduction",
             punctuation:   "punctuation",
             spacing:       "spacing",
+            silent:        "",                              // Unreported / uncounted
             titleSaysAll:  "replicated title in body"
         };
 
@@ -1295,7 +1296,7 @@
             trailingspaces: {
                 expr: /[ \t]*$/gm,
                 replacement: "",
-                reason: App.consts.reasons.spacing
+                reason: App.consts.reasons.silent
             },
             multiplespaces: {
                 // https://regex101.com/r/hY9hQ3/1
@@ -1592,6 +1593,9 @@
                 data[field] = fix.fixed;
                 App.edits[j].fixed = true;
             }
+            
+            // Remove silent change reason
+            delete App.globals.reasons[App.consts.reasons.silent];
             
             // If there are no reasons, exit
             if (App.globals.reasons == {}) return false;
