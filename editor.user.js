@@ -176,7 +176,7 @@
                 reason: App.consts.reasons.trademark
             },
             php: {
-                expr: /(?:[^\b\w.]|^)php\b/gi,
+                expr: /(?:[^\b\w.]|^)php[\d]?\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.trademark
             },
@@ -241,7 +241,7 @@
                 reason: App.consts.reasons.trademark
             },
             apache: {
-                expr: /\bapache\b/gi,
+                expr: /\bapache[\d]?\b/gi,
                 replacement: "Apache",
                 reason: App.consts.reasons.trademark
             },
@@ -435,6 +435,11 @@
                 replacement: "Internet",
                 reason: App.consts.reasons.trademark
             },
+            oauth: {  // https://regex101.com/r/sA2cQ5/1
+                expr: /\boauth(?:(?: )*(\d)(?!\.\d)|(?: )*([\d.]+))?\b/gi,
+                replacement: "OAuth$1 $2",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -611,6 +616,21 @@
             ascii: {
                 expr: /([^\b\w.]|^)ascii?\b/gi,
                 replacement: "$1ASCII",
+                reason: App.consts.reasons.acronym
+            },
+            gsoap: {
+                expr: /([^\b\w.]|^)gsoap\b/gi,
+                replacement: "$1gSOAP",
+                reason: App.consts.reasons.acronym
+            },
+            soap: {
+                expr: /([^\b\w.]|^)soap\b/gi,
+                replacement: "$1SOAP",
+                reason: App.consts.reasons.acronym
+            },
+            csv: {
+                expr: /([^\b\w.]|^)csv\b/gi,
+                replacement: "$1CSV",
                 reason: App.consts.reasons.acronym
             },
             /*
@@ -1179,6 +1199,41 @@
                 replacement: "$1xample",
                 reason: App.consts.reasons.spelling
             },
+            somewhere: {
+                expr: /\b(s)ome ?wh?[ea]re?\b/gi,
+                replacement: "$1omewhere",
+                reason: App.consts.reasons.spelling
+            },
+            with_or_without_you: {
+                expr: /\b(w)hith(out)\b/gi,
+                replacement: "$1ith$2",
+                reason: App.consts.reasons.spelling
+            },
+            reproducible: {
+                expr: /\b(r)eproduct?[ia]ble\b/gi,
+                replacement: "$1eproducible",
+                reason: App.consts.reasons.spelling
+            },
+            unnecessary: {
+                expr: /\b(u)nn?ecc?ess?ary\b/gi,
+                replacement: "$1nnecessary",
+                reason: App.consts.reasons.spelling
+            },
+            require: {  // https://regex101.com/r/nS6kM5/1
+                expr: /\b(r)equie?re?(d|s|me?nts?)?\b/gi,
+                replacement: "$1equire$2",
+                reason: App.consts.reasons.spelling
+            },
+            address: {
+                expr: /\b(a)dd?ress?(es|ed|ing)?\b/gi,
+                replacement: "$1ddress$2",
+                reason: App.consts.reasons.spelling
+            },
+            password: {
+                expr: /\b(p)ass?wo?rd?(s)?\b/gi,
+                replacement: "$1assword$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1199,13 +1254,13 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            spacesbeforesymbols: {  // https://regex101.com/r/fN6lL7/2
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/2
                 expr: /(?:[ \t]([(&])[ \t]+|[ \t]*([(&])(?=[a-z]|$))/gim,
                 replacement: " $1$2",
                 reason: App.consts.reasons.grammar
             },
-            spacesaftersymbols: {  // https://regex101.com/r/jB5aN0/2
-                expr: /(?:[ \t]([.,!?;:])[ \t]+|[ \t]*([.,!?;:])(?=[a-z]|$))/gim,
+            symbol_then_space: {  // https://regex101.com/r/jB5aN0/4
+                expr: /(?:[ \t]+([.,!?;:])(?:[ \t]+|$)|[ \t]+([,!?;:])(?=\w)|([a-z][,!?;:])(?=\w))/gim,
                 replacement: "$1$2 ",
                 reason: App.consts.reasons.grammar
             },
@@ -1229,8 +1284,8 @@
                 replacement: "$1.e. ",
                 reason: App.consts.reasons.grammar
             },
-            eg: { // https://regex101.com/r/qH2oT0/2
-                expr: /\b(e)g[.\s]+/gi,
+            eg: { // https://regex101.com/r/qH2oT0/3
+                expr: /\b(e)g[.\s:]+/gi,
                 replacement: "$1.g. ",
                 reason: App.consts.reasons.grammar
             },
