@@ -280,8 +280,8 @@
                 replacement: "Ubuntu",
                 reason: App.consts.reasons.trademark
             },
-            vbnet: {  // https://regex101.com/r/bB9pP3/7
-                expr: /(?:vb\.net|\bvb|\.net)\b(?:\s*[0-9]+)?\s*(?:framework|core)?/gi,
+            vbnet: {  // https://regex101.com/r/bB9pP3/8
+                expr: /(?:vb\.net|\bvb|(?:[^\b\w.]|^)\.net)\b(?:\s*[0-9]+)?\s*(?:framework|core)?/gi,
                 replacement: function(str) {
                     return str.replace(/vb/i, 'VB')
                     .replace(/asp/i, 'ASP')
@@ -440,16 +440,21 @@
                 replacement: "OAuth$1 $2",
                 reason: App.consts.reasons.trademark
             },
-            /*
-            ** Acronyms - to be capitalized (except sometimes when part of a file name)
-            **/
             web_services: {
                 expr: /\bweb services\b/g,
                 replacement: "Web services",
                 reason: App.consts.reasons.trademark
             },
+            opencv: {
+                expr: /\bopencv\b/g,
+                replacement: "OpenCV",
+                reason: App.consts.reasons.trademark
+            },
+            /*
+            ** Acronyms - to be capitalized (except sometimes when part of a file name)
+            **/
             x_html: {
-                expr: /(?:[^\b\w.]|^)(g|ht|x|xht)ml\b/gi,
+                expr: /(?:[^\b\w.]|^)(g|ht|x|xht|sf)ml\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -614,7 +619,7 @@
                 reason: App.consts.reasons.acronym
             },
             ascii: {
-                expr: /([^\b\w.]|^)ascii?\b/gi,
+                expr: /([^\b\w.]|^)ascc?ii?\b/gi,
                 replacement: "$1ASCII",
                 reason: App.consts.reasons.acronym
             },
@@ -709,32 +714,32 @@
                 reason: App.consts.reasons.spelling
             },
             apostrophe_d: {
-                expr: /\b(he|she|who|you)[^\w']*(d)\b/gi,
+                expr: /\b(he|she|who|you)[^\w'`]*(d)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_ll: {
-                expr: /\b(they|what|who|you)[^\w']*(ll)\b/gi,
+                expr: /\b(they|what|who|you)[^\w'`]*(ll)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_re: {
-                expr: /\b(they|what|you)[^\w']*(re)\b/gi,
+                expr: /\b(they|what|you)[^\w'`]*(re)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_s: {
-                expr: /\b(he|she|that|there|what|where|here)[^\w']*(s)\b/gi,
+                expr: /\b(he|she|that|there|what|where|here)[^\w'`]*(s)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_t: {
-                expr: /\b(aren|can|couldn|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
+                expr: /\b(aren|can|couldn|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w'`]*(t)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
-            doesn_t: { // https://regex101.com/r/sL0uO9/1
-                expr: /\b(d)(?:ose?n'?t|oens'?t)\b/gi,
+            doesn_t: { // https://regex101.com/r/sL0uO9/3
+                expr: /\b(d)(?:ose?n.?t|oens.?t|oesn[ `]t)\b/gi,
                 replacement: "$1oesn't",
                 reason: App.consts.reasons.spelling
             },
@@ -743,8 +748,8 @@
                 replacement: "$1oesn't $2",
                 reason: App.consts.reasons.spelling
             },
-            prolly: {
-                expr: /\b(p)roll?y\b/gi,
+            probably: {  // https://regex101.com/r/zU3qZ0/1
+                expr: /\b(p)r(?:oll?|obb?l|o?babl?|ababl)y\b/gi,
                 replacement: "$1robably",
                 reason: App.consts.reasons.spelling
             },
@@ -809,7 +814,7 @@
                 reason: App.consts.reasons.spelling
             },
             width: {
-                expr: /\b(w)idh?t\b/gi,
+                expr: /\b(w)it?dh?t\b/gi,
                 replacement: "$1idth",
                 reason: App.consts.reasons.spelling
             },
@@ -1234,9 +1239,19 @@
                 replacement: "$1assword$2",
                 reason: App.consts.reasons.spelling
             },
+            method: {
+                expr: /\b(m)e[th]+[oeu]+d(s)?\b/gi,
+                replacement: "$1ethod$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
+            start_with_so: {
+                expr: /^so[,-\s]+/gi,
+                replacement: "",
+                reason: App.consts.reasons.grammar
+            },
             firstcaps: {
                 //    https://regex101.com/r/qR5fO9/18
                 // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
@@ -1269,13 +1284,18 @@
                 replacement: "I",
                 reason: App.consts.reasons.grammar
             },
+            i_ll: {  // Must NOT convert ill to I'll
+                expr: /\bi[ '`]+ll\b/gi,
+                replacement: "I'll",
+                reason: App.consts.reasons.grammar
+            },
             im: {
-                expr: /\bi ?m\b/gi,
+                expr: /\bi[ `]?m\b/gi,
                 replacement: "I'm",
                 reason: App.consts.reasons.grammar
             },
             ive: {
-                expr: /\biv'?e\b/gi,
+                expr: /\bi`?v'?e\b/gi,
                 replacement: "I've",
                 reason: App.consts.reasons.grammar
             },
