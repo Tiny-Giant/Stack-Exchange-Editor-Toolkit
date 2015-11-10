@@ -322,7 +322,7 @@
                 reason: App.consts.reasons.trademark
             },
             netbeans: {
-                expr: /\b(netbeans|net-beans|net beans)\b/gi,
+                expr: /\b(?:netbean?|net-bean|net bean|netbeen)s?\b/gi,
                 replacement: "NetBeans",
                 reason: App.consts.reasons.trademark
             },
@@ -446,8 +446,43 @@
                 reason: App.consts.reasons.trademark
             },
             opencv: {
-                expr: /\bopencv\b/g,
+                expr: /\bopencv\b/gi,
                 replacement: "OpenCV",
+                reason: App.consts.reasons.trademark
+            },
+            ruby: {
+                expr: /\bruby\b/g,
+                replacement: "Ruby",
+                reason: App.consts.reasons.trademark
+            },
+            rails: {
+                expr: /\brails\b/g,
+                replacement: "Rails",
+                reason: App.consts.reasons.trademark
+            },
+            grails: {
+                expr: /\bgrails\b/g,
+                replacement: "Grails",
+                reason: App.consts.reasons.trademark
+            },
+            subversion: {
+                expr: /\bsubversion\b/g,
+                replacement: "Subversion",
+                reason: App.consts.reasons.trademark
+            },
+            javafx: {
+                expr: /\bjavafx\b/gi,
+                replacement: "JavaFX",
+                reason: App.consts.reasons.trademark
+            },
+            delphi: {
+                expr: /\bdelphi\b/gi,
+                replacement: "Delphi",
+                reason: App.consts.reasons.trademark
+            },
+            dotnetnuke: {
+                expr: /\bdotnetnuke\b/gi,
+                replacement: "DotNetNuke",
                 reason: App.consts.reasons.trademark
             },
             /*
@@ -630,12 +665,17 @@
             },
             soap: {
                 expr: /([^\b\w.]|^)soap\b/gi,
-                replacement: "$1SOAP",
+                replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
             csv: {
                 expr: /([^\b\w.]|^)csv\b/gi,
-                replacement: "$1CSV",
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            image_types: {
+                expr: /([^\b\w.]|^)(gif|jpe?g|bmp|png)\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
             /*
@@ -1242,6 +1282,36 @@
             method: {
                 expr: /\b(m)e[th]+[oeu]+d(s)?\b/gi,
                 replacement: "$1ethod$2",
+                reason: App.consts.reasons.spelling
+            },
+            property: {
+                expr: /\b(p)rope?rt[iey]?\b/gi,
+                replacement: "$1roperty",
+                reason: App.consts.reasons.spelling
+            },
+            properties: {
+                expr: /\b(p)rope?rt[iey]+s\b/gi,
+                replacement: "$1roperties",
+                reason: App.consts.reasons.spelling
+            },
+            wireless: {
+                expr: /\b(w)ire?le?ss?\b/gi,
+                replacement: "$1ireless",
+                reason: App.consts.reasons.spelling
+            },
+            possible: {
+                expr: /\b(p)oss?[ai]?ble\b/gi,
+                replacement: "$1ossible",
+                reason: App.consts.reasons.spelling
+            },
+            fields: {
+                expr: /\b(f)[ie]+l?d(s)?\b/gi,
+                replacement: "$1ield$2",
+                reason: App.consts.reasons.spelling
+            },
+            execute: {
+                expr: /\b(e)x[ei]?cute(s|d)\b/gi,
+                replacement: "$1xecute$2",
                 reason: App.consts.reasons.spelling
             },
             /*
