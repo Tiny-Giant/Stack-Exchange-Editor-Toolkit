@@ -678,6 +678,16 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
+            yaml: {
+                expr: /([^\b\w.]|^)yaml\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            smtp: {
+                expr: /\bsmtp\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
             /*
             ** Spelling - Correct common spelling errors. (Including apostrophes, which are really grammar.)
             ** Acknowledgement: A subset of terms were adapted from Peter Mortensen's list
@@ -811,6 +821,11 @@
             gr8: {
                 expr: /\bgr8\b/gi,
                 replacement: "great",
+                reason: App.consts.reasons.spelling
+            },
+            cuz: {
+                expr: /\bcuz\b/gi,
+                replacement: "because",
                 reason: App.consts.reasons.spelling
             },
             allways: {
@@ -1038,8 +1053,13 @@
                 replacement: "$1ersisten$2",
                 reason: App.consts.reasons.spelling
             },
+            access: {  // must come before _ibility to catch accessibility with spelling variations ** but does not fix acessability?
+                expr: /\b(a)c+e+s+(.*)\b/gi,
+                replacement: "$1ccess$2",
+                reason: App.consts.reasons.spelling
+            },
             _ibility: {
-                expr: /\b(comp|incomp|access)abilit(y|ies)\b/gi,
+                expr: /\b(comp|incomp|access)abili?t(y|ies)\b/gi,
                 replacement: "$1ibilit$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1270,7 +1290,7 @@
                 reason: App.consts.reasons.spelling
             },
             address: {
-                expr: /\b(a)dd?ress?(es|ed|ing)?\b/gi,
+                expr: /\b(a)dd?ress?(es|ed|ing)?e?\b/gi,
                 replacement: "$1ddress$2",
                 reason: App.consts.reasons.spelling
             },
