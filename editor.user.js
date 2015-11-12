@@ -161,7 +161,7 @@
                 reason: App.consts.reasons.trademark
             },
             javascript: {
-                expr: /([^\b\w.]|^)(javascr?ipt|js|java script)\b/gi,
+                expr: /([^\b\w.]|^)(jav?a?scr?i?pt|js|java script)\b/gi,
                 replacement: "$1JavaScript",
                 reason: App.consts.reasons.trademark
             },
