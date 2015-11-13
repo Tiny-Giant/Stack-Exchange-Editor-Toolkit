@@ -412,7 +412,7 @@
                 reason: App.consts.reasons.trademark
             },
             google: { // https://regex101.com/r/iS5fO1/1
-                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive|sites?|forms?)?\b/gi,
+                expr: /\bgoogle\b[ \t]*(?:maps?|sheets?|docs?|drive|sites?|forms?|documents?|spreadsheets?|images?|presentations?)?\b/gi,
                 replacement: function(str) {
                     return str.toTitleCase();
                 },
@@ -511,6 +511,29 @@
             openssl: {
                 expr: /([^\b\w.]|^)openssl\b/gi,
                 replacement: "$1OpenSSL",
+                reason: App.consts.reasons.trademark
+            },
+            drupal: {
+                expr: /([^\b\w.]|^)drupal\b/gi,
+                replacement: "$1Drupal",
+                reason: App.consts.reasons.trademark
+            },
+            saas: {
+                expr: /([^\b\w.]|^)saas\b/gi,
+                replacement: "$1SaaS",
+                reason: App.consts.reasons.trademark
+            },
+            gwt: {
+                expr: /([^\b\w.]|^)gwt[- ](mosaic|designer)\b/gi,
+                replacement: function (str,pre,titlecase) {
+                    var fixed = pre + "GWT" + (titlecase? ' '+titlecase.toTitleCase() : '');
+                    return fixed;
+                },
+                reason: App.consts.reasons.trademark
+            },
+            gmail: {
+                expr: /([^\b\w.]|^)gmail(s)?\b/gi,
+                replacement: "$1Gmail$2",
                 reason: App.consts.reasons.trademark
             },
             /*
@@ -719,6 +742,16 @@
             phpmyadmin: {
                 expr: /([^\b\w.]|^)phpmyadmin\b/gi,
                 replacement: "$1phpMyAdmin",
+                reason: App.consts.reasons.acronym
+            },
+            mkl: {
+                expr: /([^\b\w.]|^)mkl\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            xsl: {
+                expr: /(?:[^\b\w.]|^)xslt?(?!:)\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
             /*
@@ -1371,13 +1404,13 @@
                 replacement: "$1lgorithm$2",
                 reason: App.consts.reasons.spelling
             },
-            version: {
-                expr: /\b(v)ers[io]*n(s|ing|ed)?\b/gi,
+            version: { // https://regex101.com/r/wE8uD0/1
+                expr: /\b(v)er(?:s[io]*|io)n(s|ing|ed)?\b/gi,
                 replacement: "$1ersion$2",
                 reason: App.consts.reasons.spelling
             },
             which: {  // 22,772 of these as of 12-Nov-2015!
-                expr: /\b(w)ich\b/gi,
+                expr: /\b(w)(?:ich|hic)\b/gi,
                 replacement: "$1hich",
                 reason: App.consts.reasons.spelling
             },
@@ -1399,6 +1432,11 @@
             totally: {
                 expr: /\b(t)ota?ll?y\b/gi,
                 replacement: "$1otally",
+                reason: App.consts.reasons.spelling
+            },
+            lambda: {
+                expr: /\b(l)am[bd]+a\b/gi,
+                replacement: "$1ambda",
                 reason: App.consts.reasons.spelling
             },
             /*
@@ -1471,10 +1509,14 @@
                 replacement: "etc.",
                 reason: App.consts.reasons.grammar
             },
-            multiplesymbols: {
-                //    https://regex101.com/r/bE9zM6/2
+            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/2
                 expr: /([^\w\s*#.\-_+:])\1{1,}/g,
                 replacement: "$1",
+                reason: App.consts.reasons.grammar
+            },
+            i_want: { //https://regex101.com/r/iD2tU0/1
+                expr: /\bI['a ]*m wanting\b/g,
+                replacement: "I want",
                 reason: App.consts.reasons.grammar
             },
             /*
