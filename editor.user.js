@@ -161,7 +161,7 @@
                 reason: App.consts.reasons.trademark
             },
             javascript: {
-                expr: /([^\b\w.]|^)(java?scr?ipt|js|java script)\b/gi,
+                expr: /([^\b\w.]|^)(java?scr?ipt?|js|java script?)\b/gi,
                 replacement: "$1JavaScript",
                 reason: App.consts.reasons.trademark
             },
@@ -540,7 +540,7 @@
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
             x_html: {
-                expr: /(?:[^\b\w.]|^)(g|ht|x|xht|sf)ml\b/gi,
+                expr: /(?:[^\b\w.]|^)(:?g|ht|x|xht|sf)ml[\d.]*\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -751,6 +751,11 @@
             },
             xsl: {
                 expr: /(?:[^\b\w.]|^)xslt?(?!:)\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            jpa: {
+                expr: /(?:[^\b\w.]|^)jpa\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -1437,6 +1442,11 @@
             lambda: {
                 expr: /\b(l)am[bd]+a\b/gi,
                 replacement: "$1ambda",
+                reason: App.consts.reasons.spelling
+            },
+            command: {
+                expr: /\b(c)om(?:m?ad|and|mnd)(ed|s|ing|ers?|o)?\b/gi,
+                replacement: "$1ommand$2",
                 reason: App.consts.reasons.spelling
             },
             /*
