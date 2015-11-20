@@ -1449,6 +1449,11 @@
                 replacement: "$1ommand$2",
                 reason: App.consts.reasons.spelling
             },
+            therefore: {
+                expr: /\b(t)here?fore?\b/gi,
+                replacement: "$1herefore",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
