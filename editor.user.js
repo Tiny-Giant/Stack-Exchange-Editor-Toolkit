@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.39
+// @version        1.5.2.40
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -308,7 +308,7 @@
                 reason: App.consts.reasons.trademark
             },
             postgresql: {
-                expr: /\bpostgres(ql|s)?\b/gi,
+                expr: /\bpost?gres?(q?l|s)?\b/gi,
                 replacement: "PostgreSQL",
                 reason: App.consts.reasons.trademark
             },
@@ -419,7 +419,7 @@
                 reason: App.consts.reasons.trademark
             },
             google_apps_script: {
-                expr: /\bgoogle[- ]?(?:apps?)?[- ]?script(?:ing)?\b/gi,
+                expr: /\bgoogle[- ]?(?:apps?)?[- ]?script(?:ing|s)?\b/gi,
                 replacement: "Google Apps Script",
                 reason: App.consts.reasons.trademark
             },
@@ -541,6 +541,29 @@
                 replacement: "$1XAMPP",
                 reason: App.consts.reasons.trademark
             },
+            meteor: {
+                expr: /([^\b\w.]|^)meteor\b/gi,
+                replacement: "$1Meteor",
+                reason: App.consts.reasons.trademark
+            },
+            meteorjs: {
+                expr: /([^\b\w.]|^)meteorjs\b/gi,
+                replacement: "$1MeteorJS",
+                reason: App.consts.reasons.trademark
+            },
+            galaxy: {
+                expr: /([^\b\w.]|^)galaxy/gi,
+                replacement: "$1Galaxy",
+                reason: App.consts.reasons.trademark
+            },
+            mongo: {
+                expr: /([^\b\w.]|^)mongo(?:\s?(db))?\b/gi,
+                replacement: function(str,pre,uppercase) {
+                    var fixed = pre + "Mongo" + (uppercase ? uppercase.toUpperCase() : '');
+                    return fixed;
+                },
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -624,9 +647,9 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
-            mp3: {
-                expr: /([^\b\w.]|^)mp3(s)?\b/gi,
-                replacement: "$1MP3$2",
+            mp3_mp4: {
+                expr: /([^\b\w.]|^)mp(3|4)(s)?\b/gi,
+                replacement: "$1MP$2$3",
                 reason: App.consts.reasons.acronym
             },
             gui: {
@@ -764,6 +787,11 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
+            jvm: {
+                expr: /(?:[^\b\w.]|^)jvm\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
             /*
             ** Spelling - Correct common spelling errors. (Including apostrophes, which are really grammar.)
             ** Acknowledgement: A subset of terms were adapted from Peter Mortensen's list
@@ -840,27 +868,32 @@
                 reason: App.consts.reasons.spelling
             },
             apostrophe_d: {
-                expr: /\b(he|she|who|you)[^\w'`]*(d)\b/gi,
+                expr: /\b(he|she|who|you)[^\w']*(d)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_ll: {
-                expr: /\b(they|what|who|you)[^\w'`]*(ll)\b/gi,
+                expr: /\b(they|what|who|you)[^\w']*(ll)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_re: {
-                expr: /\b(they|what|you)[^\w'`]*(re)\b/gi,
+                expr: /\b(they|what|you)[^\w']*(re)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
-            apostrophe_s: {
-                expr: /\b(he|she|that|there|what|where|here)[^\w'`]*(s)\b/gi,
+            apostrophe_s: { // https://regex101.com/r/bN5pA3/1
+                expr: /\b(he|she|that|there|what|where|here)[^\w']*(s)\b/gi,
+                replacement: "$1'$2",
+                reason: App.consts.reasons.spelling
+            },
+            it_s: {
+                expr: /\b(it)[^\w'](s)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_t: {
-                expr: /\b(aren|can|couldn|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w'`]*(t)\b/gi,
+                expr: /\b(aren|can|couldn|didn|doesn|don|hasn|haven|isn|mightn|mustn|shan|shouldn|won|wouldn)[^\w']*(t)\b/gi,
                 replacement: "$1'$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1110,7 +1143,7 @@
                 reason: App.consts.reasons.spelling
             },
             command_line: {
-                expr: /\b(c)ommandline\b/gi,
+                expr: /\b(c)(?:omm?andline|mdline?)\b/gi,
                 replacement: "$1ommand-line",
                 reason: App.consts.reasons.spelling
             },
@@ -1334,8 +1367,8 @@
                 replacement: "$1efore",
                 reason: App.consts.reasons.spelling
             },
-            example: {
-                expr: /\b(e)(?:xsample|xamle|x?ample?)\b/gi,
+            example: { // https://regex101.com/r/uU4bH5/1
+                expr: /\b(e)(?:xsample|xamle|x?amp[le]{1-2}|xemple)\b/gi,
                 replacement: "$1xample",
                 reason: App.consts.reasons.spelling
             },
@@ -1459,6 +1492,21 @@
                 replacement: "$1herefore",
                 reason: App.consts.reasons.spelling
             },
+            parameter: {
+                expr: /\b(p)ara?m[ea]n?ter(s)?\b/gi,
+                replacement: "$1arameter$2",
+                reason: App.consts.reasons.spelling
+            },
+            just: {
+                expr: /\b(j)(?:uste|us)\b/gi,
+                replacement: "$1ust",
+                reason: App.consts.reasons.spelling
+            },
+            fulfill: {
+                expr: /\b(f)ull?\s?fill\b/gi,
+                replacement: "$1ulfill",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1495,22 +1543,22 @@
                 reason: App.consts.reasons.grammar
             },
             i: { // https://regex101.com/r/uO7qG0/1
-                expr: /\bi('|\b)(?!.e.)/g,  // i or i-apostrophe
+                expr: /\bi(['`´]|\b)(?!.e.)/g,  // i or i-apostrophe
                 replacement: "I",
                 reason: App.consts.reasons.grammar
             },
             i_ll: {  // Must NOT convert ill to I'll
-                expr: /\bi[ '`]+ll\b/gi,
+                expr: /\bi ll\b/gi,
                 replacement: "I'll",
                 reason: App.consts.reasons.grammar
             },
             im: {
-                expr: /\bi[ `]?m\b/gi,
+                expr: /\bi *m\b/gi,
                 replacement: "I'm",
                 reason: App.consts.reasons.grammar
             },
             ive: {
-                expr: /\bi`?v'?e\b/gi,
+                expr: /\bi['`´]*v['`´]*e\b/gi,
                 replacement: "I've",
                 reason: App.consts.reasons.grammar
             },
