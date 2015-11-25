@@ -536,6 +536,11 @@
                 replacement: "$1Gmail$2",
                 reason: App.consts.reasons.trademark
             },
+            xampp: {
+                expr: /([^\b\w.]|^)xampp?\b/gi,
+                replacement: "$1XAMPP",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
