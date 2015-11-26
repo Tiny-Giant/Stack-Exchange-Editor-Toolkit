@@ -1507,6 +1507,11 @@
                 replacement: "$1ulfill",
                 reason: App.consts.reasons.spelling
             },
+            coming: {
+                expr: /\b(c)omming\b/gi,
+                replacement: "$1oming",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
