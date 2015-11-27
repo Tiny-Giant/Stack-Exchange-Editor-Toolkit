@@ -552,7 +552,7 @@
                 reason: App.consts.reasons.trademark
             },
             galaxy: {
-                expr: /([^\b\w.]|^)galaxy/gi,
+                expr: /([^\b\w.]|^)galaxy\b/gi,
                 replacement: "$1Galaxy",
                 reason: App.consts.reasons.trademark
             },
@@ -564,11 +564,31 @@
                 },
                 reason: App.consts.reasons.trademark
             },
+            pymongo: {
+                expr: /([^\b\w.]|^)pymongo\b/gi,
+                replacement: "$1PyMongo",
+                reason: App.consts.reasons.trademark
+            },
+            scala: {
+                expr: /([^\b\w.]|^)scala\b/gi,
+                replacement: "$1Scala",
+                reason: App.consts.reasons.trademark
+            },
+            microsoft: { // https://regex101.com/r/dJ5tE3/1
+                expr: /\b([mM]icrosoft?|[mM]ircosoft|M[Ss]oft)\b/g,
+                replacement: "Microsoft",
+                reason: App.consts.reasons.trademark
+            },
+            intellisense: {
+                expr: /\bintell?isen[sc]e?\b/gi,
+                replacement: "IntelliSense",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
             x_html: {
-                expr: /(?:[^\b\w.]|^)(:?g|ht|x|xht|sf)ml[\d.]*\b/gi,
+                expr: /(?:[^\b\w.]|^)(:?g|ht|x|xht|sf|csht)ml[\d.]*\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -792,6 +812,16 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
+            linq: {
+                expr: /(?:[^\b\w.]|^)linq\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            md5: {
+                expr: /(?:[^\b\w.]|^)md5\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
             /*
             ** Spelling - Correct common spelling errors. (Including apostrophes, which are really grammar.)
             ** Acknowledgement: A subset of terms were adapted from Peter Mortensen's list
@@ -900,6 +930,11 @@
             doesn_t: { // https://regex101.com/r/sL0uO9/3
                 expr: /\b(d)(?:ose?n.?t|oens.?t|oesn[ `]t)\b/gi,
                 replacement: "$1oesn't",
+                reason: App.consts.reasons.spelling
+            },
+            apostrophe_nt: {
+                expr: /['`´]nt\b/gi,
+                replacement: "n't",
                 reason: App.consts.reasons.spelling
             },
             doesn_t_work: {  // >4K instances of this (Oct 2015)
@@ -1135,6 +1170,11 @@
             one_r_two_r: {
                 expr: /\b(refe|prefe|occu)r(ed|ing)\b/gi,
                 replacement: "$1rr$2",
+                reason: App.consts.reasons.spelling
+            },
+            occur: {
+                expr: /\b(o)ccure(s)?\b/gi,
+                replacement: "$1ccur$2",
                 reason: App.consts.reasons.spelling
             },
             preferably: {
@@ -1512,6 +1552,11 @@
                 replacement: "$1oming",
                 reason: App.consts.reasons.spelling
             },
+            tried: {  // 8,540 of these!
+                expr: /\b(t)rye(d|s)\b/gi,
+                replacement: "$1rie$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1558,7 +1603,7 @@
                 reason: App.consts.reasons.grammar
             },
             im: {
-                expr: /\bi *m\b/gi,
+                expr: /\b(?:i *m|i'am)\b/gi,
                 replacement: "I'm",
                 reason: App.consts.reasons.grammar
             },
