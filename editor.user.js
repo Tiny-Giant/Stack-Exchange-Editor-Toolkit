@@ -308,7 +308,7 @@
                 reason: App.consts.reasons.trademark
             },
             postgresql: {
-                expr: /\bpost?gres?(q?l|s)?\b/gi,
+                expr: /\bpost?gres*(q?l|s)?\b/gi,
                 replacement: "PostgreSQL",
                 reason: App.consts.reasons.trademark
             },
@@ -930,6 +930,11 @@
             doesn_t: { // https://regex101.com/r/sL0uO9/3
                 expr: /\b(d)(?:ose?n.?t|oens.?t|oesn[ `]t)\b/gi,
                 replacement: "$1oesn't",
+                reason: App.consts.reasons.spelling
+            },
+            didn_t: {
+                expr: /\b(d)(id[ '`´]t)\b/gi,
+                replacement: "$1idn't",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_nt: {
@@ -1622,8 +1627,8 @@
                 replacement: "$1.g. ",
                 reason: App.consts.reasons.grammar
             },
-            etc: {  // https://regex101.com/r/dE7cV1/3
-                expr: /\betc(?!\.)/g,
+            etc: {  // https://regex101.com/r/dE7cV1/4
+                expr: /\betc(?:\.+)?/g,
                 replacement: "etc.",
                 reason: App.consts.reasons.grammar
             },
