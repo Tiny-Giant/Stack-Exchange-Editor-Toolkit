@@ -537,18 +537,16 @@
                 reason: App.consts.reasons.trademark
             },
             xampp: {
-                expr: /([^\b\w.]|^)xam+pp?\b/gi,
+                expr: /([^\b\w.]|^)xam+p+\b/gi,
                 replacement: "$1XAMPP",
                 reason: App.consts.reasons.trademark
             },
             meteor: {
-                expr: /([^\b\w.]|^)meteor\b/gi,
-                replacement: "$1Meteor",
-                reason: App.consts.reasons.trademark
-            },
-            meteorjs: {
-                expr: /([^\b\w.]|^)meteorjs\b/gi,
-                replacement: "$1MeteorJS",
+                expr: /([^\b\w.]|^)meteor(js)?\b/gi,
+                replacement: function (str,pre,uppercase) {
+                    var fixed = pre + "Meteor" + (uppercase ? uppercase.toUpperCase() : '');
+                    return fixed;
+                },
                 reason: App.consts.reasons.trademark
             },
             galaxy: {
