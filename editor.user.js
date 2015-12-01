@@ -160,6 +160,14 @@
                 replacement: "JSFiddle",
                 reason: App.consts.reasons.trademark
             },
+            meteor: {  // must appear before "javascript"
+                expr: /([^\b\w.]|^)meteor *(js)?\b/gi,
+                replacement: function (str,pre,uppercase) {
+                    var fixed = pre + "Meteor" + (uppercase ? uppercase.toUpperCase() : '');
+                    return fixed;
+                },
+                reason: App.consts.reasons.trademark
+            },
             javascript: {
                 expr: /([^\b\w.]|^)(java?scr?ipt?|js|java script?)\b/gi,
                 replacement: "$1JavaScript",
@@ -541,14 +549,6 @@
                 replacement: "$1XAMPP",
                 reason: App.consts.reasons.trademark
             },
-            meteor: {
-                expr: /([^\b\w.]|^)meteor(js)?\b/gi,
-                replacement: function (str,pre,uppercase) {
-                    var fixed = pre + "Meteor" + (uppercase ? uppercase.toUpperCase() : '');
-                    return fixed;
-                },
-                reason: App.consts.reasons.trademark
-            },
             galaxy: {
                 expr: /([^\b\w.]|^)galaxy\b/gi,
                 replacement: "$1Galaxy",
@@ -582,6 +582,16 @@
                 replacement: "IntelliSense",
                 reason: App.consts.reasons.trademark
             },
+            sass: {  // Syntactically Awesome Style Sheets
+                expr: /\bsass\b/gi,
+                replacement: "Sass",
+                reason: App.consts.reasons.trademark
+            },
+            heroku: {
+                expr: /\bheroku\b/gi,
+                replacement: "Heroku",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -591,7 +601,7 @@
                 reason: App.consts.reasons.acronym
             },
             css: {
-                expr: /(?:[^\b\w.]|^)css\b/gi,
+                expr: /(?:[^\b\w.]|^)s?css\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -822,6 +832,11 @@
             },
             md5: {
                 expr: /(?:[^\b\w.]|^)md5\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            xfa: {  // XML Forms Architecture
+                expr: /(?:[^\b\w.]|^)xfa\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
