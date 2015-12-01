@@ -537,7 +537,7 @@
                 reason: App.consts.reasons.trademark
             },
             xampp: {
-                expr: /([^\b\w.]|^)xampp?\b/gi,
+                expr: /([^\b\w.]|^)xam+pp?\b/gi,
                 replacement: "$1XAMPP",
                 reason: App.consts.reasons.trademark
             },
@@ -613,8 +613,8 @@
                 reason: App.consts.reasons.acronym
             },
             urli: {
-                expr: /\b(ur[li])\b/gi,
-                replacement: function(match) { return match.toUpperCase(); },
+                expr: /\b(ur[li])(s)?\b/gi,
+                replacement: function(match,upper,lower) { return upper.toUpperCase() + (lower?lower.toLowerCase():''); },
                 reason: App.consts.reasons.acronym
             },
             asp: {
@@ -790,6 +790,11 @@
             phpmyadmin: {
                 expr: /([^\b\w.]|^)phpmyadmin\b/gi,
                 replacement: "$1phpMyAdmin",
+                reason: App.consts.reasons.acronym
+            },
+            phpunit: {
+                expr: /([^\b\w.]|^)phpunit\b/gi,
+                replacement: "$1PHPUnit",
                 reason: App.consts.reasons.acronym
             },
             mkl: {
@@ -1212,8 +1217,13 @@
                 replacement: "$1ccess$2",
                 reason: App.consts.reasons.spelling
             },
+            _ible: {
+                expr: /\b(compat|incompat|access)able\b/gi,
+                replacement: "$1ible",
+                reason: App.consts.reasons.spelling
+            },
             _ibility: {
-                expr: /\b(comp|incomp|access)abili?t(y|ies)\b/gi,
+                expr: /\b(compat|incompat|access)abili?t(y|ies)\b/gi,
                 replacement: "$1ibilit$2",
                 reason: App.consts.reasons.spelling
             },
