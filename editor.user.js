@@ -875,8 +875,8 @@
                 replacement: "$1ersonal$2",
                 reason: App.consts.reasons.spelling
             },
-            problem: { // https://regex101.com/r/yA8jM7/5
-                expr: /\b(p)(?:or?|ro|rο|r0)b(?:le|el|e|re|l|[|]e)m(s)?\b/gi,
+            problem: { // https://regex101.com/r/yA8jM7/6
+                expr: /\b(p)(?:or?|ro|rο|r0)b(?:le|el|e|re|l|[|]e)me?(s)?\b/gi,
                 replacement: "$1roblem$2",
                 reason: App.consts.reasons.spelling
             },
