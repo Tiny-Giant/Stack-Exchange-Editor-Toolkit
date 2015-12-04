@@ -184,7 +184,7 @@
                 reason: App.consts.reasons.trademark
             },
             php: {
-                expr: /(?:[^\b\w.]|^)php[\d]?\b/gi,
+                expr: /(?:[^\b\w.]|^)php[\d]?\b(?!\.ini)/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.trademark
             },
@@ -250,8 +250,8 @@
                 reason: App.consts.reasons.trademark
             },
             apache: {
-                expr: /\bapache[\d]?\b/gi,
-                replacement: "Apache",
+                expr: /\bapache([\d])?\b/gi,
+                replacement: "Apache$1",
                 reason: App.consts.reasons.trademark
             },
             git: {
@@ -590,6 +590,16 @@
             heroku: {
                 expr: /\bheroku\b/gi,
                 replacement: "Heroku",
+                reason: App.consts.reasons.trademark
+            },
+            os_x: {
+                expr: /\bos ?x\b/gi,
+                replacement: "OS X",
+                reason: App.consts.reasons.trademark
+            },
+            el_capitan: {
+                expr: /\bel ?capi?tan\b/gi,
+                replacement: "El Capitan",
                 reason: App.consts.reasons.trademark
             },
             /*
@@ -1583,6 +1593,21 @@
             tried: {  // 8,540 of these!
                 expr: /\b(t)rye(d|s)\b/gi,
                 replacement: "$1rie$2",
+                reason: App.consts.reasons.spelling
+            },
+            basically: {  // 7,924 of these!
+                expr: /\b(b)asica?l+y\b/gi,
+                replacement: "$1asically",
+                reason: App.consts.reasons.spelling
+            },
+            completely: {  // 4,793 examples!   https://regex101.com/r/oG7nH6/2
+                expr: /\b(c)ompl?ete?l?e?y\b/gi,
+                replacement: "$1ompletely",
+                reason: App.consts.reasons.spelling
+            },
+            misread: {
+                expr: /\b(m)is+[ -]?rea?d\b/gi,
+                replacement: "$1isread",
                 reason: App.consts.reasons.spelling
             },
             /*
