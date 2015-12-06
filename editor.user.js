@@ -1800,11 +1800,10 @@
                 if (e.which === 13) {
                     if (e.metaKey || e.ctrlKey) {
                         // CTRL/CMD + Enter -> Activate the auto-editor
-                        App.selections.buttonFix.click();
+                        App.funcs.fixEvent();
                     } else {
                         // It's possible to remove the event listeners, because of the way outerHTML works.
                         this.outerHTML = this.outerHTML;
-                        App.funcs.fixEvent();
                     }
                 }
             }
