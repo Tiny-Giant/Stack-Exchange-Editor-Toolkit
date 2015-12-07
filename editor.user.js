@@ -956,13 +956,18 @@
                 reason: App.consts.reasons.spelling
             },
             doesn_t: { // https://regex101.com/r/sL0uO9/3
-                expr: /\b(d)(?:ose?n.?t|oens.?t|oesn[ `]t)\b/gi,
+                expr: /\b(d)(?:ose?n.?t|oens.?t|oesn[ `]t|oest)\b/gi,
                 replacement: "$1oesn't",
                 reason: App.consts.reasons.spelling
             },
             didn_t: {
                 expr: /\b(d)(id[ '`´]t)\b/gi,
                 replacement: "$1idn't",
+                reason: App.consts.reasons.spelling
+            },
+            don_t: {
+                expr: /\b(d)(on[ '`´]no?t)\b/gi,
+                replacement: "$1on't",
                 reason: App.consts.reasons.spelling
             },
             apostrophe_nt: {
@@ -1656,7 +1661,7 @@
                 reason: App.consts.reasons.grammar
             },
             im: {
-                expr: /\b(?:i *m|i'am)\b/gi,
+                expr: /\b(?:i *m(?: am)?|i'am)\b/gi,
                 replacement: "I'm",
                 reason: App.consts.reasons.grammar
             },
