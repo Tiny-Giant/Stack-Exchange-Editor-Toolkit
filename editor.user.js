@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.46
+// @version        1.5.2.47
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1729,21 +1729,12 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            hello: { // TODO: Update badphrases (new) to catch everything hello and thanks (old) did.
-                expr: /(?:^|\s)(hi\s+guys|hi|hello|good\s(?:evening|morning|day|afternoon))(?:\.|!|\ )/gmi,
+            // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
+            salutation: { // https://regex101.com/r/yS9lN8/3
+                expr: /^\s*(?:(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-//            thanks: { // https://regex101.com/r/tV6uM4/2
-//                expr: /[^\n.!?:]*\b(?:thanks|pl(?:ease|z|s)\s+h[ea]lp|cheers|regards|tanx|thx|thank\s+you|my\s+first\s+question|kind(?:ly)\shelp).*$/gmi,
-//                replacement: "",
-//                reason: App.consts.reasons.noise
-//            },
-//            badwords: {
-//                expr: /[^\n.!?:]*\b(?:th?anks?|th(?:an)?x|tanx|folks?|kind(?:est|ly)|first\s*question)\b[^,.!?\n]*[,.!?]*/gi,
-//                replacement: "",
-//                reason: App.consts.reasons.noise
-//            },
             badphrases: { // https://regex101.com/r/gE2hH6/11
                 expr: /[^\n.!?:]*(?:thanks[ .?!]*$|thank[ -]you[ .?!]*$|(?:please|help|suggest(?:ions)|thanks)\b[^\n.!?:]*\b(?:help|ap+reciat\w*|me|advan\w*|a ?lot)\b[^\n.!?:]*)[.!?_*]*[ ]*/gi,
                 replacement: "",
@@ -1754,8 +1745,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            salutations: {
-                expr: /[\r\n]*(regards|cheers?),?[\t\f ]*[\r\n]?\w*\.?/gi,
+            complimentaryClose: {  // https://regex101.com/r/hL3kT5/1
+                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?)\b,?[\t\f ]*[\r\n]*.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
