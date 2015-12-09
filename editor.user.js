@@ -602,6 +602,11 @@
                 replacement: "El Capitan",
                 reason: App.consts.reasons.trademark
             },
+            hadoop: {
+                expr: /\bhadoop\b/gi,
+                replacement: "Hadoop",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -1010,6 +1015,21 @@
                 replacement: "because",
                 reason: App.consts.reasons.spelling
             },
+            ofc: {
+                expr: /\b(o)fc\b/gi,
+                replacement: "$1f course",
+                reason: App.consts.reasons.spelling
+            },
+            nvm: {
+                expr: /\b(n)vm\b/gi,
+                replacement: "$1ever mind",
+                reason: App.consts.reasons.spelling
+            },
+            btw: {
+                expr: /\b(b)tw\b/gi,
+                replacement: "$1y the way",
+                reason: App.consts.reasons.spelling
+            },
             allways: {
                 expr: /\b(a)llways\b/gi,
                 replacement: "$1lways",
@@ -1266,7 +1286,7 @@
                 reason: App.consts.reasons.spelling
             },
             definite: {
-                expr: /\b(d)efin(?:ate?|ite?|al|te?)(ly)?\b/gi,  // Catches correct spelling, too.
+                expr: /\b(d)efin(?:ate?|ite?|al|te?|et)(ly)?\b/gi,  // Catches correct spelling, too.
                 replacement: "$1efinite$2",
                 reason: App.consts.reasons.spelling
             },
