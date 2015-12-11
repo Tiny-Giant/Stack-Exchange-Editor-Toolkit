@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.48
+// @version        1.5.2.49
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1041,7 +1041,7 @@
                 reason: App.consts.reasons.spelling
             },
             sry: {
-                expr: /\b(s)ry\b/gi,
+                expr: /\b(s)o?r+y\b/gi,
                 replacement: "$1orry",
                 reason: App.consts.reasons.spelling
             },
@@ -1675,6 +1675,11 @@
                 replacement: "$1lasses",
                 reason: App.consts.reasons.spelling
             },
+            english: {
+                expr: /\benglisc?h?\b/gi,
+                replacement: "English",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1760,11 +1765,6 @@
                 replacement: "$1,$2",
                 reason: App.consts.reasons.grammar
             },
-            is_it_possible: { // EXPERIMENTAL
-                expr: /\bIs (it )?possible( to)?\b/gi,
-                replacement: "How do I",
-                reason: App.consts.reasons.grammar
-            },
             /*
             ** Noise reduction - Remove fluff that adds nothing of technical value to posts.
             **/
@@ -1805,13 +1805,13 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            complimentaryClose: {  // https://regex101.com/r/hL3kT5/1
+            complimentaryClose: {  // https://regex101.com/r/hL3kT5/2
                 expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks)\b,?[\t\f ]*[\r\n]*.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            sorry4english: { // https://regex101.com/r/pG3oD6/3
-                expr: /(?:^|\s)[^.!\n\r]*(sorry).*?(english).*?(?:[.! \n\r])/gmi,
+            sorry4english: { // https://regex101.com/r/pG3oD6/4
+                expr: /[^\n.!?]*((sorry)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:])*/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
