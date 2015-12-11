@@ -1040,6 +1040,11 @@
                 replacement: "$1y the way",
                 reason: App.consts.reasons.spelling
             },
+            sry: {
+                expr: /\b(s)ry\b/gi,
+                replacement: "$1orry",
+                reason: App.consts.reasons.spelling
+            },
             allways: {
                 expr: /\b(a)llways\b/gi,
                 replacement: "$1lways",
@@ -1805,7 +1810,7 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            sorry4english: { // https://regex101.com/r/pG3oD6/1
+            sorry4english: { // https://regex101.com/r/pG3oD6/3
                 expr: /(?:^|\s)[^.!\n\r]*(sorry).*?(english).*?(?:[.! \n\r])/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
