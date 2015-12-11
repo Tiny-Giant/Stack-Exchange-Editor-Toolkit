@@ -1671,13 +1671,23 @@
                 reason: App.consts.reasons.spelling
             },
             classes: {
-                expr: /\b(c)lases\b/gi,
+                expr: /\b(c)la(se|ss)s\b/gi,
                 replacement: "$1lasses",
                 reason: App.consts.reasons.spelling
             },
             english: {
                 expr: /\benglisc?h?\b/gi,
                 replacement: "English",
+                reason: App.consts.reasons.spelling
+            },
+            inheritance: {  // 1700 x inheritence
+                expr: /\b(i)nherit[ae]n[cs]e?\b/gi,
+                replacement: "$1nheritance",
+                reason: App.consts.reasons.spelling
+            },
+            advice: {  // 9000 x advices
+                expr: /\b(a)dvices\b/gi,
+                replacement: "$1dvice",
                 reason: App.consts.reasons.spelling
             },
             /*
@@ -1778,6 +1788,11 @@
                 replacement: "$1hanks",
                 reason: App.consts.reasons.silent
             },
+            tia: {  // common acronym; should only remove "thanks in advance" at end of post
+                expr: /\btia$/gi,
+                replacement: "",
+                reason: App.consts.reasons.noise
+            },
             please: {
                 expr: /\b(p)(?:lz|lse?|l?ease?)\b/gi,
                 replacement: "$1lease",
@@ -1810,8 +1825,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            sorry4english: { // https://regex101.com/r/pG3oD6/4
-                expr: /[^\n.!?]*((sorry)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:])*/gi,
+            sorry4english: { // https://regex101.com/r/pG3oD6/6
+                expr: /[^\n.!?]*((sorry|ap+olog.*)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:_*])*/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
