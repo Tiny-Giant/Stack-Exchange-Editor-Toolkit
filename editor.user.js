@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name           Stack-Exchange-Editor-Toolkit
 // @author         Cameron Bernhardt (AstroCB)
 // @developer      Jonathan Todd (jt0dd)
