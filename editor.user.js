@@ -1488,7 +1488,7 @@
                 replacement: "$1omewhere",
                 reason: App.consts.reasons.spelling
             },
-            with: {
+            with: { // https://regex101.com/r/xO5dP3/1
                 expr: /\b(w)h?ith?(?=(ou?t|in)?\b)/gi,
                 replacement: "$1ith",
                 reason: App.consts.reasons.spelling
@@ -1708,8 +1708,8 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            space_then_symbol: {  // https://regex101.com/r/fN6lL7/2
-                expr: /(?:[ \t]([(&])[ \t]+|[ \t]*([(&])(?=[a-z]|$))/gim,
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/3
+                expr: /(?:[ \t]([(&][ \t]+)|[ \t]*([(&])(?=[a-z]|$))/gim,
                 replacement: " $1$2",
                 reason: App.consts.reasons.grammar
             },
