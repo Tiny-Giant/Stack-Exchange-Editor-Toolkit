@@ -1489,7 +1489,7 @@
                 reason: App.consts.reasons.spelling
             },
             with: {
-                expr: /\b(w)h?ith?/gi,
+                expr: /\b(w)h?ith?(?=(ou?t|in)?\b)/gi,
                 replacement: "$1ith",
                 reason: App.consts.reasons.spelling
             },
