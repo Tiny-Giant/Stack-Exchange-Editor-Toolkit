@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name           Stack-Exchange-Editor-Toolkit
 // @author         Cameron Bernhardt (AstroCB)
 // @developer      Jonathan Todd (jt0dd)
@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.50
+// @version        1.5.2.51
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1707,17 +1707,26 @@
                 reason: App.consts.reasons.grammar
             },
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/18
+                //    https://regex101.com/r/qR5fO9/19
                 // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
                 //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
-                expr: /((?!\n\n)[A-z](?:(?!\n\n)[^?.!A-Z])+(?:\.[A-z][^?.!A-Z]+)*([?.!])?)/gm, 
+                expr: /((?!\n\n)[A-z](?:(?!\n\n)[^?.!])+(?:\.[A-z\d)][^?.!A-Z]+)*([?.!])*)/gm, 
                 replacement: function(str, endpunc) { 
                     if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
-                    //                 https://regex101.com/r/bL9xD7/1 find and capitalize first letter
-                    return str.replace(/^(\W*)([a-z])(.*)/g, function(sentence, pre, first, post) {
+                    //                 https://regex101.com/r/bL9xD7/3 find and capitalize first letter
+                    return str.replace(/^(\W*)*(([a-zA-Z])[\w\d]*(?:[._\-]+[\w\d]+)?)(.*)/g, function(sentence, pre, fWord, fLetter, post) {
+                        console.log("Sentence: "+sentence)
                         if (!pre) pre = '';
                         if (!post) post = '';
-                        var update = pre + first.toUpperCase() + post; // + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
+                        if (!fWord) fWord = '';
+                        var fWordChars = fWord.split('');
+                        // Leave some words alone: filenames, camelCase
+                        for (var i=0; i<fWordChars.length; i++) {
+                            if (fWordChars[i] == '.' ||
+                                fWordChars[i] == fWordChars[i].toUpperCase())
+                                return sentence;
+                        }
+                        var update = pre + fLetter.toUpperCase() + fWord.slice(1) + post; // + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
                         return update;
                     });
                 },
