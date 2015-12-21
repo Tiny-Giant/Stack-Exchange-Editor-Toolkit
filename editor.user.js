@@ -282,8 +282,8 @@
                 replacement: "iOS $1",
                 reason: App.consts.reasons.trademark
             },
-            ubuntu: {  // https://regex101.com/r/sT8wV5/1
-                expr: /\b[uoa]+b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
+            ubuntu: {  // https://regex101.com/r/sT8wV5/2
+                expr: /\b[uoa]+n?b[uoa]*[tn][oua]*[tnu][oua]*\b/gi,
                 replacement: "Ubuntu",
                 reason: App.consts.reasons.trademark
             },
@@ -948,6 +948,11 @@
                 replacement: "$1on't",
                 reason: App.consts.reasons.spelling
             },
+            haven_t: {
+                expr: /\b(h)(?:avent|av[^\w]t|ave[^\w]t)\b/gi,
+                replacement: "$1aven't",
+                reason: App.consts.reasons.spelling
+            },
             apostrophe_d: {
                 expr: /\b(he|she|who|you)[^\w]*(d)\b/gi,
                 replacement: "$1'$2",
@@ -1134,7 +1139,7 @@
                 reason: App.consts.reasons.spelling
             },
             program: {
-                expr: /\b(p)rogr?amm?\b/gi,
+                expr: /\b(p)rogr?amm?e?\b/gi,
                 replacement: "$1rogram",
                 reason: App.consts.reasons.spelling
             },
@@ -1681,6 +1686,16 @@
             advice: {  // 9000 x advices
                 expr: /\b(a)dvices\b/gi,
                 replacement: "$1dvice",
+                reason: App.consts.reasons.spelling
+            },
+            when: {
+                expr: /\b(w)h[ea]ne?\b/gi,
+                replacement: "$1hen",
+                reason: App.consts.reasons.spelling
+            },
+            and_then: {   // 16K instances of this!
+                expr: /\b(a)nd,? tha?n\b/gi,
+                replacement: "$1nd then",
                 reason: App.consts.reasons.spelling
             },
             /*
