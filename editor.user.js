@@ -1816,8 +1816,8 @@
                 reason: App.consts.reasons.silent
             },
             editupdate: {
-                // https://regex101.com/r/tT2pK6/2
-                expr: /(?!(?:edit|update)\w*\s*[^:]*$)(?:^\**)(edit|update)\w*(\s*#?[0-9]+)?:?(?:\**):?/gmi,
+                // https://regex101.com/r/tT2pK6/4
+                expr: /(?!(?:edit|update)\b\s*[^:]*$)(?:^\**)(edit|update)\b(\s*#?[0-9]+)?:?(?:\**):?/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
