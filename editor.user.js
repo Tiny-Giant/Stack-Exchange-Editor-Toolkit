@@ -1816,8 +1816,8 @@
                 reason: App.consts.reasons.silent
             },
             editupdate: {
-                // https://regex101.com/r/tT2pK6/4
-                expr: /(?!(?:edit|update)\b\s*[^:]*$)(?:^\**)(edit|update)\b(\s*#?[0-9]+)?:?(?:\**):?/gmi,
+                // https://regex101.com/r/tT2pK6/8
+                expr: /([-*]+[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?[\t ]*:*[\t ]*[-*]+|[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?\s*:+[\t ]*)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1842,7 +1842,7 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            sorry4english: { // https://regex101.com/r/pG3oD6/6
+            sorry4english: { // https://regex101.com/r/pG3oD6/7
                 expr: /[^\n.!?]*((sorry|ap+olog.*)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:_*])*/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
