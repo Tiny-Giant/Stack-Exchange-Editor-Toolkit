@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.51
+// @version        1.5.2.52
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1856,11 +1856,6 @@
             ** Spacing - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
             **/
-            trailingspaces: {
-                expr: /[ \t]*$/gm,
-                replacement: "",
-                reason: App.consts.reasons.silent
-            },
             multiplespaces: {
                 // https://regex101.com/r/hY9hQ3/1
                 expr: /[ ]{2,}(?!\n)/g,
@@ -1903,7 +1898,7 @@
             });
             return count > 0 ? {
                 reason: reasoning,
-                fixed: String(input).trim(),
+                fixed: String(input),
                 count: count
             } : false;
         };
