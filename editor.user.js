@@ -1707,7 +1707,7 @@
                 reason: App.consts.reasons.grammar
             },
             a_vs_an: {  // See http://stackoverflow.com/q/34440307/1677912
-                expr: /\b(a|an) ([\(\"'“‘-]+\w*)\b/gim,   // https://regex101.com/r/nE1yA4/2
+                expr: /\b(a|an) ([\(\"'“‘-]*\w*)\b/gim,   // https://regex101.com/r/nE1yA4/2
                 replacement: function( match, article, following ) {
                     var input = following.replace(/^[\s\(\"'“‘-]+|\s+$/g, "");//strip initial punctuation symbols
                     var res = AvsAnSimple.query(input);
