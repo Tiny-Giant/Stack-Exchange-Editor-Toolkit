@@ -1751,9 +1751,14 @@
                 replacement: "$1$2 ",
                 reason: App.consts.reasons.grammar
             },
-            i: { // https://regex101.com/r/uO7qG0/1
-                expr: /\bi(['`´]|\b)(?!.e.)/g,  // i or i-apostrophe
+            i: { // https://regex101.com/r/uO7qG0/2
+                expr: /\bi\b(?!\.e\.)/g,  // i but not i.e.
                 replacement: "I",
+                reason: App.consts.reasons.grammar
+            },
+            i_apostrophe: {
+                expr: /\bi['`´]/gi,  // i-apostrophe only
+                replacement: "I'",
                 reason: App.consts.reasons.grammar
             },
             i_ll: {  // Must NOT convert ill to I'll
