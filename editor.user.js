@@ -953,11 +953,11 @@
                 replacement: "$1aven't",
                 reason: App.consts.reasons.spelling
             },
-            apostrophe_d: {
-                expr: /\b(he|she|who|you)[^\w]*(d)\b/gi,
-                replacement: "$1'$2",
-                reason: App.consts.reasons.spelling
-            },
+            //apostrophe_d: {   // Too many false positives
+            //    expr: /\b(he|she|who|you)[^\w]*(d)\b/gi,
+            //    replacement: "$1'$2",
+            //    reason: App.consts.reasons.spelling
+            //},
             apostrophe_ll: {
                 expr: /\b(they|what|who|you)[^\w]*(ll)\b/gi,
                 replacement: "$1'$2",
