@@ -1821,6 +1821,7 @@
                                   .replace(/%tags%/g,App.globals.taglist.map(escapeRegExp).join("|")),
                                  'gim'),
                 replacement: "$1",
+                debug: true,
                 //reason: App.consts.reasons.noise
                 reason: "Tags from title"
             },
@@ -1913,17 +1914,24 @@
         };
 
         // This is where the magic happens: this function takes a few pieces of information and applies edits to the post
-        App.funcs.fixIt = function(input, expression, replacement, reasoning) {
-            if ("Tags from title"==reasoning) console.log( expression.toString() );
+        App.funcs.fixIt = function(input, edit) {
+            var expression = edit.expr;
+            var replacement = edit.replacement;
+            var reasoning = edit.reason;
+            var debug = edit.debug;
+            
+            if (debug) console.log(input);
             // If there is nothing to search, exit
             if (!input) return false;
             // Scan the post text using the expression to see if there are any matches
             var matches = input.match(expression);
+            if (debug) console.log(matches, expression.exec(input));
             if (!matches) return false;
             var count = 0;  // # replacements to do
             input = input.replace(expression, function(before){ 
                 var after = before.replace(expression, replacement);
                 if(after !== before) ++count; 
+                if (debug) console.log(before, after, after !== before, count);
                 return after;
             });
             return count > 0 ? {
@@ -2148,7 +2156,7 @@
             
             // Loop through all editing rules
             for (var j in App.edits) for (var field in fields) {
-                var fix = App.funcs.fixIt(data[field], App.edits[j].expr, App.edits[j].replacement, App.edits[j].reason);
+                var fix = App.funcs.fixIt(data[field], App.edits[j]);
                 if (!fix) continue;
                 if (fix.reason in App.globals.reasons) App.globals.reasons[fix.reason].count += fix.count;
                 else App.globals.reasons[fix.reason] = { reason:fix.reason, editId:j, count:fix.count };
