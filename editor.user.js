@@ -1816,10 +1816,10 @@
             /*
             ** Noise reduction - Remove fluff that adds nothing of technical value to posts.
             **/
-            taglist: {  // https://regex101.com/r/wH4oA3/13
-                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/])*)*[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)])*)+([?.! ]*)$)"
+            taglist: {  // https://regex101.com/r/wH4oA3/14
+                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)])*)+([?.! ]*)$)"
                                   .replace(/%tags%/g,App.globals.taglist.map(escapeRegExp).join("|")),
-                                 'gim'),
+                                 'gi'),
                 replacement: "$1",
                 debug: true,
                 //reason: App.consts.reasons.noise
