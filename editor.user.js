@@ -1816,8 +1816,8 @@
             /*
             ** Noise reduction - Remove fluff that adds nothing of technical value to posts.
             **/
-            taglist: {  // https://regex101.com/r/wH4oA3/8
-                expr: new RegExp(  "(?:^(?:(?:%tags%)(?:and|[ ,.&+/])*)*[:. \-]*|(?:[:. \-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/])*)+([?.! ]*)$)"
+            taglist: {  // https://regex101.com/r/wH4oA3/12
+                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/])*)*[:. \-)]*|(?:[:. \-(]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)])*)+([?.! ]*)$)"
                                   .replace(/%tags%/g,App.globals.taglist.map(escapeRegExp).join("|")),
                                  'gim'),
                 replacement: "$1",
