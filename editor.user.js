@@ -115,6 +115,13 @@
             titleSaysAll:  "replicated title in body"
         };
 
+        
+        // Get the original post tags
+        App.globals.taglist = [];
+        $('.post-taglist .post-tag').each( function(){
+            App.globals.taglist.push( $(this).html() );
+        });
+
         // Define edit rules
         App.edits = {
             // All caps
@@ -1809,6 +1816,13 @@
             /*
             ** Noise reduction - Remove fluff that adds nothing of technical value to posts.
             **/
+            taglist: {
+                expr: new RegExp( "^((%tags%)(and|[ ,.&+])*)*[:. ]*"
+                                  .replace(/%tags%/,App.globals.taglist.join("|")),
+                                 'i'),
+                replacement: "",
+                reason: App.consts.reasons.noise
+            },
             help: {
                 expr: /\b(h)(?:[ea]l?p)(?![-])\b/gi,
                 replacement: "$1elp",
