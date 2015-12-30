@@ -132,8 +132,8 @@
                 },
                 reason: App.consts.reasons.tidyTitle
             },
-            taglist: {  // https://regex101.com/r/wH4oA3/14
-                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)])*)+([?.! ]*)$)"
+            taglist: {  // https://regex101.com/r/wH4oA3/15
+                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
                                   .replace(/%tags%/g,App.globals.taglist.map(escapeTag).join("|")),
                                  'gi'),
                 replacement: "$1",
@@ -1919,7 +1919,10 @@
             var reasoning = edit.reason;
             var debug = edit.debug;
             
-            if (debug) console.log(input);
+            if (debug) {
+                console.log(input);
+                console.log(expression.toString());
+            }
             // If there is nothing to search, exit
             if (!input) return false;
             // Scan the post text using the expression to see if there are any matches
@@ -2323,12 +2326,10 @@ var AvsAnSimple=function(n){function i(n){var r=parseInt(t,36)||0,f=r&&r.toStrin
 
 // Adapted from http://stackoverflow.com/a/6969486/1677912
 function escapeTag(tag) {
-    if (debug) console.log( tag );
     // See https://regex101.com/r/yW9cD4/1
     return tag.replace(/(?:(\-)|([+.#]))/g,
                      function (match, hyphen, other) {
                          var escaped = (hyphen) ? "[ \\-]" : "\\"+match;
-                         if (debug) console.log( escaped );
                          return escaped;
                      });
 }
