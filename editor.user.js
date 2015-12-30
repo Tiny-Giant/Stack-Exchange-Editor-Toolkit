@@ -2333,5 +2333,5 @@ function escapeTag(tag) {
                          var escaped = (hyphen) ? "[ \\-]" : "\\"+match;
                          return escaped;
                      });
-    return "\\b" + retag + "\\b";  // hack - enclose tag in regexp boundary metachars. WBN to do this in the taglist regexp.
+    return "(?:\\s|\\b|$)" + retag + "(?:\\s|\\b|$)";  // hack - enclose tag in regexp boundary checks. WBN to do this in the taglist regexp.
 }
