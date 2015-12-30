@@ -132,9 +132,10 @@
                 },
                 reason: App.consts.reasons.tidyTitle
             },
-            taglist: {  // https://regex101.com/r/wH4oA3/15
-                expr: new RegExp(  "(?:^(?:[(]?(?:%tags%)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:%tags%)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
-                                  .replace(/%tags%/g,App.globals.taglist.map(escapeTag).join("|")),
+            taglist: {  // https://regex101.com/r/wH4oA3/16
+                expr: new RegExp(  "(?:^(?:[(]?(?:_xTagsx_)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:_xTagsx_)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
+                                 .replace(/_xTagsx_/g,App.globals.taglist.map(escapeTag).join("|")),
+                                 //.replace(/\\(?=[bsSdDwW])/g,"\\"), // https://regex101.com/r/pY1hI2/1 - WBN to figure this out.
                                  'gi'),
                 replacement: "$1",
                 debug: true,
@@ -2327,9 +2328,10 @@ var AvsAnSimple=function(n){function i(n){var r=parseInt(t,36)||0,f=r&&r.toStrin
 // Adapted from http://stackoverflow.com/a/6969486/1677912
 function escapeTag(tag) {
     // See https://regex101.com/r/yW9cD4/1
-    return tag.replace(/(?:(\-)|([+.#]))/g,
+    var retag = tag.replace(/(?:(\-)|([+.#]))/g,
                      function (match, hyphen, other) {
                          var escaped = (hyphen) ? "[ \\-]" : "\\"+match;
                          return escaped;
                      });
+    return "\\b" + retag + "\\b";  // hack - enclose tag in regexp boundary metachars. WBN to do this in the taglist regexp.
 }
