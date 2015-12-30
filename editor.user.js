@@ -621,6 +621,11 @@
                 replacement: "Hadoop",
                 reason: App.consts.reasons.trademark
             },
+            django: {
+                expr: /\bdjango\b/gi,
+                replacement: "Django",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -1189,8 +1194,8 @@
                 replacement: "$1ample$2",
                 reason: App.consts.reasons.spelling
             },
-            really: {
-                expr: /\b(r)ea?ll?y\b/gi,
+            really: {  // https://regex101.com/r/sO4zD9/1
+                expr: /\b(r)(?:elly|ealy)\b/gi,
                 replacement: "$1eally",
                 reason: App.consts.reasons.spelling
             },
@@ -1509,8 +1514,8 @@
                 replacement: "$1omewhere",
                 reason: App.consts.reasons.spelling
             },
-            with: { // https://regex101.com/r/xO5dP3/1
-                expr: /\b(w)h?ith?(?=(ou?t|in)?\b)/gi,
+            with: { // https://regex101.com/r/xO5dP3/2
+                expr: /\b(w)(?:hith|iht)(?=(ou?t|in)?\b)/gi,
                 replacement: "$1ith",
                 reason: App.consts.reasons.spelling
             },
@@ -1712,6 +1717,18 @@
             and_then: {   // 16K instances of this!
                 expr: /\b(a)nd,? tha?n\b/gi,
                 replacement: "$1nd then",
+                reason: App.consts.reasons.spelling
+            },
+            un_initialize: { // >4K instances https://regex101.com/r/lY2hY1/1
+                expr: /\b((?:un-?|re-?)?i)n?i?t[ia]+li?[zs](e|ed|[eo]r|es|ing)\b/gi,
+                replacement: function(match, prefix, suffix) {
+                    return (prefix+'nitializ'+suffix).replace("-","");
+                },
+                reason: App.consts.reasons.spelling
+            },
+            character: { // 3500+ instances, https://regex101.com/r/lG1qH0/1
+                expr: /\b(c)(?:har|h?arac?h?ter)(s|istics?|i[zs]e)?\b/gi,
+                replacement: "$1haracter$2",
                 reason: App.consts.reasons.spelling
             },
             /*
