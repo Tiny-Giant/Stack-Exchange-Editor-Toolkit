@@ -1797,8 +1797,8 @@
                 replacement: "$1.e. ",
                 reason: App.consts.reasons.grammar
             },
-            eg: { // https://regex101.com/r/qH2oT0/6
-                expr: /\b(e)\.?g[.. :]+/gi,
+            eg: { // https://regex101.com/r/qH2oT0/7
+                expr: /\b(e)\.?g[.,; :]+/gi,
                 replacement: "$1.g. ",
                 reason: App.consts.reasons.grammar
             },
@@ -1885,20 +1885,15 @@
             /*
             ** Spacing - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
+            **           Leading and trailing spaces are part of Markdown formatting; leave them.
             **/
-            multiplespaces: {
-                // https://regex101.com/r/hY9hQ3/1
-                expr: /[ ]{2,}(?!\n)/g,
+            multiplespaces: { // https://regex101.com/r/hY9hQ3/3
+                expr: /(?!^)[ ]{2,}(?!$)/g,
                 replacement: " ",
                 reason: App.consts.reasons.spacing
             },
-            blanklines: {
-                expr: /(?:\s*[\r\n]){3,}/gm,
-                replacement: "\n\n",
-                reason: App.consts.reasons.spacing
-            },
-            endblanklines: {
-                expr: /[\s\r\n]+$/g,
+            blanklines: {  // https://regex101.com/r/eA5hA2/1
+                expr: /(?:^(?:\s*[\n\r])*|(?:\s*[\r\n])(?=(?:\s*[\r\n]|$){2}))/g,
                 replacement: "",
                 reason: App.consts.reasons.spacing
             },
