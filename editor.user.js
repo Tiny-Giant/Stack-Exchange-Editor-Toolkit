@@ -1774,14 +1774,22 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            space_then_symbol: {  // https://regex101.com/r/fN6lL7/3
-                expr: /(?:[ \t]([(&][ \t]+)|[ \t]*([(&])(?=[a-z]|$))/gim,
-                replacement: " $1$2",
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/4
+                expr: /(?!^|[ \t]+)([(])/gm,
+                replacement: " $1",
+                debug: false,
                 reason: App.consts.reasons.grammar
             },
-            symbol_then_space: {  // https://regex101.com/r/jB5aN0/4
-                expr: /(?:[ \t]+([.,!?;:])(?:[ \t]+|$)|[ \t]+([,!?;:])(?=\w)|([a-z][,!?;:])(?=\w))/gim,
-                replacement: "$1$2 ",
+            symbol_then_space: {  // https://regex101.com/r/iD9aS1/3
+                expr: /(?:\b| +)([,?!:)])(?: |\b|$)(?![\d])/gm,
+                replacement: "$1 ",
+                debug: false,
+                reason: App.consts.reasons.grammar
+            },
+            space_symbol_space: {
+                expr: /(?:\b| +)([&])(?: |\b)(?![\d])/g,
+                replacement: " $1 ",
+                debug: false,
                 reason: App.consts.reasons.grammar
             },
             i: { // https://regex101.com/r/uO7qG0/2
@@ -1935,6 +1943,7 @@
             if (debug) {
                 console.log(input);
                 console.log(expression.toString());
+                console.log("replacement: '"+replacement+"'");
             }
             // If there is nothing to search, exit
             if (!input) return false;
@@ -1949,6 +1958,18 @@
                 if (debug) console.log(before, after, after !== before, count);
                 return after;
             });
+            if (!count) {
+                // Seems like no replacements, check.
+                // In some cases, the expression matches on the initial input, but
+                // fails to on the individual matches. In that case, we can't count
+                // the total changes accurately, but we can still complete the
+                // replacement on the initial input.
+                var after = input.replace(expression, replacement);
+                if(after !== input) {
+                    ++count; 
+                    input = after;
+                }
+            }
             return count > 0 ? {
                 reason: reasoning,
                 fixed: String(input),
