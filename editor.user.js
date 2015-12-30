@@ -110,7 +110,7 @@
             grammar:       "grammar",
             noise:         "noise reduction",
             punctuation:   "punctuation",
-            spacing:       "spacing",
+            layout:        "layout",
             silent:        "",                              // Unreported / uncounted
             titleSaysAll:  "replicated title in body"
         };
@@ -1774,24 +1774,6 @@
                 },
                 reason: App.consts.reasons.grammar
             },
-            space_then_symbol: {  // https://regex101.com/r/fN6lL7/4
-                expr: /(?!^|[ \t]+)([(])/gm,
-                replacement: " $1",
-                debug: false,
-                reason: App.consts.reasons.grammar
-            },
-            symbol_then_space: {  // https://regex101.com/r/iD9aS1/3
-                expr: /(?:\b| +)([,?!:)])(?: |\b|$)(?![\d])/gm,
-                replacement: "$1 ",
-                debug: false,
-                reason: App.consts.reasons.grammar
-            },
-            space_symbol_space: {
-                expr: /(?:\b| +)([&])(?: |\b)(?![\d])/g,
-                replacement: " $1 ",
-                debug: false,
-                reason: App.consts.reasons.grammar
-            },
             i: { // https://regex101.com/r/uO7qG0/2
                 expr: /\bi\b(?!\.e\.)/g,  // i but not i.e.
                 replacement: "I",
@@ -1908,19 +1890,37 @@
                 reason: App.consts.reasons.noise
             },
             /*
-            ** Spacing - Minimize whitespace (which is compressed by markup).
+            ** Layout  - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
             **           Leading and trailing spaces are part of Markdown formatting; leave them.
             **/
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/4
+                expr: /(?!^|[ \t]+)([(])/gm,
+                replacement: " $1",
+                debug: false,
+                reason: App.consts.reasons.layout
+            },
+            symbol_then_space: {  // https://regex101.com/r/iD9aS1/3
+                expr: /(?:\b| +)([,?!:)])(?: |\b|$)(?![\d])/gm,
+                replacement: "$1 ",
+                debug: false,
+                reason: App.consts.reasons.layout
+            },
+            space_symbol_space: {
+                expr: /(?:\b| +)([&])(?: |\b)(?![\d])/g,
+                replacement: " $1 ",
+                debug: false,
+                reason: App.consts.reasons.layout
+            },
             multiplespaces: { // https://regex101.com/r/hY9hQ3/3
                 expr: /(?!^)[ ]{2,}(?!$)/g,
                 replacement: " ",
-                reason: App.consts.reasons.spacing
+                reason: App.consts.reasons.layout
             },
             blanklines: {  // https://regex101.com/r/eA5hA2/1
                 expr: /(?:^(?:\s*[\n\r])*|(?:\s*[\r\n])(?=(?:\s*[\r\n]|$){2}))/g,
                 replacement: "",
-                reason: App.consts.reasons.spacing
+                reason: App.consts.reasons.layout
             },
             // The title says it all
             thetitlesaysitall: {
