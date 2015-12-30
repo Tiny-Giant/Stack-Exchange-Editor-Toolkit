@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.54
+// @version        1.5.2.55
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -138,7 +138,7 @@
                                  //.replace(/\\(?=[bsSdDwW])/g,"\\"), // https://regex101.com/r/pY1hI2/1 - WBN to figure this out.
                                  'gi'),
                 replacement: "$1",
-                debug: true,
+                debug: false,
                 reason: App.consts.reasons.tidyTitle
             },
             so: {
