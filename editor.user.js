@@ -1889,6 +1889,11 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
+            enter_code_here: {
+                expr: /\benter (?code|image description|link description) here\b/gi,
+                replacement: "",
+                reason: App.consts.reasons.noise
+            },
             /*
             ** Layout  - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
