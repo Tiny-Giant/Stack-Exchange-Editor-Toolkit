@@ -1853,8 +1853,8 @@
                 reason: App.consts.reasons.silent
             },
             editupdate: {
-                // https://regex101.com/r/tT2pK6/8
-                expr: /([-*]+[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?[\t ]*:*[\t ]*[-*]+|[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?\s*:+[\t ]*)/gmi,
+                // https://regex101.com/r/tT2pK6/9
+                expr: /([-_*]+[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?[\t ]*:*[\t ]*[-_*]+:*|[\t ]*\b(edit|update)\b([\t ]*#?[0-9]+)?\s*:+[\t ]*)/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1890,7 +1890,7 @@
                 reason: App.consts.reasons.noise
             },
             enter_code_here: {
-                expr: /\benter (?code|image description|link description) here\b/gi,
+                expr: /\benter (?:code|image description|link description) here\b/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1926,6 +1926,11 @@
                 expr: /(?:^(?:\s*[\n\r])*|(?:\s*[\r\n])(?=(?:\s*[\r\n]|$){2}))/g,
                 replacement: "",
                 reason: App.consts.reasons.layout
+            },
+            trailing_space: {  // https://regex101.com/r/iQ0yR8/1
+                expr: /([^ ])[ ]{1}$/g,
+                replacement: "$1",
+                reason: App.consts.reasons.silent
             },
             // The title says it all
             thetitlesaysitall: {
