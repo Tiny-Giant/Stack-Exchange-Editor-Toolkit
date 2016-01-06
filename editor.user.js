@@ -118,8 +118,11 @@
         
         // Get the original post tags
         App.globals.taglist = [];
-        $('.post-taglist .post-tag').each( function(){
-            App.globals.taglist.push( $(this).text() );
+        $('a.post-tag').each( function(){
+            var newtag = $(this).text();
+            if (App.globals.taglist.indexOf(newtag) === -1) {
+                App.globals.taglist.push(newtag);                
+            }
         });
 
         // Define edit rules
