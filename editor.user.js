@@ -77,8 +77,8 @@
             "quote":  /^\>(?:(?!\n\n)[^])+/gm,
             //        https://regex101.com/r/lL6fH3/1 single-line inline code
             "inline": /`[^`\n]+`/g,
-            //        https://regex101.com/r/eC7mF7/1 code blocks and multiline inline code.
-            "block":  /`[^`]+`|(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/g,
+            //        https://regex101.com/r/eC7mF7/2 code blocks and multiline inline code.
+            "block":  /`[^`]+`|^(?:(?:[ ]{4}|[ ]{0,3}\t).+(?:[\r\n]?(?!\n\S)(?:[ ]+\n)*)+)+/gm,
             //        https://regex101.com/r/tZ4eY3/7 link-sections 
             "lsec":   /(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+/g,
             //        https://regex101.com/r/tZ4eY3/20 links and pathnames
@@ -1921,8 +1921,9 @@
                 reason: App.consts.reasons.layout
             },
             multiplespaces: { // https://regex101.com/r/hY9hQ3/3
-                expr: /(?!^)[ ]{2,}(?!$)/g,
+                expr: /(?!^)[ ]{2,}(?! ?$)/gm,
                 replacement: " ",
+                debug: false,
                 reason: App.consts.reasons.layout
             },
             blanklines: {  // https://regex101.com/r/eA5hA2/1
