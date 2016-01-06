@@ -2234,7 +2234,7 @@
             var reasonStr = reasons.length ? reasons.join('; ')+'.' : '';  // Unique reasons separated by ; and terminated by .
 
             if (!data.hasOwnProperty('summaryOrig')) data.summaryOrig = data.summary.trim() // Remember original summary
-                                                                            .replace(/([^.;])$/,"$1;");
+                                                                            .replace(/([^;])[.?!:]?$/,"$1;");
             if (data.summaryOrig.length)
                 data.summaryOrig = data.summaryOrig + ' ';
             else
