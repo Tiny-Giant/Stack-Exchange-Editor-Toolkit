@@ -1746,9 +1746,19 @@
                 expr: /\b(a|an) ([\(\"'“‘-]*\w*)\b/gim,   // https://regex101.com/r/nE1yA4/4
                 replacement: function( match, article, following ) {
                     var input = following.replace(/^[\s\(\"'“‘-]+|\s+$/g, "");//strip initial punctuation symbols
-                    var res = AvsAnSimple.query(input);
+                    var res = AvsAnOverride_(input) || AvsAnSimple.query(input);
                     var newArticle = res;
                     return newArticle+' '+following;
+                    
+                    // Hack alert: Due to the technical nature of SO subjects, many common terms
+                    // are not well-represented in the data used by AvsAnSimple, so we need to
+                    // provide a way to override it.
+                    function AvsAnOverride_(fword) {
+                        var exeptionsA_ = /^(?:uis?)/i;
+                        var exeptionsAn_ = /(?:^[lr]value)/i;
+                        return (exeptionsA_.test(fword) ? "a" :
+                                exeptionsAn_.test(fword) ? "an" : false);
+                    }
                 },
                 reason: App.consts.reasons.grammar
             },
