@@ -1588,7 +1588,7 @@
                 reason: App.consts.reasons.spelling
             },
             algorithm: {
-                expr: /\b(a)lgo?r[iy]?th?[iy]?m(s)?\b/gi,
+                expr: /\b(a)lgo?r[iy]?th?[iya]?m(s)?\b/gi,
                 replacement: "$1lgorithm$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1942,8 +1942,9 @@
                 reason: App.consts.reasons.layout
             },
             trailing_space: {  // https://regex101.com/r/iQ0yR8/1
-                expr: /([^ ])[ ]{1}$/g,
+                expr: /([^ ])[ ]{1}$/gm,
                 replacement: "$1",
+                debug: false,
                 reason: App.consts.reasons.silent
             },
             // The title says it all
