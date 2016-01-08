@@ -135,8 +135,8 @@
                 },
                 reason: App.consts.reasons.tidyTitle
             },
-            taglist: {  // https://regex101.com/r/wH4oA3/16
-                expr: new RegExp(  "(?:^(?:[(]?(?:_xTagsx_)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using)*(?:(?:_xTagsx_)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
+            taglist: {  // https://regex101.com/r/wH4oA3/18
+                expr: new RegExp(  "(?:^(?:[(]?(?:_xTagsx_)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using|by)*(?:(?:_xTagsx_)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
                                  .replace(/_xTagsx_/g,App.globals.taglist.map(escapeTag).join("|")),
                                  //.replace(/\\(?=[bsSdDwW])/g,"\\"), // https://regex101.com/r/pY1hI2/1 - WBN to figure this out.
                                  'gi'),
@@ -952,6 +952,11 @@
                 replacement: "$1utocomplete$2",
                 reason: App.consts.reasons.spelling
             },
+            you: {
+                expr: /\b(y)o+u?\b/gi,
+                replacement: "$1ou",
+                reason: App.consts.reasons.spelling
+            },
             doesn_t: { // https://regex101.com/r/sL0uO9/3
                 expr: /\b(d)(?:ose?[^\w]?n?.?t|oens.?t|oesn[^\w]t|oest)\b/gi,
                 replacement: "$1oesn't",
@@ -1734,6 +1739,16 @@
                 replacement: "$1haracter$2",
                 reason: App.consts.reasons.spelling
             },
+            found: {
+                expr: /\b(f)inded\b/gi,
+                replacement: "$1ound",
+                reason: App.consts.reasons.spelling
+            },
+            tuple: {  // https://regex101.com/r/zP7zM2/1
+                expr: /\b(t)o?up+e?le?(s)?\b/gi,
+                replacement: "$1uple$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1842,6 +1857,11 @@
                 replacement: "$1,$2",
                 reason: App.consts.reasons.grammar
             },
+            i_have_find: {
+                expr: /\b(I|you) have find\b(?![(]|\.\w)/gi,
+                replacement: "$1 have found",
+                reason: App.consts.reasons.grammar
+            },
             /*
             ** Noise reduction - Remove fluff that adds nothing of technical value to posts.
             **/
@@ -1918,8 +1938,8 @@
                 debug: false,
                 reason: App.consts.reasons.layout
             },
-            symbol_then_space: {  // https://regex101.com/r/iD9aS1/3
-                expr: /(?:\b| +)([,?!:)])(?: |\b|$)(?![\d])/gm,
+            symbol_then_space: {  // https://regex101.com/r/iD9aS1/4
+                expr: /(?:\b| +)([,?!:)]+)(?: |\b|$)(?![\d])/gm,
                 replacement: "$1 ",
                 debug: false,
                 reason: App.consts.reasons.layout
@@ -1950,9 +1970,9 @@
             // The title says it all
             thetitlesaysitall: {
                 // https://regex101.com/r/bX1qB4/3
-                expr: /(?:the )?title says it all/gi,
+                expr: /(?:the )?title says (?:it all|everything)[.?!]*/gi,
                 replacement: function(){
-                    return '"' + App.selections.title.val() + '" says it all.\n\n';
+                    return App.selections.title.val().replace(/[.?!]*$/,"? \n\n");
                 },
                 reason: App.consts.reasons.titleSaysAll
             }
