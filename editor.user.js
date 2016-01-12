@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.55
+// @version        1.5.2.56
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1892,8 +1892,8 @@
                 reason: App.consts.reasons.noise
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
-            salutation: { // https://regex101.com/r/yS9lN8/4
-                expr: /^\s*(?:dear\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
+            salutation: { // https://regex101.com/r/yS9lN8/5
+                expr: /^\s*(?:dear\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|mates?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
