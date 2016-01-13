@@ -852,6 +852,16 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
+            xpath: {
+                expr: /([^\b\w.]|^)xpath\b/gi,
+                replacement: "$1XPath",
+                reason: App.consts.reasons.acronym
+            },
+            xquery: {
+                expr: /([^\b\w.]|^)xquery\b/gi,
+                replacement: "$1XQuery",
+                reason: App.consts.reasons.acronym
+            },
             jpa: {
                 expr: /(?:[^\b\w.]|^)jpa\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
