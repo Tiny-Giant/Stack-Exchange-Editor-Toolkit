@@ -1893,7 +1893,7 @@
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
             salutation: { // https://regex101.com/r/yS9lN8/5
-                expr: /^\s*(?:dear\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|mates?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
+                expr: /^\s*(?:dears?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|mates?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
