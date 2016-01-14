@@ -1764,6 +1764,16 @@
                 replacement: "$1 read",
                 reason: App.consts.reasons.spelling
             },
+            customize: {  // http://grammarist.com/spelling/customise-customize/
+                expr: /\b(c)u[st]+[oui]mi[zs](e)?/gi,
+                replacement: "$1ustomiz$2",
+                reason: App.consts.reasons.spelling
+            },
+            customizable: {  // Common errors are to retain 'e', and/or to use ible, not able
+                expr: /\b(c)ustomiz[ea]+(tions?|ble|bility|bilities)/gi,
+                replacement: "$1ustomiza$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
