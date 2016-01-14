@@ -185,6 +185,11 @@
                 replacement: "Knockout.js",
                 reason: App.consts.reasons.trademark
             },
+            script: {  // Spelling rule out-of-order, must run before javascript & google_apps_script
+                expr: /(s)c[ri]+pt?(ing|s)?\b/gi,
+                replacement: "$1cript$2",
+                reason: App.consts.reasons.spelling
+            },
             javascript: {
                 expr: /([^\b\w.]|^)(java?scr?ipt?|js|java script?)\b/gi,
                 replacement: "$1JavaScript",
@@ -958,28 +963,33 @@
                 reason: App.consts.reasons.spelling
             },
             doesn_t: { // https://regex101.com/r/sL0uO9/3
-                expr: /\b(d)(?:ose?[^\w]?n?.?t|oens.?t|oesn[^\w]t|oest)\b/gi,
+                expr: /\b(d)(?:ose?[^\w]*n?.?t|oens.?t|oesn[^\w]*t|oest)\b/gi,
                 replacement: "$1oesn't",
                 reason: App.consts.reasons.spelling
             },
             couldn_t_wouldn_t_shouldn_t: {
-                expr: /\b(c|w|sh)o?ul?dn[ '`´]?t\b/gi,
+                expr: /\b(c|w|sh)o?ul?dn[ '`´]*t\b/gi,
                 replacement: "$1ouldn't",
                 reason: App.consts.reasons.spelling
             },
             didn_t: {
-                expr: /\b(d)id[^\w]n?t\b/gi,
+                expr: /\b(d)id[^\w]*n?t\b/gi,
                 replacement: "$1idn't",
                 reason: App.consts.reasons.spelling
             },
             don_t: {
-                expr: /\b(d)(?:on[^\w]no?t|ont?)\b/gi,
+                expr: /\b(d)(?:on[^\w]*no?t|ont?)\b/gi,
                 replacement: "$1on't",
                 reason: App.consts.reasons.spelling
             },
             haven_t: {
-                expr: /\b(h)(?:avent|av[^\w]t|ave[^\w]t)\b/gi,
+                expr: /\b(h)(?:avent|av[^\w]*t|ave[^\w]?t)\b/gi,
                 replacement: "$1aven't",
+                reason: App.consts.reasons.spelling
+            },
+            wasn_t: {
+                expr: /\b(w)as[^\w]*n?t\b/gi,
+                replacement: "$1asn't",
                 reason: App.consts.reasons.spelling
             },
             //apostrophe_d: {   // Too many false positives
@@ -1178,7 +1188,7 @@
                 reason: App.consts.reasons.spelling
             },
             bear_with_me: {
-                expr: /\b(b)are (with me|it|in mind)\b/gi,
+                expr: /\b(b)are (with m[ey]|it|in mind)\b/gi,
                 replacement: "$1ear $2",
                 reason: App.consts.reasons.spelling
             },
@@ -1749,6 +1759,11 @@
                 replacement: "$1uple$2",
                 reason: App.consts.reasons.spelling
             },
+            i_read: {
+                expr: /\b(I|I've|we|they) red\b/gi,
+                replacement: "$1 read",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1892,8 +1907,8 @@
                 reason: App.consts.reasons.noise
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
-            salutation: { // https://regex101.com/r/yS9lN8/5
-                expr: /^\s*(?:dear\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon))[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|mates?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
+            salutation: { // https://regex101.com/r/yS9lN8/8
+                expr: /^\s*(?:dear\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1912,8 +1927,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            sorry4english: { // https://regex101.com/r/pG3oD6/7
-                expr: /[^\n.!?]*((sorry|ap+olog.*)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:_*])*/gi,
+            sorry4english: { // https://regex101.com/r/pG3oD6/8
+                expr: /[^\n.!?]*((sorry|ap+olog.*|forgive)\b[^.!?:\n\r]+\b((bad|my|poor) english)|(english[^.!?:\n\r]+)\b(tongue|language))\b[^.!?:\n\r]*(?:[.!?:_*])*/gi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1927,6 +1942,11 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
+            repeating_characters: {  // https://regex101.com/r/tX6cE8/1
+                expr: /([^-=+\d])\1{3,}\s?|(asdf)\2+/gi,
+                replacement: "",
+                reason: App.consts.reasons.noise
+            },
             /*
             ** Layout  - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
@@ -1935,6 +1955,12 @@
             space_then_symbol: {  // https://regex101.com/r/fN6lL7/4
                 expr: /(?!^|[ \t]+)([(])/gm,
                 replacement: " $1",
+                debug: false,
+                reason: App.consts.reasons.layout
+            },
+            period_space: {  // Not much we can safely do with periods, since they are used in file names.
+                expr: / (\.)( |$)/gm,
+                replacement: "$1$2",
                 debug: false,
                 reason: App.consts.reasons.layout
             },
