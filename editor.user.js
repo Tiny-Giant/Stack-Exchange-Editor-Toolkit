@@ -1928,7 +1928,7 @@
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
             salutation: { // https://regex101.com/r/yS9lN8/8
-                expr: /^\s*(?:dear\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
+                expr: /^\s*(?:dears?\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -1942,8 +1942,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            complimentaryClose: {  // https://regex101.com/r/hL3kT5/2
-                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks)\b,?[\t\f ]*[\r\n]*.*(?:[.!?: ]*|$)/gim,
+            complimentaryClose: {  // https://regex101.com/r/hL3kT5/4
+                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
