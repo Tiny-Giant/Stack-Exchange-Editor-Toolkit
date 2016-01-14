@@ -1774,6 +1774,16 @@
                 replacement: "$1ustomiza$2",
                 reason: App.consts.reasons.spelling
             },
+            across: {  // http://grammarist.com/spelling/customise-customize/
+                expr: /\b(a)c+ros+\b/gi,
+                replacement: "$1cross",
+                reason: App.consts.reasons.spelling
+            },
+            immediate: {  // http://grammarist.com/spelling/customise-customize/
+                expr: /\b(i)m+ed[ia]+te?l?(ly)?\b/gi,
+                replacement: "$1mmediate$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
