@@ -1797,7 +1797,7 @@
                 replacement: function( match, article, following ) {
                     var input = following.replace(/^[\s\(\"'“‘-]+|\s+$/g, "");//strip initial punctuation symbols
                     var res = AvsAnOverride_(input) || AvsAnSimple.query(input);
-                    var newArticle = res;
+                    var newArticle = article[0] + res.substr(1);  // Preserve existing capitalization
                     return newArticle+' '+following;
                     
                     // Hack alert: Due to the technical nature of SO subjects, many common terms
@@ -1806,8 +1806,8 @@
                     function AvsAnOverride_(fword) {
                         var exeptionsA_ = /^(?:uis?)/i;
                         var exeptionsAn_ = /(?:^[lr]value)/i;
-                        return (exeptionsA_.test(fword) ? "a" :
-                                exeptionsAn_.test(fword) ? "an" : false);
+                        return (exeptionsA_.test(fword) ? article[0] :
+                                exeptionsAn_.test(fword) ? article[0]+"n" : false);
                     }
                 },
                 reason: App.consts.reasons.grammar
@@ -1927,7 +1927,7 @@
                 reason: App.consts.reasons.noise
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
-            salutation: { // https://regex101.com/r/yS9lN8/8
+            salutation: { // https://regex101.com/r/yS9lN8/9
                 expr: /^\s*(?:dears?\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
