@@ -877,8 +877,13 @@
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
-            xfa: {  // XML Forms Architecture
-                expr: /(?:[^\b\w.]|^)xfa\b/gi,
+            xfa_xsd: {  // XML Forms Architecture
+                expr: /(?:[^\b\w.]|^)xfa|xsd\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
+                reason: App.consts.reasons.acronym
+            },
+            wsdl: {
+                expr: /(?:[^\b\w.]|^)wsdl\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -1147,8 +1152,8 @@
                 replacement: "$1oordinate$2",
                 reason: App.consts.reasons.spelling
             },
-            argument: {
-                expr: /\b(a)rguement(s)?\b/gi,
+            argument: {  // https://regex101.com/r/iU2vK9/1
+                expr: /\b(a)rg?[ue]+ment(s)?\b/gi,
                 replacement: "$1rgument$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1774,14 +1779,59 @@
                 replacement: "$1ustomiza$2",
                 reason: App.consts.reasons.spelling
             },
-            across: {  // http://grammarist.com/spelling/customise-customize/
+            across: {  // http://www.oxforddictionaries.com/words/common-misspellings
                 expr: /\b(a)c+ros+\b/gi,
                 replacement: "$1cross",
                 reason: App.consts.reasons.spelling
             },
-            immediate: {  // http://grammarist.com/spelling/customise-customize/
+            immediate: {  // http://www.oxforddictionaries.com/words/common-misspellings
                 expr: /\b(i)m+ed[ia]+te?l?(ly)?\b/gi,
                 replacement: "$1mmediate$2",
+                reason: App.consts.reasons.spelling
+            },
+            every_time: {  // https://regex101.com/r/dB6jC2/1
+                expr: /\b(e)v[ery]+time?\b/gi,
+                replacement: "$1very time",
+                reason: App.consts.reasons.spelling
+            },
+            achieve: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/bZ2qJ1/1
+                expr: /\b(a)ch[ei]+ve?(s|d|ment)?\b/gi,
+                replacement: "$1chieve$2",
+                reason: App.consts.reasons.spelling
+            },
+            apparent: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/dO3aH4/2
+                expr: /\b(a)p+ar[ae]nt?(ly)?\b/gi,
+                replacement: "$1pparent$2",
+                reason: App.consts.reasons.spelling
+            },
+            appear: {  // https://regex101.com/r/oL8lI1/1
+                expr: /\b(a)p+[ea]+re?(s|ed|ing)?\b/gi,
+                replacement: "$1ppear$2",
+                reason: App.consts.reasons.spelling
+            },
+            appearance: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/eP2bF9/1
+                expr: /\b(a)p+[ea]+r[ea]+nce(s)?\b/gi,
+                replacement: "$1ppearance$2",
+                reason: App.consts.reasons.spelling
+            },
+            beginning: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/sT4gQ0/1
+                expr: /\b(b)egining/gi,
+                replacement: "$1eginning",
+                reason: App.consts.reasons.spelling
+            },
+            believe: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/pM1cC6/1
+                expr: /\b(b)e?l[ei]+v(e|ing|able)/gi,
+                replacement: "$1eliev$2",
+                reason: App.consts.reasons.spelling
+            },
+            colleague: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/xN8qD9/1
+                expr: /\b(c)ol+[ea]+gue(s)?\b/gi,
+                replacement: "$1olleague$2",
+                reason: App.consts.reasons.spelling
+            },
+            implement: {  // https://regex101.com/r/zW1aS5/1
+                expr: /\b(i)mpl?[ei]?ment/gi,
+                replacement: "$1mplement",
                 reason: App.consts.reasons.spelling
             },
             /*
@@ -1805,7 +1855,7 @@
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
                         var exeptionsA_ = /^(?:uis?)/i;
-                        var exeptionsAn_ = /(?:^[lr]value)/i;
+                        var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
                     }
@@ -1877,8 +1927,8 @@
                 replacement: "etc.",
                 reason: App.consts.reasons.grammar
             },
-            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/2
-                expr: /([^\w\s*#.\-_+:])\1{1,}/g,
+            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/3
+                expr: /([^\w\s*#.\-_:\[\]\</>])\1{1,}/g,
                 replacement: "$1",
                 reason: App.consts.reasons.grammar
             },
@@ -2002,9 +2052,9 @@
                 debug: false,
                 reason: App.consts.reasons.layout
             },
-            blanklines: {  // https://regex101.com/r/eA5hA2/1
-                expr: /(?:^(?:\s*[\n\r])*|(?:\s*[\r\n])(?=(?:\s*[\r\n]|$){2}))/g,
-                replacement: "",
+            blanklines: {  // https://regex101.com/r/eA5hA2/2
+                expr: /[\n\r\f]*$|([\n\r\f]{2})(?:[\n\r\f])+/g,
+                replacement: "$1",
                 reason: App.consts.reasons.layout
             },
             trailing_space: {  // https://regex101.com/r/iQ0yR8/1
