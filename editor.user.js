@@ -634,6 +634,11 @@
                 replacement: "Django",
                 reason: App.consts.reasons.trademark
             },
+            tcl: {
+                expr: /([^\b\w.]|^)tcl\b/gi,
+                replacement: "$1Tcl",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
@@ -1834,6 +1839,11 @@
                 replacement: "$1mplement",
                 reason: App.consts.reasons.spelling
             },
+            simultaneous: {  // https://regex101.com/r/iB0mE7/1
+                expr: /\b(s)imu[lt]+an[ieou]+se?/gi,
+                replacement: "$1imultaneous",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1927,6 +1937,11 @@
                 replacement: "etc.",
                 reason: App.consts.reasons.grammar
             },
+            pysanky: {
+                expr: /([^\!])[!]{5}(?!\!)/g,
+                replacement: "$1!",
+                reason: window.atob('IkZpdmUgZXhjbGFtYXRpb24gbWFya3MsIHRoZSBzdXJlIHNpZ24gb2YgYW4gaW5zYW5lIG1pbmQi')
+            },
             multiplesymbols: {  //    https://regex101.com/r/bE9zM6/3
                 expr: /([^\w\s*#.\-_:\[\]\</>])\1{1,}/g,
                 replacement: "$1",
@@ -1945,6 +1960,11 @@
             i_have_find: {
                 expr: /\b(I|you) have find\b(?![(]|\.\w)/gi,
                 replacement: "$1 have found",
+                reason: App.consts.reasons.grammar
+            },
+            let_s_say: {  // 60K!
+                expr: /\b(l)ets (say|see|look|just|put|have|leave|give|write)\b/gi,
+                replacement: "$1et's $2",
                 reason: App.consts.reasons.grammar
             },
             /*
@@ -2012,30 +2032,25 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            repeating_characters: {  // https://regex101.com/r/tX6cE8/1
-                expr: /([^-=+\d])\1{3,}\s?|(asdf)\2+/gi,
-                replacement: "",
-                reason: App.consts.reasons.noise
-            },
             /*
             ** Layout  - Minimize whitespace (which is compressed by markup).
             **           Must follow noise reduction.
             **           Leading and trailing spaces are part of Markdown formatting; leave them.
             **/
-            space_then_symbol: {  // https://regex101.com/r/fN6lL7/4
-                expr: /(?!^|[ \t]+)([(])/gm,
-                replacement: " $1",
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/5
+                expr: /([^ \n\r\[\)])([(])/gm,
+                replacement: "$1 $2",
                 debug: false,
                 reason: App.consts.reasons.layout
             },
-            period_space: {  // Not much we can safely do with periods, since they are used in file names.
-                expr: / (\.)( |$)/gm,
+            no_space_before_symbol: {  // https://regex101.com/r/qB9lS0/2
+                expr: /(?:(^ +)|[ ]+?([,?!:)]+|[.]+(?![\S])))/gm,
                 replacement: "$1$2",
                 debug: false,
                 reason: App.consts.reasons.layout
             },
-            symbol_then_space: {  // https://regex101.com/r/iD9aS1/4
-                expr: /(?:\b| +)([,?!:)]+)(?: |\b|$)(?![\d])/gm,
+            symbol_then_space: {  // https://regex101.com/r/iD9aS1/6
+                expr: /(?:\b)([,?!:)]+|[.]{3})(?:\b)(?![\d])/gm,
                 replacement: "$1 ",
                 debug: false,
                 reason: App.consts.reasons.layout
@@ -2106,6 +2121,7 @@
                 // the total changes accurately, but we can still complete the
                 // replacement on the initial input.
                 var after = input.replace(expression, replacement);
+                if (debug) console.log("zero-count: ", input, after, after !== input);
                 if(after !== input) {
                     ++count; 
                     input = after;
