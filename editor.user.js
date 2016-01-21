@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.56
+// @version        1.5.2.57
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -639,11 +639,16 @@
                 replacement: "$1Tcl",
                 reason: App.consts.reasons.trademark
             },
+            flickr: {
+                expr: /([^\b\w.]|^)flickr(?!\.\w)/gi,
+                replacement: "$1Flickr",
+                reason: App.consts.reasons.trademark
+            },
             /*
             ** Acronyms - to be capitalized (except sometimes when part of a file name)
             **/
             x_html: {
-                expr: /(?:[^\b\w.]|^)(:?g|ht|x|xht|sf|csht)ml[\d.]*\b/gi,
+                expr: /(?:[^\b\w.]|^)(:?g|ht|xa?|xht|sf|csht)ml[\d.]*\b/gi,
                 replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.acronym
             },
@@ -1628,7 +1633,7 @@
                 reason: App.consts.reasons.spelling
             },
             disappear: {
-                expr: /\b(d)isapea?r(ing|ed|s)?\b/gi,
+                expr: /\b(d)is?apea?r(ing|ed|s)?\b/gi,
                 replacement: "$1isappear$2",
                 reason: App.consts.reasons.spelling
             },
@@ -1844,6 +1849,46 @@
                 replacement: "$1imultaneous",
                 reason: App.consts.reasons.spelling
             },
+            environment: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/qD5zU6/1
+                expr: /\b(e)nvi?ro?[nm]+ent/gi,
+                replacement: "$1nvironment",
+                reason: App.consts.reasons.spelling
+            },
+            existence: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/mH7hA6/1
+                expr: /\b(e)xist[ae]n[cs]e/gi,
+                replacement: "$1xistence",
+                reason: App.consts.reasons.spelling
+            },
+            further: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/sE6nY3/1
+                expr: /\b(f)(?:u|[au]r)th?er/gi,
+                replacement: "$1urther",
+                reason: App.consts.reasons.spelling
+            },
+            jist: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\bjist of\b/gi,
+                replacement: "gist of",
+                reason: App.consts.reasons.spelling
+            },
+            noticeable: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\b(n)oticabl(e|y)\b/gi,
+                replacement: "$1oticeabl$2",
+                reason: App.consts.reasons.spelling
+            },
+            publicly: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\b(p)ublica?l*y\b/gi,
+                replacement: "$1ublicly",
+                reason: App.consts.reasons.spelling
+            },
+            receive: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\b(r)eciev(e[rds]?|ing)/gi,
+                replacement: "$1eceiv$2",
+                reason: App.consts.reasons.spelling
+            },
+            referred: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/kE0oZ5/3
+                expr: /\b(r)efer(?!s|ence)(?=\w)/gi,
+                replacement: "$1eferr",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1864,7 +1909,7 @@
                     // are not well-represented in the data used by AvsAnSimple, so we need to
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
-                        var exeptionsA_ = /^(?:uis?)/i;
+                        var exeptionsA_ = /^(?:uis?|co\w)/i;
                         var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
