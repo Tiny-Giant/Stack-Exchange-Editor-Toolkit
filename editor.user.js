@@ -1885,22 +1885,27 @@
                 reason: App.consts.reasons.spelling
             },
             referred: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/kE0oZ5/3
-                expr: /\b(r)efer(?!s|ence)(?=\w)/gi,
+                expr: /\b(r)efer(?!s|enc[a-z]*)(?=\w)/gi,
                 replacement: "$1eferr",
+                reason: App.consts.reasons.spelling
+            },
+            remember: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\b(r)e(?:mber|meber|memer)/gi,
+                replacement: "$1emember",
                 reason: App.consts.reasons.spelling
             },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
             start_with_so: {
-                expr: /^so[,-\s]+/gi,
+                expr: /^(so|ok)[,-\s]+/gi,
                 replacement: "",
                 reason: App.consts.reasons.grammar
             },
             a_vs_an: {  // See http://stackoverflow.com/q/34440307/1677912
-                expr: /\b(a|an) ([\(\"'“‘-]*\w*)\b/gim,   // https://regex101.com/r/nE1yA4/4
+                expr: /\b(a|an) ([\(\"'“‘`<-]*\w*)\b/gim,   // https://regex101.com/r/nE1yA4/5
                 replacement: function( match, article, following ) {
-                    var input = following.replace(/^[\s\(\"'“‘-]+|\s+$/g, "");//strip initial punctuation symbols
+                    var input = following.replace(/^[\s\(\"'“‘`<-]+|\s+$/g, "");//strip initial punctuation symbols
                     var res = AvsAnOverride_(input) || AvsAnSimple.query(input);
                     var newArticle = article[0] + res.substr(1);  // Preserve existing capitalization
                     return newArticle+' '+following;
@@ -1909,7 +1914,7 @@
                     // are not well-represented in the data used by AvsAnSimple, so we need to
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
-                        var exeptionsA_ = /^(?:uis?|co\w)/i;
+                        var exeptionsA_ = /^(?:uis?|co\w|form)/i;
                         var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
@@ -2058,7 +2063,7 @@
                 reason: App.consts.reasons.noise
             },
             complimentaryClose: {  // https://regex101.com/r/hL3kT5/4
-                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
+                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you|enjoy)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
