@@ -332,6 +332,11 @@
                 replacement: "VBScript",
                 reason: App.consts.reasons.trademark
             },
+            excel: {
+                expr: /\bexcel\b/gi,
+                replacement: "Excel",
+                reason: App.consts.reasons.trademark
+            },
             regex: {
                 expr: /\bregg?[ea]?x(p)?\b/gi,
                 replacement: "RegEx$1",
@@ -524,7 +529,7 @@
                 reason: App.consts.reasons.trademark
             },
             silverlight: {
-                expr: /\bsilverl(?:ight|ite)\b/gi,
+                expr: /\bsilv?erl(?:ight|ite)\b/gi,
                 replacement: "Silverlight",
                 reason: App.consts.reasons.trademark
             },
@@ -1824,8 +1829,8 @@
                 replacement: "$1ppearance$2",
                 reason: App.consts.reasons.spelling
             },
-            beginning: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/sT4gQ0/1
-                expr: /\b(b)egining/gi,
+            beginning: {  // http://www.oxforddictionaries.com/words/common-misspellings https://regex101.com/r/sT4gQ0/2
+                expr: /\b(b)egi?n+in?g/gi,
                 replacement: "$1eginning",
                 reason: App.consts.reasons.spelling
             },
@@ -1894,11 +1899,21 @@
                 replacement: "$1emember",
                 reason: App.consts.reasons.spelling
             },
+            connection: {  // https://regex101.com/r/rO2wH0/1
+                expr: /\b(c)on+e[ctx]+i?on(s)?/gi,
+                replacement: "$1onnection$2",
+                reason: App.consts.reasons.spelling
+            },
+            additional: {  // https://regex101.com/r/iM4xV5/1
+                expr: /\b(a)d+i.?tio?na?l*?(ly)?\b/gi,
+                replacement: "$1dditional$2",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
             start_with_so: {
-                expr: /^(so|ok)[,-\s]+/gi,
+                expr: /^(?:so|ok)[,-\s]+/gi,
                 replacement: "",
                 reason: App.consts.reasons.grammar
             },
@@ -1914,7 +1929,7 @@
                     // are not well-represented in the data used by AvsAnSimple, so we need to
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
-                        var exeptionsA_ = /^(?:uis?|co\w|form)/i;
+                        var exeptionsA_ = /^(?:uis?|co\w|form|v|data)/i;
                         var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
@@ -1992,9 +2007,9 @@
                 replacement: "$1!",
                 reason: window.atob('IkZpdmUgZXhjbGFtYXRpb24gbWFya3MsIHRoZSBzdXJlIHNpZ24gb2YgYW4gaW5zYW5lIG1pbmQi')
             },
-            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/3
-                expr: /([^\w\s*#.\-_:\[\]\</>])\1{1,}/g,
-                replacement: "$1",
+            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/5
+                expr: /([cC]\+\+)|([^\w\s*#.\-_:\[\]\</>])\2{1,}/g,
+                replacement: "$1$2",
                 reason: App.consts.reasons.grammar
             },
             i_want: { //https://regex101.com/r/iD2tU0/1
@@ -2015,6 +2030,11 @@
             let_s_say: {  // 60K!
                 expr: /\b(l)ets (say|see|look|just|put|have|leave|give|write)\b/gi,
                 replacement: "$1et's $2",
+                reason: App.consts.reasons.grammar
+            },
+            suggest_me: {  // 36K
+                expr: /\b(s)u[gj]+est(s)? me/gi,
+                replacement: "$1uggest$2",
                 reason: App.consts.reasons.grammar
             },
             /*
@@ -2063,7 +2083,7 @@
                 reason: App.consts.reasons.noise
             },
             complimentaryClose: {  // https://regex101.com/r/hL3kT5/4
-                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you|enjoy)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
+                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you|enjoy|good luck)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
