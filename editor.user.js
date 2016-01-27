@@ -135,8 +135,8 @@
                 },
                 reason: App.consts.reasons.tidyTitle
             },
-            taglist: {  // https://regex101.com/r/wH4oA3/18
-                expr: new RegExp(  "(?:^(?:[(]?(?:_xTagsx_)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using|by)*(?:(?:_xTagsx_)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
+            taglist: {  // https://regex101.com/r/wH4oA3/19
+                expr: new RegExp(  "(?:^(?:[(]?(?:_xTagsx_)(?:and|[ ,.&+/-])*)+[:. \)-]*|(?:[:. \(-]|in|with|using|by|for)*(?:(?:_xTagsx_)(?:and|[ ,&+/)-])*)+([?.! ]*)$)"
                                  .replace(/_xTagsx_/g,App.globals.taglist.map(escapeTag).join("|")),
                                  //.replace(/\\(?=[bsSdDwW])/g,"\\"), // https://regex101.com/r/pY1hI2/1 - WBN to figure this out.
                                  'gi'),
@@ -287,7 +287,7 @@
                 reason: App.consts.reasons.trademark
             },
             facebook: {
-                expr: /\bfacebook\b/gi,
+                expr: /\bface?book\b/gi,
                 replacement: "Facebook",
                 reason: App.consts.reasons.trademark
             },
@@ -645,8 +645,13 @@
                 reason: App.consts.reasons.trademark
             },
             flickr: {
-                expr: /([^\b\w.]|^)flickr(?!\.\w)/gi,
-                replacement: "$1Flickr",
+                expr: /(?:[^\b\w.]|^)flickr(?!\.\w)/gi,
+                replacement: "Flickr",
+                reason: App.consts.reasons.trademark
+            },
+            poi: {
+                expr: /(?:[^\b\w.]|^)poi\b/gi,
+                replacement: function (match) { return match.toUpperCase(); },
                 reason: App.consts.reasons.trademark
             },
             /*
@@ -1093,13 +1098,18 @@
                 reason: App.consts.reasons.spelling
             },
             btw: {
-                expr: /\b(b)tw\b/gi,
-                replacement: "$1y the way",
+                expr: /\b(b)tw,?\b/gi,
+                replacement: "$1y the way,",
                 reason: App.consts.reasons.spelling
             },
             sry: {
                 expr: /\b(s)o?r+y\b/gi,
                 replacement: "$1orry",
+                reason: App.consts.reasons.spelling
+            },
+            any1: {
+                expr: /\b(a)ny1\b/gi,
+                replacement: "$1nyone",
                 reason: App.consts.reasons.spelling
             },
             allways: {
@@ -1899,6 +1909,21 @@
                 replacement: "$1emember",
                 reason: App.consts.reasons.spelling
             },
+            sense: {  // http://www.oxforddictionaries.com/words/common-misspellings
+                expr: /\b(s)ence/gi,
+                replacement: "$1ense",
+                reason: App.consts.reasons.spelling
+            },
+            supersede: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/mA5nC1/1
+                expr: /(s)uperced(e[sd]?|ing)\b/gi,
+                replacement: "$1upersed$2",
+                reason: App.consts.reasons.spelling
+            },
+            surprise: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/uS8oS4/1
+                expr: /\b(s)ur?pri[scz](e[ds]?|ing(?:ly)?)\b/gi,
+                replacement: "$1urpris$2",
+                reason: App.consts.reasons.spelling
+            },
             connection: {  // https://regex101.com/r/rO2wH0/1
                 expr: /\b(c)on+e[ctx]+i?on(s)?/gi,
                 replacement: "$1onnection$2",
@@ -1912,8 +1937,8 @@
             /*
             ** Grammar - Correct common grammatical errors.
             **/
-            start_with_so: {
-                expr: /^(?:so|ok)[,-\s]+/gi,
+            start_with_so: {  // https://regex101.com/r/gP1xA2/2
+                expr: /^(?:okay\b|ok\b|so\b|[ \t,-])+/gi,
                 replacement: "",
                 reason: App.consts.reasons.grammar
             },
@@ -1968,7 +1993,7 @@
                 reason: App.consts.reasons.grammar
             },
             i_apostrophe: {
-                expr: /\bi['`´]/gi,  // i-apostrophe only
+                expr: /\bi['`´’]/gi,  // i-apostrophe only
                 replacement: "I'",
                 reason: App.consts.reasons.grammar
             },
@@ -1983,7 +2008,7 @@
                 reason: App.consts.reasons.grammar
             },
             ive: {
-                expr: /\bi['`´]*v['`´]*e\b/gi,
+                expr: /\bi['`´’]*v['`´’]*e\b/gi,
                 replacement: "I've",
                 reason: App.consts.reasons.grammar
             },
@@ -2007,8 +2032,8 @@
                 replacement: "$1!",
                 reason: window.atob('IkZpdmUgZXhjbGFtYXRpb24gbWFya3MsIHRoZSBzdXJlIHNpZ24gb2YgYW4gaW5zYW5lIG1pbmQi')
             },
-            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/5
-                expr: /([cC]\+\+)|([^\w\s*#.\-_:\[\]\</>])\2{1,}/g,
+            multiplesymbols: {  //    https://regex101.com/r/bE9zM6/6
+                expr: /(\b[cC]\+\+|={1,3}(?!=))|([^\w\s*#.\-_:\[\]\</>])\2{1,}/g,
                 replacement: "$1$2",
                 reason: App.consts.reasons.grammar
             },
@@ -2072,8 +2097,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            badphrases: { // https://regex101.com/r/gE2hH6/13
-                expr: /[^\n.!?:]*(?:thanks|thank[ -]you|please|help|suggest(?:ions))\b(?:[ .?!]*$|[^\n.!?:]*\b(?:help|ap+reciat\w*|me|advan\w*|a ?lot)\b[^\n.!?:]*)[.!?_*]*[ ]*/gim,
+            badphrases: { // https://regex101.com/r/gE2hH6/16
+                expr: /[^\n.!?:]*(?:thanks|thank[ -]you|please|help|suggest(?:ions))\b(?:[ .?!]*$|[^\n.!?:]*\b(?:help|ap+reciat\w*|me|advan\w*|a ?lot)\b[^\n.!?:]*)[.!?_*]*/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -2082,8 +2107,8 @@
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
-            complimentaryClose: {  // https://regex101.com/r/hL3kT5/4
-                expr: /^\s*(?:(?:kind(?:est)* )*regards?|cheers?|greetings?|thanks|thank you|enjoy|good luck)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
+            complimentaryClose: {  // https://regex101.com/r/hL3kT5/5
+                expr: /^\s*(?:(?:kind(?:est)* |best )*regards?|cheers?|greetings?|thanks|thank you)\b,?.*[\r\n]{0,2}.*(?:[.!?: ]*|$)/gim,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
