@@ -333,7 +333,7 @@
                 reason: App.consts.reasons.trademark
             },
             excel: {
-                expr: /\bexcel\b/gi,
+                expr: /\bexcel\b(?!\-|\.\w)/gi,
                 replacement: "Excel",
                 reason: App.consts.reasons.trademark
             },
