@@ -286,9 +286,11 @@
                 replacement: "GitHub",
                 reason: App.consts.reasons.trademark
             },
-            facebook: {
-                expr: /\bface?book\b/gi,
-                replacement: "Facebook",
+            facebook: {  // https://regex101.com/r/rO1tH4/2
+                expr: /\bf(?:a[cs]e?)?be?o+k?(s)?/gi,
+                replacement: function(str,s) {
+                    return "Facebook" + (s ? "'s" : "");
+                },
                 reason: App.consts.reasons.trademark
             },
             python: {
@@ -1934,6 +1936,16 @@
                 replacement: "$1dditional$2",
                 reason: App.consts.reasons.spelling
             },
+            automatic: {  // https://regex101.com/r/fU2hF1/1
+                expr: /\b(a)(?:uto[ma]+t?i?c?|tomatic)/gi,
+                replacement: "$1utomatic",
+                reason: App.consts.reasons.spelling
+            },
+            automatically: {  // 6K+
+                expr: /\b(a)utomatic[aly]+\b/gi,
+                replacement: "$1utomatically",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1954,7 +1966,7 @@
                     // are not well-represented in the data used by AvsAnSimple, so we need to
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
-                        var exeptionsA_ = /^(?:uis?|co\w|form|v|data)/i;
+                        var exeptionsA_ = /^(?:uis?|co\w|form|v|data|media)/i;
                         var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
@@ -2092,8 +2104,8 @@
                 reason: App.consts.reasons.noise
             },
             // http://meta.stackexchange.com/questions/2950/should-hi-thanks-taglines-and-salutations-be-removed-from-posts/93989#93989
-            salutation: { // https://regex101.com/r/yS9lN8/9
-                expr: /^\s*(?:dears?\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
+            salutation: { // https://regex101.com/r/yS9lN8/10
+                expr: /^\s*(?:dears?\b.*$|greetings?\b.*$|(?:hi(?:ya)*|hel+o+|heya?|hai|g'?day|good\s?(?:evening|morning|day|afternoon)|ahoy|folks|guys)[,\s]*(?:\s+(?:all|guys|folks|friends?|there|everyone|people|matey?s?|bud+(y|ies))*))(?:[,.!?: ]*|$)/gmi,
                 replacement: "",
                 reason: App.consts.reasons.noise
             },
@@ -2132,8 +2144,8 @@
             **           Must follow noise reduction.
             **           Leading and trailing spaces are part of Markdown formatting; leave them.
             **/
-            space_then_symbol: {  // https://regex101.com/r/fN6lL7/5
-                expr: /([^ \n\r\[\)])([(])/gm,
+            space_then_symbol: {  // https://regex101.com/r/fN6lL7/6
+                expr: /([^ \n\r\[\)])(\((?!\)))/gm,
                 replacement: "$1 $2",
                 debug: false,
                 reason: App.consts.reasons.layout
