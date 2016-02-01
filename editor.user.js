@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.57
+// @version        1.5.2.58
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        /^https?://\w*.?(stackoverflow|stackexchange|serverfault|superuser|askubuntu|stackapps)\.com/(questions|posts|review)/(?!tagged|new).*/
 // ==/UserScript==
@@ -1946,6 +1946,11 @@
                 replacement: "$1utomatically",
                 reason: App.consts.reasons.spelling
             },
+            even_though: {  // 2.7K+
+                expr: /\b(e)venth?ou?[gh]+\b/gi,
+                replacement: "$1ven though",
+                reason: App.consts.reasons.spelling
+            },
             /*
             ** Grammar - Correct common grammatical errors.
             **/
@@ -1975,27 +1980,22 @@
                 reason: App.consts.reasons.grammar
             },
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/19
-                // This doesn't work quite right, because is finds all sentences, not just ones needing caps.
-                //expr: /(?:(?!\n\n)[^\s.!?]+[ ]*)+([.!?])*[ ]*/g, 
-                expr: /((?!\n\n)[A-z](?:(?!\n\n)[^?.!])+(?:\.[A-z\d)][^?.!A-Z]+)*([?.!])*)/gm, 
-                replacement: function(str, endpunc) { 
-                    if (str === "undefined") return str;  // MUST match str, or gets counted as a change.
-                    //                 https://regex101.com/r/bL9xD7/3 find and capitalize first letter
-                    return str.replace(/^(\W*)*(([a-zA-Z])[\w\d]*(?:[._\-]+[\w\d]+)?)(.*)/g, function(sentence, pre, fWord, fLetter, post) {
-                        if (!pre) pre = '';
-                        if (!post) post = '';
-                        if (!fWord) fWord = '';
-                        var fWordChars = fWord.split('');
-                        // Leave some words alone: filenames, camelCase
-                        for (var i=0; i<fWordChars.length; i++) {
-                            if (fWordChars[i] == '.' ||
-                                fWordChars[i] == fWordChars[i].toUpperCase())
-                                return sentence;
-                        }
-                        var update = pre + fLetter.toUpperCase() + fWord.slice(1) + post; // + (!endpunc && /\w/.test(post.substr(-1)) ? '.' : '');
-                        return update;
-                    });
+                //    https://regex101.com/r/qR5fO9/21
+                // Regex finds all sentences; replacement must determine whether it needs to capitalize.
+                expr: /((\w)([\S]*))((?:etc\.|i\.e\.|e\.g\.|[\w '",()\[\];:%&\-]|\.(?![ \n)"])|\n(?!\n))+(?:\n\n|$|([.?!])(?=[ )\n"]|$)))/gm, 
+                replacement: function(sentence, fWord, fChar, fWordPost, sentencePost, endpunc) { 
+                    var capChar = fChar.toUpperCase();
+                    if (sentence === "undefined"||capChar == fChar) return sentence;  // MUST match sentence, or gets counted as a change.
+                    if (!fWord) fWord = '';
+                    var fWordChars = fWord.split('');
+                    // Leave some words alone: filenames, camelCase
+                    for (var i=0; i<fWordChars.length; i++) {
+                        if (fWordChars[i] == '.' ||
+                            fWordChars[i] == fWordChars[i].toUpperCase())
+                            return sentence;
+                    }
+                    var update = capChar + fWordPost + sentencePost;
+                    return update;
                 },
                 reason: App.consts.reasons.grammar
             },
