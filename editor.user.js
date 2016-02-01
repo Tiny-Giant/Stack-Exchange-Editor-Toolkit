@@ -1971,8 +1971,9 @@
                     // are not well-represented in the data used by AvsAnSimple, so we need to
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
-                        var exeptionsA_ = /^(?:uis?|co\w|form|v|data|media)/i;
-                        var exeptionsAn_ = /(?:^[lr]value|a\b)/i;
+                        //var exeptionsA_ = /^(?:uis?|co\w|form|v|data|media)/i;
+                        var exeptionsA_ = /^(?:uis?)/i;
+                        var exeptionsAn_ = /(?:^[lr]value|a\b|sql)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
                     }
@@ -1980,9 +1981,9 @@
                 reason: App.consts.reasons.grammar
             },
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/21
+                //    https://regex101.com/r/qR5fO9/25
                 // Regex finds all sentences; replacement must determine whether it needs to capitalize.
-                expr: /((\w)([\S]*))((?:etc\.|i\.e\.|e\.g\.|[\w '",()\[\];:%&\-]|\.(?![ \n)"])|\n(?!\n))+(?:\n\n|$|([.?!])(?=[ )\n"]|$)))/gm, 
+                expr: /(([A-Za-z]|\d(?=[^.]+))([\S]*))((?:etc\.|i\.e\.|e\.g\.|\.\.\.|[\w '",()\[\];:%&\-]|\.(?![ \n)"])|\n(?!\n| *[*-]))+(?:\n *[*-]|\n\n|$|([.?!])(?=[ )\n"]|$)))/g, 
                 replacement: function(sentence, fWord, fChar, fWordPost, sentencePost, endpunc) { 
                     var capChar = fChar.toUpperCase();
                     if (sentence === "undefined"||capChar == fChar) return sentence;  // MUST match sentence, or gets counted as a change.
