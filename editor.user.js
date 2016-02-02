@@ -83,8 +83,8 @@
             "lsec":   /(?:  (?:\[\d\]): \w*:+\/\/.*\n*)+/g,
             //        https://regex101.com/r/tZ4eY3/20 links and pathnames
             "links":  /\[[^\]\n]+\](?:\([^\)\n]+\)|\[[^\]\n]+\])|(?:\/\w+\/|.:\\|\w*:\/\/|\.+\/[./\w\d]+|(?:\w+\.\w+){2,})[./\w\d:/?#\[\]@!$&'()*+,;=\-~%]*/g,
-            //        https://regex101.com/r/bF0iQ0/1   tags and html comments 
-            "tags":   /\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>/g
+            //        https://regex101.com/r/bF0iQ0/2   tags and html comments 
+            "tags":   /\<[\/a-z]+\>|\<\!\-\-[^>]+\-\-\>|\[tag:[\w.-]+\]/gi
         };
         App.globals.checksr = (function(o1){
             var o2 = {};
@@ -1219,6 +1219,11 @@
                 replacement: "$1rogramm$2",
                 reason: App.consts.reasons.spelling
             },
+            programmatically: {  // 40K+   https://regex101.com/r/vF2jQ8/2
+                expr: /\b(p)rogram+at+ica?l+y\b/gi,
+                replacement: "$1rogrammatically",
+                reason: App.consts.reasons.spelling
+            },
             bear_with_me: {
                 expr: /\b(b)are (with m[ey]|it|in mind)\b/gi,
                 replacement: "$1ear $2",
@@ -1901,8 +1906,8 @@
                 replacement: "$1eceiv$2",
                 reason: App.consts.reasons.spelling
             },
-            referred: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/kE0oZ5/3
-                expr: /\b(r)efer(?!s|enc[a-z]*)(?=\w)/gi,
+            referred: {  // http://www.oxforddictionaries.com/words/common-misspellings  https://regex101.com/r/kE0oZ5/5
+                expr: /\b(r)efer(?!s|enc\w*|r\w*)(?=\w)/gi,
                 replacement: "$1eferr",
                 reason: App.consts.reasons.spelling
             },
@@ -1931,19 +1936,24 @@
                 replacement: "$1onnection$2",
                 reason: App.consts.reasons.spelling
             },
-            additional: {  // https://regex101.com/r/iM4xV5/1
-                expr: /\b(a)d+i.?tio?na?l*?(ly)?\b/gi,
+            additional: {  // https://regex101.com/r/iM4xV5/2
+                expr: /\b(a)d+i.?tio?n[al]+?(ly)?\b/gi,
                 replacement: "$1dditional$2",
                 reason: App.consts.reasons.spelling
             },
-            automatic: {  // https://regex101.com/r/fU2hF1/1
-                expr: /\b(a)(?:uto[ma]+t?i?c?|tomatic)/gi,
+            automatic: {  // https://regex101.com/r/fU2hF1/2
+                expr: /\b(a)(?:uto[ma]+[tic]+|tomatic)(?!e|[io]+n)/gi,
                 replacement: "$1utomatic",
                 reason: App.consts.reasons.spelling
             },
             automatically: {  // 6K+
                 expr: /\b(a)utomatic[aly]+\b/gi,
                 replacement: "$1utomatically",
+                reason: App.consts.reasons.spelling
+            },
+            running: {  // 2K+
+                expr: /\b(r)un+in?g\b/gi,
+                replacement: "$1unning",
                 reason: App.consts.reasons.spelling
             },
             even_though: {  // 2.7K+
@@ -1972,7 +1982,7 @@
                     // provide a way to override it.
                     function AvsAnOverride_(fword) {
                         //var exeptionsA_ = /^(?:uis?|co\w|form|v|data|media)/i;
-                        var exeptionsA_ = /^(?:uis?)/i;
+                        var exeptionsA_ = /^(?:uis?|data)/i;
                         var exeptionsAn_ = /(?:^[lr]value|a\b|sql)/i;
                         return (exeptionsA_.test(fword) ? article[0] :
                                 exeptionsAn_.test(fword) ? article[0]+"n" : false);
@@ -1981,23 +1991,25 @@
                 reason: App.consts.reasons.grammar
             },
             firstcaps: {
-                //    https://regex101.com/r/qR5fO9/25
+                //    https://regex101.com/r/qR5fO9/31
                 // Regex finds all sentences; replacement must determine whether it needs to capitalize.
-                expr: /(([A-Za-z]|\d(?=[^.]+))([\S]*))((?:etc\.|i\.e\.|e\.g\.|\.\.\.|[\w '",()\[\];:%&\-]|\.(?![ \n)"])|\n(?!\n| *[*-]))+(?:\n *[*-]|\n\n|$|([.?!])(?=[ )\n"]|$)))/g, 
+                expr: /(([A-Z_a-z]|\d)([\w]*))((?:(?:etc\.|i\.e\.|e\.g\.|\.\.|\w+\.(?! )|[*-]+|\n(?!\n| *(?:[*-]|\d+\.))|[\w '",()\[\];:%&\-/]))+(?:([.?!])(?=[ )\n"]|\n|$)|\n\n|\n(?= *[*-])|\n(?= *\d+\.)|$))/gi, 
                 replacement: function(sentence, fWord, fChar, fWordPost, sentencePost, endpunc) { 
+                    console.log("bbep");
                     var capChar = fChar.toUpperCase();
                     if (sentence === "undefined"||capChar == fChar) return sentence;  // MUST match sentence, or gets counted as a change.
                     if (!fWord) fWord = '';
                     var fWordChars = fWord.split('');
                     // Leave some words alone: filenames, camelCase
                     for (var i=0; i<fWordChars.length; i++) {
-                        if (fWordChars[i] == '.' ||
+                        if (fWordChars[i].search(/[._/]/g) !== -1 ||
                             fWordChars[i] == fWordChars[i].toUpperCase())
                             return sentence;
                     }
                     var update = capChar + fWordPost + sentencePost;
                     return update;
                 },
+                debug: true,
                 reason: App.consts.reasons.grammar
             },
             i: { // https://regex101.com/r/uO7qG0/2
